@@ -680,7 +680,7 @@
       ctx.restore();
     },
 
-    // state: { time, score, hover: 'retry'|'toTitle'|null }
+    // state: { time, score, note, hover: 'retry'|'toTitle'|null }
     drawEndScreen: function (ctx, s) {
       s = s || {};
       var e = L.end;
@@ -697,6 +697,8 @@
         textPlain(ctx, c.label, c.x + 120, 292, 22, P.textDim, 'center', false);
         textPlain(ctx, c.value, c.x + 120, 360, 44, P.text, 'center', true);
       }
+      // 選用備註(例: 紀錄已下載): 卡片與按鈕之間, 小字低對比
+      if (s.note) textPlain(ctx, String(s.note), W / 2, 460, 18, P.textDim, 'center', false);
       drawButton(ctx, e.retry, '再玩一次', s.hover === 'retry', 'primary');
       drawButton(ctx, e.toTitle, '回標題', s.hover === 'toTitle', 'normal');
       ctx.restore();

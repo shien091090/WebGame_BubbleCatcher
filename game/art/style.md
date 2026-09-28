@@ -66,7 +66,7 @@ RD 只需讀本檔。`art.js` 掛在 `window.Art`, 非 ES module。art.js 內含
 | 標題畫面 | `drawTitleScreen(ctx, state)` | `hover`: `'start'`/`'help'`/`'device'`/null; `device`: null/`'mouse'`/`'touchpad'` | 自帶背景。遊戲名 + 四色氣泡 + 開始(亮底)/ 說明 / 輸入裝置; 已選過裝置時按鈕字為「輸入裝置: 滑鼠 / 觸控板」 |
 | 輸入裝置選擇 | `drawInputSelect(ctx, state)` | `selected`: null(未選)/`'mouse'`/`'touchpad'`; `hover`: 同值或 null | 自帶背景。提問「你用什麼操作?」+ 兩張卡。已選的卡 4px 白框 + 右上白勾; hover 底變亮 |
 | 說明畫面(含示意圖) | `drawGuidePage(ctx, state)` | `page`: 1~5; `hover`: `'close'`/`'prev'`/`'next'`/null | 自帶背景。上方頁名與一句文字, 中間示意圖, 右上「關閉」、左下「上一頁」(第 1 頁不畫)、右下「下一頁」(第 5 頁不畫), 底部中央頁碼。示意圖內容: 1 抓泡泡(綠泡 7 拖進綠網 7, 打勾); 2 扣命(左: 紫泡 5 放進黃網 5 打叉、命 3 格; 右: 2 → 1 → 消失、命 3 格); 3 數字要對上(同一張綠網 6; 左: 8 放上 → 彈回, 命 4 格; 右: 抓起時 6 → 放上仍 6 打勾, 對照黃泡 9 → 7); 4 雙擊重來(5 / 兩白 → 12 / 一白 → 9 / 一白 → 12 / 兩暗 → 雙擊沒反應, 無網); 5 結束(命 4 格 → 0 格 → 結束畫面) |
-| 結束畫面 | `drawEndScreen(ctx, state)` | `time`: 存活秒數; `score`; `hover`: `'retry'`/`'toTitle'`/null | 自帶背景。「結束」+ 存活時間(小數一位)與分數兩張卡 + 再玩一次(亮底)/ 回標題 |
+| 結束畫面 | `drawEndScreen(ctx, state)` | `time`: 存活秒數; `score`; `note`: 選用字串, 例「紀錄已下載」, 空字串或未傳不畫(**新增欄位, 需要 RD 接**); `hover`: `'retry'`/`'toTitle'`/null | 自帶背景。「結束」+ 存活時間(小數一位)與分數兩張卡 + 再玩一次(亮底)/ 回標題; note 以 18px textDim 一行置中, 畫在卡片下方、按鈕上方(中心 y 460) |
 
 ### 按鈕與判定矩形(`Art.layout`)
 
@@ -107,4 +107,5 @@ RD 只需讀本檔。`art.js` 掛在 `window.Art`, 非 ES module。art.js 內含
 | 標題按鈕 | 280 × 60 |
 | 輸入裝置卡 | 240 × 220 |
 | 結束畫面按鈕 | 240 × 64 |
+| 結束畫面備註(note) | 18px 一般字重, textDim, 中心 (640, 460); 卡片底 y 420、按鈕頂 y 500 |
 | 說明頁按鈕 | 關閉 120 × 48; 上一頁 / 下一頁 160 × 52 |
