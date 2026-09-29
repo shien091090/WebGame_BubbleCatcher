@@ -1,0 +1,8118 @@
+{
+  "playerId": "p_mulccdz4_wvl318ww",
+  "gameIndex": 4,
+  "device": "mouse",
+  "gapFromPrevGameMs": 4115,
+  "buildVersion": "demo-v6-0.1.0",
+  "paramsSnapshot": {
+    "bubbleRadius": 20,
+    "netRadius": 60,
+    "spawnGap": 4,
+    "spawnTries": 10,
+    "firstSpawnDelay": 1,
+    "initialTimer": 12,
+    "renewResetValue": 12,
+    "spawnRateBase": 0.15,
+    "spawnRateSlope": 0.0068,
+    "spawnJitter": 0.4,
+    "minSpawnInterval": 0.25,
+    "maxSpawnInterval": 5,
+    "sameColorStreakCap": 3,
+    "hpMax": 4,
+    "doubleClickTolerance": 20,
+    "expireHpLoss": 1,
+    "wrongNetHpLoss": 1,
+    "sameColorMismatchHpLoss": 0,
+    "doubleClickWindowMs": 350,
+    "dragStartDistance": 6,
+    "returnDuration": 0.2,
+    "scoreBase": 10,
+    "comboBonusPerStreak": 0.1,
+    "comboStreakCap": 20,
+    "sampleInterval": 1,
+    "targetMin": 3,
+    "targetMax": 10,
+    "segmentMs": 30000
+  },
+  "countedForMainStats": true,
+  "durationSec": 98.578,
+  "deathReasons": [
+    "expire"
+  ],
+  "score": 610,
+  "summary": {
+    "handSpeed": {
+      "grabDelay": {
+        "avg": 337.2857142857143,
+        "p90": 569,
+        "n": 21
+      },
+      "cycleS": {
+        "avg": 1657.6,
+        "p90": 2924,
+        "n": 10
+      }
+    },
+    "renewUsage": {
+      "diffDistribution": [
+        -1,
+        -2,
+        -1,
+        -2,
+        -4,
+        -1,
+        0,
+        3,
+        2,
+        0,
+        3,
+        3,
+        0,
+        -3,
+        -1,
+        -2,
+        2
+      ],
+      "wastefulRatio": 0.6470588235294118,
+      "windowMidRenewRatio": 0.17647058823529413
+    },
+    "busyRate": {
+      "secTotal": 41.8892000000006,
+      "rate": 0.668430048795384
+    },
+    "saturatedSegments": [],
+    "saturatedProcessingRate": null,
+    "maxConcurrent": 16,
+    "maxOverlapPairs": 0,
+    "forcedPlacementCount": 0,
+    "totals": {
+      "spawned": 48,
+      "captured": 28,
+      "expired": 5,
+      "wrongColor": 0,
+      "numberBounce": 0,
+      "outerBounce": 0,
+      "stayInner": 3,
+      "renew": 17,
+      "windowOpen": 79,
+      "forcedPlacement": 0,
+      "fullHpCapture": 27,
+      "totalHpGained": 1
+    },
+    "spawnRatioVsLambda": 1.0036304452312066,
+    "firstWindowDelayAvgMs": 4645.222222222223,
+    "avgLifespanMs": 7795.181818181818,
+    "dragTimeRatio": 0.09242759772240611,
+    "deathTimeoutClass": "playerMissed",
+    "busyLossRatioByRound": 0.28205128205128205,
+    "redrawLossRatioByRound": 0,
+    "roundDenominator": 39,
+    "pauseCount": 0,
+    "segments": [
+      {
+        "index": 0,
+        "startMs": 0,
+        "endMs": 30000,
+        "spawnCount": 9,
+        "captureCount": 7,
+        "wrongCount": 0,
+        "expireCount": 0,
+        "renewCount": 0,
+        "fullHpCaptureCount": 7,
+        "renewToCatchRatio": 0,
+        "indicator4": 1,
+        "timerPassedLossRatio": 0,
+        "redrawnLossRatio": 0,
+        "spawnBatch": {
+          "segment": 0,
+          "spawnCount": 9,
+          "captured": 9,
+          "expired": 0,
+          "wrongColor": 0,
+          "residual": 0,
+          "captureRate": 1
+        }
+      },
+      {
+        "index": 1,
+        "startMs": 30000,
+        "endMs": 60000,
+        "spawnCount": 14,
+        "captureCount": 11,
+        "wrongCount": 0,
+        "expireCount": 0,
+        "renewCount": 0,
+        "fullHpCaptureCount": 11,
+        "renewToCatchRatio": 0,
+        "indicator4": 1,
+        "timerPassedLossRatio": 0,
+        "redrawnLossRatio": 0,
+        "spawnBatch": {
+          "segment": 1,
+          "spawnCount": 14,
+          "captured": 14,
+          "expired": 0,
+          "wrongColor": 0,
+          "residual": 0,
+          "captureRate": 1
+        }
+      },
+      {
+        "index": 2,
+        "startMs": 60000,
+        "endMs": 90000,
+        "spawnCount": 19,
+        "captureCount": 10,
+        "wrongCount": 0,
+        "expireCount": 4,
+        "renewCount": 8,
+        "fullHpCaptureCount": 9,
+        "renewToCatchRatio": 0.8,
+        "indicator4": 0.7142857142857143,
+        "timerPassedLossRatio": 0.4444444444444444,
+        "redrawnLossRatio": 0,
+        "spawnBatch": {
+          "segment": 2,
+          "spawnCount": 19,
+          "captured": 5,
+          "expired": 5,
+          "wrongColor": 0,
+          "residual": 9,
+          "captureRate": 0.2631578947368421
+        }
+      },
+      {
+        "index": 3,
+        "startMs": 90000,
+        "endMs": 120000,
+        "spawnCount": 6,
+        "captureCount": 0,
+        "wrongCount": 0,
+        "expireCount": 1,
+        "renewCount": 9,
+        "fullHpCaptureCount": 0,
+        "renewToCatchRatio": null,
+        "indicator4": 0,
+        "timerPassedLossRatio": 1,
+        "redrawnLossRatio": 0,
+        "spawnBatch": {
+          "segment": 3,
+          "spawnCount": 6,
+          "captured": 0,
+          "expired": 0,
+          "wrongColor": 0,
+          "residual": 6,
+          "captureRate": 0
+        }
+      }
+    ],
+    "spawnBatches": [
+      {
+        "segment": 0,
+        "spawnCount": 9,
+        "captured": 9,
+        "expired": 0,
+        "wrongColor": 0,
+        "residual": 0,
+        "captureRate": 1
+      },
+      {
+        "segment": 1,
+        "spawnCount": 14,
+        "captured": 14,
+        "expired": 0,
+        "wrongColor": 0,
+        "residual": 0,
+        "captureRate": 1
+      },
+      {
+        "segment": 2,
+        "spawnCount": 19,
+        "captured": 5,
+        "expired": 5,
+        "wrongColor": 0,
+        "residual": 9,
+        "captureRate": 0.2631578947368421
+      },
+      {
+        "segment": 3,
+        "spawnCount": 6,
+        "captured": 0,
+        "expired": 0,
+        "wrongColor": 0,
+        "residual": 6,
+        "captureRate": 0
+      }
+    ],
+    "hpLE2": {
+      "ratio": 0.1341246549676042,
+      "entries": [
+        {
+          "enterElapsedMs": 85293,
+          "durationSec": 1.215,
+          "rateAtEnter": 0.7299924
+        },
+        {
+          "enterElapsedMs": 86571,
+          "durationSec": 12.006699999999997,
+          "rateAtEnter": 0.7386828
+        }
+      ],
+      "firstElapsedMs": 85293
+    },
+    "firstHitElapsedMs": 81911,
+    "wrongBeforeFirstHpLE2": 0,
+    "firstExpireElapsedMs": 81911,
+    "firstExpireRate": 0.7069948,
+    "lastFullHpElapsedMs": 0,
+    "secFromLastFullHpToDeath": 98.5777,
+    "hpCurve": [
+      {
+        "t": 1007,
+        "hp": 4
+      },
+      {
+        "t": 2000,
+        "hp": 4
+      },
+      {
+        "t": 3007,
+        "hp": 4
+      },
+      {
+        "t": 4000,
+        "hp": 4
+      },
+      {
+        "t": 5000,
+        "hp": 4
+      },
+      {
+        "t": 6000,
+        "hp": 4
+      },
+      {
+        "t": 7000,
+        "hp": 4
+      },
+      {
+        "t": 8000,
+        "hp": 4
+      },
+      {
+        "t": 9000,
+        "hp": 4
+      },
+      {
+        "t": 10000,
+        "hp": 4
+      },
+      {
+        "t": 11000,
+        "hp": 4
+      },
+      {
+        "t": 12000,
+        "hp": 4
+      },
+      {
+        "t": 13000,
+        "hp": 4
+      },
+      {
+        "t": 14000,
+        "hp": 4
+      },
+      {
+        "t": 15000,
+        "hp": 4
+      },
+      {
+        "t": 16000,
+        "hp": 4
+      },
+      {
+        "t": 17000,
+        "hp": 4
+      },
+      {
+        "t": 18000,
+        "hp": 4
+      },
+      {
+        "t": 19000,
+        "hp": 4
+      },
+      {
+        "t": 20000,
+        "hp": 4
+      },
+      {
+        "t": 21000,
+        "hp": 4
+      },
+      {
+        "t": 22000,
+        "hp": 4
+      },
+      {
+        "t": 23000,
+        "hp": 4
+      },
+      {
+        "t": 24000,
+        "hp": 4
+      },
+      {
+        "t": 25000,
+        "hp": 4
+      },
+      {
+        "t": 26000,
+        "hp": 4
+      },
+      {
+        "t": 27000,
+        "hp": 4
+      },
+      {
+        "t": 28000,
+        "hp": 4
+      },
+      {
+        "t": 29000,
+        "hp": 4
+      },
+      {
+        "t": 30000,
+        "hp": 4
+      },
+      {
+        "t": 31001,
+        "hp": 4
+      },
+      {
+        "t": 32000,
+        "hp": 4
+      },
+      {
+        "t": 33001,
+        "hp": 4
+      },
+      {
+        "t": 34001,
+        "hp": 4
+      },
+      {
+        "t": 35000,
+        "hp": 4
+      },
+      {
+        "t": 36000,
+        "hp": 4
+      },
+      {
+        "t": 37001,
+        "hp": 4
+      },
+      {
+        "t": 38001,
+        "hp": 4
+      },
+      {
+        "t": 39001,
+        "hp": 4
+      },
+      {
+        "t": 40000,
+        "hp": 4
+      },
+      {
+        "t": 41001,
+        "hp": 4
+      },
+      {
+        "t": 42000,
+        "hp": 4
+      },
+      {
+        "t": 43001,
+        "hp": 4
+      },
+      {
+        "t": 44001,
+        "hp": 4
+      },
+      {
+        "t": 45001,
+        "hp": 4
+      },
+      {
+        "t": 46001,
+        "hp": 4
+      },
+      {
+        "t": 47001,
+        "hp": 4
+      },
+      {
+        "t": 48001,
+        "hp": 4
+      },
+      {
+        "t": 49001,
+        "hp": 4
+      },
+      {
+        "t": 50001,
+        "hp": 4
+      },
+      {
+        "t": 51001,
+        "hp": 4
+      },
+      {
+        "t": 52001,
+        "hp": 4
+      },
+      {
+        "t": 53001,
+        "hp": 4
+      },
+      {
+        "t": 54001,
+        "hp": 4
+      },
+      {
+        "t": 55001,
+        "hp": 4
+      },
+      {
+        "t": 56001,
+        "hp": 4
+      },
+      {
+        "t": 57001,
+        "hp": 4
+      },
+      {
+        "t": 58001,
+        "hp": 4
+      },
+      {
+        "t": 59001,
+        "hp": 4
+      },
+      {
+        "t": 60001,
+        "hp": 4
+      },
+      {
+        "t": 61001,
+        "hp": 4
+      },
+      {
+        "t": 62001,
+        "hp": 4
+      },
+      {
+        "t": 63001,
+        "hp": 4
+      },
+      {
+        "t": 64001,
+        "hp": 4
+      },
+      {
+        "t": 65001,
+        "hp": 4
+      },
+      {
+        "t": 66001,
+        "hp": 4
+      },
+      {
+        "t": 67001,
+        "hp": 4
+      },
+      {
+        "t": 68001,
+        "hp": 4
+      },
+      {
+        "t": 69001,
+        "hp": 4
+      },
+      {
+        "t": 70001,
+        "hp": 4
+      },
+      {
+        "t": 71001,
+        "hp": 4
+      },
+      {
+        "t": 72001,
+        "hp": 4
+      },
+      {
+        "t": 73001,
+        "hp": 4
+      },
+      {
+        "t": 74001,
+        "hp": 4
+      },
+      {
+        "t": 75001,
+        "hp": 4
+      },
+      {
+        "t": 76001,
+        "hp": 4
+      },
+      {
+        "t": 77001,
+        "hp": 4
+      },
+      {
+        "t": 78001,
+        "hp": 4
+      },
+      {
+        "t": 79001,
+        "hp": 4
+      },
+      {
+        "t": 80001,
+        "hp": 4
+      },
+      {
+        "t": 81001,
+        "hp": 4
+      },
+      {
+        "t": 82001,
+        "hp": 3
+      },
+      {
+        "t": 83001,
+        "hp": 3
+      },
+      {
+        "t": 84001,
+        "hp": 3
+      },
+      {
+        "t": 85001,
+        "hp": 3
+      },
+      {
+        "t": 86001,
+        "hp": 2
+      },
+      {
+        "t": 87001,
+        "hp": 2
+      },
+      {
+        "t": 88001,
+        "hp": 2
+      },
+      {
+        "t": 89001,
+        "hp": 1
+      },
+      {
+        "t": 90001,
+        "hp": 1
+      },
+      {
+        "t": 91001,
+        "hp": 1
+      },
+      {
+        "t": 92001,
+        "hp": 1
+      },
+      {
+        "t": 93001,
+        "hp": 1
+      },
+      {
+        "t": 94001,
+        "hp": 1
+      },
+      {
+        "t": 95001,
+        "hp": 1
+      },
+      {
+        "t": 96001,
+        "hp": 1
+      },
+      {
+        "t": 97001,
+        "hp": 1
+      },
+      {
+        "t": 98001,
+        "hp": 1
+      }
+    ],
+    "totalHpGained": 1,
+    "maxRenewBubble": {
+      "id": 26,
+      "count": 3
+    },
+    "mainIndicators": {
+      "indicator1_captureRate0to60": 1,
+      "indicator2_hpLE2Ratio": 0.1341246549676042,
+      "indicator2_firstHpLE2ElapsedMs": 85293,
+      "indicator3_renewToCatch": 0.26666666666666666,
+      "indicator4_captureRateBeforeFirstHpLE2": 0.9642857142857143,
+      "indicator5_longestNoCaptureGap": {
+        "startMs": 42285,
+        "endMs": 49160,
+        "durationSec": 6.875,
+        "noWindowSec": 6,
+        "maxFieldCount": 4
+      }
+    }
+  },
+  "events": [
+    {
+      "t": 0,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 1,
+      "oldTarget": null,
+      "newTarget": 7,
+      "newNext": 3,
+      "reason": "start",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": null
+    },
+    {
+      "t": 0,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 2,
+      "oldTarget": null,
+      "newTarget": 8,
+      "newNext": 10,
+      "reason": "start",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": null
+    },
+    {
+      "t": 0,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 3,
+      "oldTarget": null,
+      "newTarget": 9,
+      "newNext": 8,
+      "reason": "start",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": null
+    },
+    {
+      "t": 0,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 4,
+      "oldTarget": null,
+      "newTarget": 6,
+      "newNext": 4,
+      "reason": "start",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": null
+    },
+    {
+      "t": 0,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 5,
+      "oldTarget": null,
+      "newTarget": 5,
+      "newNext": 6,
+      "reason": "start",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": null
+    },
+    {
+      "t": 0,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 6,
+      "oldTarget": null,
+      "newTarget": 8,
+      "newNext": 9,
+      "reason": "start",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": null
+    },
+    {
+      "t": 0,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 7,
+      "oldTarget": null,
+      "newTarget": 8,
+      "newNext": 4,
+      "reason": "start",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": null
+    },
+    {
+      "t": 0,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 8,
+      "oldTarget": null,
+      "newTarget": 5,
+      "newNext": 7,
+      "reason": "start",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": null
+    },
+    {
+      "t": 1007,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 1,
+      "color": 1,
+      "initialTimer": 12,
+      "x": 678.3467943059755,
+      "y": 254.35909550879643,
+      "countOnField": 1,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 1007,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.1568476,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 2000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.16360067999999994,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 3007,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.1704476,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 4000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 1,
+      "netId": 3,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 4000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.17720067999999994,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 4195,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 1,
+      "x": 678,
+      "y": 254.4000005722046,
+      "display": 9
+    },
+    {
+      "t": 4243,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 1,
+      "display": 9,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 9,
+          "next": 8
+        },
+        {
+          "netId": 4,
+          "target": 6,
+          "next": 4
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 3,
+      "diffAgainstKind": "target",
+      "fieldCount": 1,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": null,
+      "nextOpenAtLastDrop": null,
+      "distanceAtDragStart": 9.433981132056603,
+      "msAtDragStart": 48
+    },
+    {
+      "t": 4542,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 1,
+      "netId": 3,
+      "reason": "capture",
+      "durationMs": 542,
+      "delayToGrabMs": 243,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 299,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 4542,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 3,
+      "oldTarget": 9,
+      "newTarget": 8,
+      "newNext": 9,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 4542,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 1,
+      "targetNetId": 3,
+      "colorCorrect": true,
+      "display": 9,
+      "netTarget": 9,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 907,
+      "y": 363.4000005722046,
+      "dragDurationMs": 299,
+      "dragDistance": 262.23245784834904,
+      "countOnField": 0,
+      "distanceToNearestNetCenter": 23.24994632017441,
+      "reopenedAsNewWindow": false,
+      "netId": 3,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 3.187699999999997,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 5000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 0,
+      "spawnRate": 0.18400067999999992,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 6000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 0,
+      "spawnRate": 0.19080067999999994,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 6007,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 2,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 796.2281746753871,
+      "y": 398.34150139846076,
+      "countOnField": 1,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 7000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.19760067999999992,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 8000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.20440135999999998,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 9000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.21120135999999998,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 10000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.21800067999999995,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 10007,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 2,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 10202,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 2,
+      "x": 803,
+      "y": 399.4000005722046,
+      "display": 8
+    },
+    {
+      "t": 10215,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 2,
+      "display": 8,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 7,
+          "next": 3
+        },
+        {
+          "netId": 2,
+          "target": 8,
+          "next": 10
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 2,
+      "diffAgainstKind": "target",
+      "fieldCount": 1,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 5673,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 6.082762530298219,
+      "msAtDragStart": 13
+    },
+    {
+      "t": 10507,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 2,
+      "netId": 2,
+      "reason": "capture",
+      "durationMs": 500,
+      "delayToGrabMs": 208,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 292,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 10507,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 2,
+      "oldTarget": 8,
+      "newTarget": 10,
+      "newNext": 4,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 10507,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 2,
+      "targetNetId": 2,
+      "colorCorrect": true,
+      "display": 8,
+      "netTarget": 8,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 859,
+      "y": 161.4000005722046,
+      "dragDurationMs": 292,
+      "dragDistance": 249.66683987581885,
+      "countOnField": 0,
+      "distanceToNearestNetCenter": 15.393505361814737,
+      "reopenedAsNewWindow": false,
+      "netId": 2,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 4.1945,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 11000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 0,
+      "spawnRate": 0.22480135999999998,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 11007,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 3,
+      "color": 2,
+      "initialTimer": 12,
+      "x": 780.0645460140757,
+      "y": 274.8697609390889,
+      "countOnField": 1,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 12000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.23160135999999998,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 13000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.23840135999999998,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 14000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.24520135999999998,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 14431,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 4,
+      "color": 2,
+      "initialTimer": 12,
+      "x": 517.6948563688279,
+      "y": 289.85816315377053,
+      "countOnField": 2,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 15000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 3,
+      "netId": 6,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 15000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.25200135999999995,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 15299,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 3,
+      "x": 785,
+      "y": 271.4000005722046,
+      "display": 8
+    },
+    {
+      "t": 15354,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 3,
+      "display": 8,
+      "sameColorNets": [
+        {
+          "netId": 5,
+          "target": 5,
+          "next": 6
+        },
+        {
+          "netId": 6,
+          "target": 8,
+          "next": 9
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 6,
+      "diffAgainstKind": "target",
+      "fieldCount": 2,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 4847,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 9.219544457292887,
+      "msAtDragStart": 55
+    },
+    {
+      "t": 15743,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 3,
+      "netId": 6,
+      "reason": "capture",
+      "durationMs": 743,
+      "delayToGrabMs": 354,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 389,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 15743,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 6,
+      "oldTarget": 8,
+      "newTarget": 9,
+      "newNext": 7,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 4,
+          "display": 11,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 15743,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 3,
+      "targetNetId": 6,
+      "colorCorrect": true,
+      "display": 8,
+      "netTarget": 8,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 433,
+      "y": 576.4000005722046,
+      "dragDurationMs": 389,
+      "dragDistance": 466.59702495897153,
+      "countOnField": 1,
+      "distanceToNearestNetCenter": 11.57410960058116,
+      "reopenedAsNewWindow": false,
+      "netId": 6,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 4.2915,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 16000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.25880204,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 17000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.26560204,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 17424,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 4,
+      "netId": 6,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 17521,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 4,
+      "x": 520,
+      "y": 285.4000005722046,
+      "display": 9
+    },
+    {
+      "t": 17549,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 4,
+      "display": 9,
+      "sameColorNets": [
+        {
+          "netId": 5,
+          "target": 5,
+          "next": 6
+        },
+        {
+          "netId": 6,
+          "target": 9,
+          "next": 7
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 6,
+      "diffAgainstKind": "target",
+      "fieldCount": 1,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 1806,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 8.06225774829855,
+      "msAtDragStart": 28
+    },
+    {
+      "t": 17861,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 4,
+      "netId": 6,
+      "reason": "capture",
+      "durationMs": 437,
+      "delayToGrabMs": 125,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 313,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 17861,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 6,
+      "oldTarget": 9,
+      "newTarget": 7,
+      "newNext": 9,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 17861,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 4,
+      "targetNetId": 6,
+      "colorCorrect": true,
+      "display": 9,
+      "netTarget": 9,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 413,
+      "y": 597.4000005722046,
+      "dragDurationMs": 312,
+      "dragDistance": 328.2880234579258,
+      "countOnField": 0,
+      "distanceToNearestNetCenter": 39.16324855114624,
+      "reopenedAsNewWindow": false,
+      "netId": 6,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 3.0897999999999883,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 18000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 0,
+      "spawnRate": 0.27240204,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 19000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 0,
+      "spawnRate": 0.27920204000000004,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 19167,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 5,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 545.7002841658144,
+      "y": 257.1937799467571,
+      "countOnField": 1,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 20000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.28600204,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 21000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.29280135999999995,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 21160,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 5,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 21306,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 5,
+      "x": 550,
+      "y": 262.4000005722046,
+      "display": 10
+    },
+    {
+      "t": 21361,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 5,
+      "display": 10,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 7,
+          "next": 3
+        },
+        {
+          "netId": 2,
+          "target": 10,
+          "next": 4
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 2,
+      "diffAgainstKind": "target",
+      "fieldCount": 1,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 3500,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 8,
+      "msAtDragStart": 55
+    },
+    {
+      "t": 21605,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 5,
+      "netId": 2,
+      "reason": "capture",
+      "durationMs": 445,
+      "delayToGrabMs": 201,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 243,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 21605,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 2,
+      "oldTarget": 10,
+      "newTarget": 4,
+      "newNext": 6,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 21605,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 5,
+      "targetNetId": 2,
+      "colorCorrect": true,
+      "display": 10,
+      "netTarget": 10,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 844,
+      "y": 180.4000005722046,
+      "dragDurationMs": 244,
+      "dragDistance": 318.32010557687056,
+      "countOnField": 0,
+      "distanceToNearestNetCenter": 25.41967798906968,
+      "reopenedAsNewWindow": false,
+      "netId": 2,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 2.139300000000003,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 21889,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 6,
+      "color": 2,
+      "initialTimer": 12,
+      "x": 650.1086772835462,
+      "y": 214.5356686657854,
+      "countOnField": 1,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 22000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.29960204,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 23000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.30640271999999996,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 24000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.31320204,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 24278,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 7,
+      "color": 1,
+      "initialTimer": 12,
+      "x": 608.31335056875,
+      "y": 419.56925378499767,
+      "countOnField": 2,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 25000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.32000204,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 26000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.32680272,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 26882,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 6,
+      "netId": 6,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 27000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.33360271999999996,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 27098,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 6,
+      "x": 644,
+      "y": 213.4000005722046,
+      "display": 7
+    },
+    {
+      "t": 27160,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 6,
+      "display": 7,
+      "sameColorNets": [
+        {
+          "netId": 5,
+          "target": 5,
+          "next": 6
+        },
+        {
+          "netId": 6,
+          "target": 7,
+          "next": 9
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 6,
+      "diffAgainstKind": "target",
+      "fieldCount": 2,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 5555,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 6.708203932499369,
+      "msAtDragStart": 62
+    },
+    {
+      "t": 27473,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 6,
+      "netId": 6,
+      "reason": "capture",
+      "durationMs": 591,
+      "delayToGrabMs": 278,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 313,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 27473,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 6,
+      "oldTarget": 7,
+      "newTarget": 9,
+      "newNext": 10,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 27473,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 6,
+      "targetNetId": 6,
+      "colorCorrect": true,
+      "display": 7,
+      "netTarget": 7,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 423,
+      "y": 562.4000005722046,
+      "dragDurationMs": 313,
+      "dragDistance": 419.3601582342398,
+      "countOnField": 1,
+      "distanceToNearestNetCenter": 12.278436261370437,
+      "reopenedAsNewWindow": false,
+      "netId": 6,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 5.2088999999999945,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 27480,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 8,
+      "color": 3,
+      "initialTimer": 12,
+      "x": 496.16276011879097,
+      "y": 256.0292441108088,
+      "countOnField": 2,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 28000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.34040271999999994,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 28278,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 7,
+      "netId": 3,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 28494,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 7,
+      "x": 613,
+      "y": 419.4000005722046,
+      "display": 8
+    },
+    {
+      "t": 28556,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 7,
+      "display": 8,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 8,
+          "next": 9
+        },
+        {
+          "netId": 4,
+          "target": 6,
+          "next": 4
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 3,
+      "diffAgainstKind": "target",
+      "fieldCount": 2,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 1083,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 7,
+      "msAtDragStart": 62
+    },
+    {
+      "t": 28910,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 7,
+      "netId": 3,
+      "reason": "capture",
+      "durationMs": 632,
+      "delayToGrabMs": 278,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 354,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 28910,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 3,
+      "oldTarget": 8,
+      "newTarget": 9,
+      "newNext": 8,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 28910,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 7,
+      "targetNetId": 3,
+      "colorCorrect": true,
+      "display": 8,
+      "netTarget": 8,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 932,
+      "y": 370.4000005722046,
+      "dragDurationMs": 354,
+      "dragDistance": 331.49695575514585,
+      "countOnField": 1,
+      "distanceToNearestNetCenter": 10.590562397807577,
+      "reopenedAsNewWindow": false,
+      "netId": 3,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 4.215400000000009,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 29000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.34720271999999996,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 29320,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 9,
+      "color": 3,
+      "initialTimer": 12,
+      "x": 535.0716646600748,
+      "y": 449.8565255806483,
+      "countOnField": 2,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 30000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.35400272,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 31001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.3608034,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 31376,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 10,
+      "color": 3,
+      "initialTimer": 12,
+      "x": 686.4709166900158,
+      "y": 209.81196320289575,
+      "countOnField": 3,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 31480,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 8,
+      "netId": 7,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 31646,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 8,
+      "x": 491,
+      "y": 251.4000005722046,
+      "display": 8
+    },
+    {
+      "t": 31695,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 8,
+      "display": 8,
+      "sameColorNets": [
+        {
+          "netId": 7,
+          "target": 8,
+          "next": 4
+        },
+        {
+          "netId": 8,
+          "target": 5,
+          "next": 7
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 7,
+      "diffAgainstKind": "target",
+      "fieldCount": 3,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 2785,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 8.94427190999916,
+      "msAtDragStart": 49
+    },
+    {
+      "t": 31973,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 8,
+      "netId": 7,
+      "reason": "capture",
+      "durationMs": 493,
+      "delayToGrabMs": 215,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 278,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 31973,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 7,
+      "oldTarget": 8,
+      "newTarget": 4,
+      "newNext": 10,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 9,
+          "display": 10,
+          "renewCount": 0
+        },
+        {
+          "bubbleId": 10,
+          "display": 12,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 31973,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 8,
+      "targetNetId": 7,
+      "colorCorrect": true,
+      "display": 8,
+      "netTarget": 8,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 357,
+      "y": 376.4000005722046,
+      "dragDurationMs": 278,
+      "dragDistance": 189.7830479327381,
+      "countOnField": 2,
+      "distanceToNearestNetCenter": 17.831433446818316,
+      "reopenedAsNewWindow": false,
+      "netId": 7,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 4.166600000000006,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 32000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.36760271999999994,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 33001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.3744034,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 33188,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 11,
+      "color": 1,
+      "initialTimer": 12,
+      "x": 535.3460645274507,
+      "y": 219.05827221081253,
+      "countOnField": 3,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 34001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.38120339999999997,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 35000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.3880027199999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 35848,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 12,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 733.7125752840658,
+      "y": 355.14862662732895,
+      "countOnField": 4,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 36000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 4,
+      "spawnRate": 0.39480271999999994,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 36181,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 11,
+      "netId": 3,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 36313,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 9,
+      "netId": 8,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 36382,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 11,
+      "x": 537,
+      "y": 224.4000005722046,
+      "display": 9
+    },
+    {
+      "t": 36410,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 11,
+      "display": 9,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 9,
+          "next": 8
+        },
+        {
+          "netId": 4,
+          "target": 6,
+          "next": 4
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 3,
+      "diffAgainstKind": "target",
+      "fieldCount": 4,
+      "allOpenWindowCount": 2,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 4437,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 9.433981132056603,
+      "msAtDragStart": 28
+    },
+    {
+      "t": 36813,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 11,
+      "netId": 3,
+      "reason": "capture",
+      "durationMs": 632,
+      "delayToGrabMs": 229,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 403,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 36813,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 3,
+      "oldTarget": 9,
+      "newTarget": 8,
+      "newNext": 5,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 36813,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 11,
+      "targetNetId": 3,
+      "colorCorrect": true,
+      "display": 9,
+      "netTarget": 9,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 934,
+      "y": 367.4000005722046,
+      "dragDurationMs": 403,
+      "dragDistance": 465.99978151643995,
+      "countOnField": 3,
+      "distanceToNearestNetCenter": 8.411896841297345,
+      "reopenedAsNewWindow": false,
+      "netId": 3,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 3.194399999999994,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 37001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.40160339999999994,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 37313,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 9,
+      "netId": 8,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 37320,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 9,
+      "netId": 7,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 37431,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 9,
+      "x": 544,
+      "y": 450.4000005722046,
+      "display": 4
+    },
+    {
+      "t": 37660,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 9,
+      "display": 4,
+      "sameColorNets": [
+        {
+          "netId": 7,
+          "target": 4,
+          "next": 10
+        },
+        {
+          "netId": 8,
+          "target": 5,
+          "next": 7
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 7,
+      "diffAgainstKind": "target",
+      "fieldCount": 3,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 847,
+      "nextOpenAtLastDrop": true,
+      "distanceAtDragStart": 9.219544457292887,
+      "msAtDragStart": 229
+    },
+    {
+      "t": 37931,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 9,
+      "netId": 7,
+      "reason": "capture",
+      "durationMs": 611,
+      "delayToGrabMs": 340,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 271,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 37931,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 7,
+      "oldTarget": 4,
+      "newTarget": 10,
+      "newNext": 3,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 10,
+          "display": 6,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 37931,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 9,
+      "targetNetId": 7,
+      "colorCorrect": true,
+      "display": 4,
+      "netTarget": 4,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 344,
+      "y": 365.4000005722046,
+      "dragDurationMs": 271,
+      "dragDistance": 217.90472146010737,
+      "countOnField": 2,
+      "distanceToNearestNetCenter": 8.072174811028928,
+      "reopenedAsNewWindow": false,
+      "netId": 7,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 8.111,
+      "windowOrdinal": 2,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 38001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.40840339999999997,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 38369,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 10,
+      "netId": 8,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 38626,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 10,
+      "x": 692,
+      "y": 209.4000005722046,
+      "display": 5
+    },
+    {
+      "t": 38716,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 10,
+      "display": 5,
+      "sameColorNets": [
+        {
+          "netId": 7,
+          "target": 10,
+          "next": 3
+        },
+        {
+          "netId": 8,
+          "target": 5,
+          "next": 7
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 8,
+      "diffAgainstKind": "target",
+      "fieldCount": 2,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 785,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 8,
+      "msAtDragStart": 90
+    },
+    {
+      "t": 38987,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 10,
+      "netId": 8,
+      "reason": "capture",
+      "durationMs": 618,
+      "delayToGrabMs": 347,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 271,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 38987,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 8,
+      "oldTarget": 5,
+      "newTarget": 7,
+      "newNext": 6,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 38987,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 10,
+      "targetNetId": 8,
+      "colorCorrect": true,
+      "display": 5,
+      "netTarget": 5,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 449,
+      "y": 157.4000005722046,
+      "dragDurationMs": 271,
+      "dragDistance": 248.8674968353766,
+      "countOnField": 1,
+      "distanceToNearestNetCenter": 14.204224820333645,
+      "reopenedAsNewWindow": false,
+      "netId": 8,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 7.25,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 39001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.41520408,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 39258,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 13,
+      "color": 3,
+      "initialTimer": 12,
+      "x": 461.53636745305107,
+      "y": 340.00080768672717,
+      "countOnField": 2,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 40000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.4220033999999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 40785,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 14,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 691.8028798802648,
+      "y": 326.49564220508137,
+      "countOnField": 3,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 40841,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 12,
+      "netId": 1,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 41001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.4288040799999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 41119,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 12,
+      "x": 737,
+      "y": 366.4000005722046,
+      "display": 7
+    },
+    {
+      "t": 41195,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 12,
+      "display": 7,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 7,
+          "next": 3
+        },
+        {
+          "netId": 2,
+          "target": 4,
+          "next": 6
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 1,
+      "diffAgainstKind": "target",
+      "fieldCount": 3,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 2208,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 7,
+      "msAtDragStart": 76
+    },
+    {
+      "t": 41257,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 13,
+      "netId": 7,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": true,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 41584,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 12,
+      "netId": 1,
+      "reason": "capture",
+      "durationMs": 743,
+      "delayToGrabMs": 354,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 389,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 41584,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 1,
+      "oldTarget": 7,
+      "newTarget": 3,
+      "newNext": 5,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 14,
+          "display": 12,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 41584,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 12,
+      "targetNetId": 1,
+      "colorCorrect": true,
+      "display": 7,
+      "netTarget": 7,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 657,
+      "y": 77.40000057220459,
+      "dragDurationMs": 389,
+      "dragDistance": 297.13355551381557,
+      "countOnField": 2,
+      "distanceToNearestNetCenter": 18.54076612410146,
+      "reopenedAsNewWindow": false,
+      "netId": 1,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 5.270699999999983,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 41980,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 13,
+      "x": 461,
+      "y": 333.4000005722046,
+      "display": 10
+    },
+    {
+      "t": 42000,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.43560339999999986,
+      "anyHoldOrDrag": true,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 42056,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 13,
+      "display": 10,
+      "sameColorNets": [
+        {
+          "netId": 7,
+          "target": 10,
+          "next": 3
+        },
+        {
+          "netId": 8,
+          "target": 7,
+          "next": 6
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 7,
+      "diffAgainstKind": "target",
+      "fieldCount": 2,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 472,
+      "nextOpenAtLastDrop": true,
+      "distanceAtDragStart": 6.4031242374328485,
+      "msAtDragStart": 76
+    },
+    {
+      "t": 42285,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 13,
+      "netId": 7,
+      "reason": "capture",
+      "durationMs": 1028,
+      "delayToGrabMs": 799,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 229,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 42285,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 7,
+      "oldTarget": 10,
+      "newTarget": 3,
+      "newNext": 5,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 42285,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 13,
+      "targetNetId": 7,
+      "colorCorrect": true,
+      "display": 10,
+      "netTarget": 10,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 331,
+      "y": 351.4000005722046,
+      "dragDurationMs": 229,
+      "dragDistance": 137.3952139820862,
+      "countOnField": 1,
+      "distanceToNearestNetCenter": 20.855694430013145,
+      "reopenedAsNewWindow": false,
+      "netId": 7,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 2.7213999999999943,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 43001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 1,
+      "spawnRate": 0.44240407999999987,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 43674,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 15,
+      "color": 3,
+      "initialTimer": 12,
+      "x": 749.7632655885423,
+      "y": 338.4106273728545,
+      "countOnField": 2,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 44001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.4492040799999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 45001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.4560047599999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 46001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.46280407999999995,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 46070,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 16,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 700.2575300595407,
+      "y": 259.0188393809422,
+      "countOnField": 3,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 47001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.46960475999999995,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 48001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.47640476,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 48674,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 15,
+      "netId": 8,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 48778,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 14,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 48820,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 17,
+      "color": 3,
+      "initialTimer": 12,
+      "x": 659.6678826216927,
+      "y": 216.81614692613223,
+      "countOnField": 4,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 48945,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 14,
+      "x": 689,
+      "y": 323.4000005722046,
+      "display": 4
+    },
+    {
+      "t": 49001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 4,
+      "spawnRate": 0.4832047599999999,
+      "anyHoldOrDrag": true,
+      "openWindowCount": 2,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 49001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 14,
+      "display": 4,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 3,
+          "next": 5
+        },
+        {
+          "netId": 2,
+          "target": 4,
+          "next": 6
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 2,
+      "diffAgainstKind": "target",
+      "fieldCount": 4,
+      "allOpenWindowCount": 2,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 6716,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 13.892443989449804,
+      "msAtDragStart": 56
+    },
+    {
+      "t": 49160,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 14,
+      "netId": 2,
+      "reason": "capture",
+      "durationMs": 382,
+      "delayToGrabMs": 223,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 160,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 49160,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 2,
+      "oldTarget": 4,
+      "newTarget": 6,
+      "newNext": 8,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 16,
+          "display": 9,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 49160,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 14,
+      "targetNetId": 2,
+      "colorCorrect": true,
+      "display": 4,
+      "netTarget": 4,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 884,
+      "y": 147.4000005722046,
+      "dragDurationMs": 159,
+      "dragDistance": 265.2632595756728,
+      "countOnField": 3,
+      "distanceToNearestNetCenter": 39.733612864959696,
+      "reopenedAsNewWindow": false,
+      "netId": 2,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 8.159699999999983,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 49424,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 15,
+      "x": 739,
+      "y": 331.4000005722046,
+      "display": 7
+    },
+    {
+      "t": 49542,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 15,
+      "display": 7,
+      "sameColorNets": [
+        {
+          "netId": 7,
+          "target": 3,
+          "next": 5
+        },
+        {
+          "netId": 8,
+          "target": 7,
+          "next": 6
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 8,
+      "diffAgainstKind": "target",
+      "fieldCount": 3,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 382,
+      "nextOpenAtLastDrop": true,
+      "distanceAtDragStart": 6.324555320336759,
+      "msAtDragStart": 118
+    },
+    {
+      "t": 49869,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 15,
+      "netId": 8,
+      "reason": "capture",
+      "durationMs": 1195,
+      "delayToGrabMs": 868,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 326,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 49869,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 8,
+      "oldTarget": 7,
+      "newTarget": 6,
+      "newNext": 4,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 17,
+          "display": 11,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 49869,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 15,
+      "targetNetId": 8,
+      "colorCorrect": true,
+      "display": 7,
+      "netTarget": 7,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 392,
+      "y": 166.4000005722046,
+      "dragDurationMs": 327,
+      "dragDistance": 402.5021500447832,
+      "countOnField": 2,
+      "distanceToNearestNetCenter": 44.48550340331404,
+      "reopenedAsNewWindow": false,
+      "netId": 8,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 5.750600000000006,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 50001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 2,
+      "spawnRate": 0.49000475999999993,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 50910,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 18,
+      "color": 3,
+      "initialTimer": 12,
+      "x": 518.594747330928,
+      "y": 469.9790291970941,
+      "countOnField": 3,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 51001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.49680475999999996,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 52001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.50360476,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 52063,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 16,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 52334,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 16,
+      "x": 698,
+      "y": 271.4000005722046,
+      "display": 6
+    },
+    {
+      "t": 52397,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 16,
+      "display": 6,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 3,
+          "next": 5
+        },
+        {
+          "netId": 2,
+          "target": 6,
+          "next": 8
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 2,
+      "diffAgainstKind": "target",
+      "fieldCount": 3,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 2528,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 11.661903789690601,
+      "msAtDragStart": 63
+    },
+    {
+      "t": 52556,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 16,
+      "netId": 2,
+      "reason": "capture",
+      "durationMs": 493,
+      "delayToGrabMs": 334,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 160,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 52556,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 2,
+      "oldTarget": 6,
+      "newTarget": 8,
+      "newNext": 9,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 52556,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 16,
+      "targetNetId": 2,
+      "colorCorrect": true,
+      "display": 6,
+      "netTarget": 6,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 862,
+      "y": 155.4000005722046,
+      "dragDurationMs": 159,
+      "dragDistance": 196.29899427204626,
+      "countOnField": 2,
+      "distanceToNearestNetCenter": 17.004705244659903,
+      "reopenedAsNewWindow": false,
+      "netId": 2,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 6.263799999999988,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 52674,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 19,
+      "color": 2,
+      "initialTimer": 12,
+      "x": 595.2256428878513,
+      "y": 454.0647751180035,
+      "countOnField": 3,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 53001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.51040544,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 54001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.5172047599999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 54077,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 20,
+      "color": 1,
+      "initialTimer": 12,
+      "x": 595.4271884449176,
+      "y": 198.33281776514812,
+      "countOnField": 4,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 54813,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 17,
+      "netId": 8,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 55001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 4,
+      "spawnRate": 0.52400544,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 55008,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 17,
+      "x": 664,
+      "y": 226.4000005722046,
+      "display": 6
+    },
+    {
+      "t": 55063,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 17,
+      "display": 6,
+      "sameColorNets": [
+        {
+          "netId": 7,
+          "target": 3,
+          "next": 5
+        },
+        {
+          "netId": 8,
+          "target": 6,
+          "next": 4
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 8,
+      "diffAgainstKind": "target",
+      "fieldCount": 4,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 2507,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 8.06225774829855,
+      "msAtDragStart": 55
+    },
+    {
+      "t": 55376,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 17,
+      "netId": 8,
+      "reason": "capture",
+      "durationMs": 563,
+      "delayToGrabMs": 250,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 313,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 55376,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 8,
+      "oldTarget": 6,
+      "newTarget": 4,
+      "newNext": 8,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 18,
+          "display": 8,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 55376,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 17,
+      "targetNetId": 8,
+      "colorCorrect": true,
+      "display": 6,
+      "netTarget": 6,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 448,
+      "y": 151.4000005722046,
+      "dragDurationMs": 313,
+      "dragDistance": 247.51777938832544,
+      "countOnField": 3,
+      "distanceToNearestNetCenter": 13.489254830424374,
+      "reopenedAsNewWindow": false,
+      "netId": 8,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 6.187899999999994,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 55674,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 19,
+      "netId": 6,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 56001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.53080544,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 56334,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 21,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 794.1281699644929,
+      "y": 429.3524890816435,
+      "countOnField": 4,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 56674,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 19,
+      "netId": 6,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 57001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 4,
+      "spawnRate": 0.53760544,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 58001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 4,
+      "spawnRate": 0.54440544,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 58070,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 20,
+      "netId": 3,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 58411,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 20,
+      "x": 585,
+      "y": 195.4000005722046,
+      "display": 8
+    },
+    {
+      "t": 58466,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 20,
+      "display": 8,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 8,
+          "next": 5
+        },
+        {
+          "netId": 4,
+          "target": 6,
+          "next": 4
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 3,
+      "diffAgainstKind": "target",
+      "fieldCount": 4,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 3090,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 9.219544457292887,
+      "msAtDragStart": 55
+    },
+    {
+      "t": 58633,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 22,
+      "color": 2,
+      "initialTimer": 12,
+      "x": 547.3126469240117,
+      "y": 214.00162649133756,
+      "countOnField": 5,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 58813,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 20,
+      "netId": 3,
+      "reason": "capture",
+      "durationMs": 743,
+      "delayToGrabMs": 396,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 347,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 58813,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 3,
+      "oldTarget": 8,
+      "newTarget": 5,
+      "newNext": 3,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 58813,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 20,
+      "targetNetId": 3,
+      "colorCorrect": true,
+      "display": 8,
+      "netTarget": 8,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 911,
+      "y": 338.4000005722046,
+      "dragDurationMs": 347,
+      "dragDistance": 361.34035079393834,
+      "countOnField": 4,
+      "distanceToNearestNetCenter": 28.76734216573999,
+      "reopenedAsNewWindow": false,
+      "netId": 3,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 4.333299999999988,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 58904,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 18,
+      "netId": 8,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 59001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 4,
+      "spawnRate": 0.55120544,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 59674,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 19,
+      "netId": 5,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 59806,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 23,
+      "color": 1,
+      "initialTimer": 12,
+      "x": 621.7526419545507,
+      "y": 389.89138881421644,
+      "countOnField": 5,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 59904,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 18,
+      "netId": 8,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 59904,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 19,
+      "x": 589,
+      "y": 451.4000005722046,
+      "display": 5
+    },
+    {
+      "t": 59911,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 18,
+      "netId": 7,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": true,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 59924,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 19,
+      "display": 5,
+      "sameColorNets": [
+        {
+          "netId": 5,
+          "target": 5,
+          "next": 6
+        },
+        {
+          "netId": 6,
+          "target": 9,
+          "next": 10
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 5,
+      "diffAgainstKind": "target",
+      "fieldCount": 5,
+      "allOpenWindowCount": 2,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 1111,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 10,
+      "msAtDragStart": 20
+    },
+    {
+      "t": 60001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 5,
+      "spawnRate": 0.55800544,
+      "anyHoldOrDrag": true,
+      "openWindowCount": 2,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 60140,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 19,
+      "netId": 5,
+      "reason": "capture",
+      "durationMs": 466,
+      "delayToGrabMs": 250,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 215,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 60140,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 5,
+      "oldTarget": 5,
+      "newTarget": 6,
+      "newNext": 4,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 22,
+          "display": 11,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 60140,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 19,
+      "targetNetId": 5,
+      "colorCorrect": true,
+      "display": 5,
+      "netTarget": 5,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 629,
+      "y": 642.4000005722046,
+      "dragDurationMs": 216,
+      "dragDistance": 195.2177941280975,
+      "countOnField": 4,
+      "distanceToNearestNetCenter": 13.370115605427298,
+      "reopenedAsNewWindow": false,
+      "netId": 5,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 7.229899999999994,
+      "windowOrdinal": 2,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 60334,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 21,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 60487,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 18,
+      "x": 523,
+      "y": 478.4000005722046,
+      "display": 3
+    },
+    {
+      "t": 60542,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 18,
+      "display": 3,
+      "sameColorNets": [
+        {
+          "netId": 7,
+          "target": 3,
+          "next": 5
+        },
+        {
+          "netId": 8,
+          "target": 4,
+          "next": 8
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 7,
+      "diffAgainstKind": "target",
+      "fieldCount": 4,
+      "allOpenWindowCount": 2,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 402,
+      "nextOpenAtLastDrop": true,
+      "distanceAtDragStart": 6.082762530298219,
+      "msAtDragStart": 55
+    },
+    {
+      "t": 60841,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 18,
+      "netId": 7,
+      "reason": "capture",
+      "durationMs": 930,
+      "delayToGrabMs": 631,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 299,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 60841,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 7,
+      "oldTarget": 3,
+      "newTarget": 5,
+      "newNext": 6,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 60841,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 18,
+      "targetNetId": 7,
+      "colorCorrect": true,
+      "display": 3,
+      "netTarget": 3,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 301,
+      "y": 374.4000005722046,
+      "dragDurationMs": 299,
+      "dragDistance": 250.11487570824866,
+      "countOnField": 3,
+      "distanceToNearestNetCenter": 51.07210605095009,
+      "reopenedAsNewWindow": false,
+      "netId": 7,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 9.576899999999995,
+      "windowOrdinal": 2,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 61001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 3,
+      "spawnRate": 0.56480544,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 61334,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 21,
+      "netId": 2,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 61584,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 24,
+      "color": 1,
+      "initialTimer": 12,
+      "x": 779.9674097156675,
+      "y": 255.71740991958114,
+      "countOnField": 4,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 61626,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 22,
+      "netId": 6,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 61890,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 21,
+      "x": 792,
+      "y": 433.4000005722046,
+      "display": 7
+    },
+    {
+      "t": 61966,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 21,
+      "display": 7,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 3,
+          "next": 5
+        },
+        {
+          "netId": 2,
+          "target": 8,
+          "next": 9
+        }
+      ],
+      "diff": -1,
+      "diffAgainstNetId": 2,
+      "diffAgainstKind": "target",
+      "fieldCount": 4,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 0,
+      "selectedIsOneOfOpen": false,
+      "selectedIsLowestDisplayAmongOpen": false,
+      "intervalSinceLastDropMs": 1125,
+      "nextOpenAtLastDrop": true,
+      "distanceAtDragStart": 8.06225774829855,
+      "msAtDragStart": 76
+    },
+    {
+      "t": 61980,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 21,
+      "targetNetId": null,
+      "colorCorrect": null,
+      "display": 7,
+      "netTarget": null,
+      "numberMatches": null,
+      "outcome": "stayInner",
+      "x": 783,
+      "y": 432.4000005722046,
+      "dragDurationMs": 14,
+      "dragDistance": 11.53791545487072,
+      "countOnField": 4,
+      "distanceToNearestNetCenter": 146.3788230867134,
+      "reopenedAsNewWindow": false
+    },
+    {
+      "t": 62001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 4,
+      "spawnRate": 0.57160612,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 62042,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 21,
+      "x": 780,
+      "y": 431.4000005722046,
+      "display": 7
+    },
+    {
+      "t": 62140,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 21,
+      "freezeDurationMs": 98
+    },
+    {
+      "t": 62355,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 21,
+      "x": 782,
+      "y": 429.4000005722046,
+      "display": 7
+    },
+    {
+      "t": 62431,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 21,
+      "remainingBefore": 7,
+      "round": 1,
+      "intervalMs": 313,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 2.8284271247461903,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 3
+        },
+        {
+          "netId": 2,
+          "target": 8
+        }
+      ],
+      "intervalSinceLastActionMs": 451,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 1,
+      "wasteful": true,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 62633,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 22,
+      "netId": 6,
+      "reason": "timerPassed",
+      "durationMs": 1007,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 62869,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 25,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 634.2896732537026,
+      "y": 194.48867086145142,
+      "countOnField": 5,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 63001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 5,
+      "spawnRate": 0.57840612,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 64001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 5,
+      "spawnRate": 0.58520612,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 64355,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 26,
+      "color": 1,
+      "initialTimer": 12,
+      "x": 722.5932839804434,
+      "y": 420.1039377152735,
+      "countOnField": 6,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 64626,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 22,
+      "netId": 5,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 64855,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 22,
+      "x": 540,
+      "y": 211.4000005722046,
+      "display": 6
+    },
+    {
+      "t": 64890,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 22,
+      "display": 6,
+      "sameColorNets": [
+        {
+          "netId": 5,
+          "target": 6,
+          "next": 4
+        },
+        {
+          "netId": 6,
+          "target": 9,
+          "next": 10
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 5,
+      "diffAgainstKind": "target",
+      "fieldCount": 6,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 2910,
+      "nextOpenAtLastDrop": true,
+      "distanceAtDragStart": 7.615773105863909,
+      "msAtDragStart": 35
+    },
+    {
+      "t": 65001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 6,
+      "spawnRate": 0.5920061200000001,
+      "anyHoldOrDrag": true,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 65237,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 22,
+      "netId": 5,
+      "reason": "capture",
+      "durationMs": 611,
+      "delayToGrabMs": 264,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 347,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 65237,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 5,
+      "oldTarget": 6,
+      "newTarget": 4,
+      "newNext": 3,
+      "reason": "capture",
+      "perColorSnapshot": [],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 65237,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 22,
+      "targetNetId": 5,
+      "colorCorrect": true,
+      "display": 6,
+      "netTarget": 6,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 640,
+      "y": 680.4000005722046,
+      "dragDurationMs": 347,
+      "dragDistance": 489.1063143049061,
+      "countOnField": 5,
+      "distanceToNearestNetCenter": 30.40000057220459,
+      "reopenedAsNewWindow": false,
+      "netId": 5,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 6.222,
+      "windowOrdinal": 2,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 65800,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 23,
+      "netId": 4,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 65904,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 27,
+      "color": 1,
+      "initialTimer": 12,
+      "x": 623.4486195872312,
+      "y": 444.66134987163775,
+      "countOnField": 6,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 66001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 6,
+      "spawnRate": 0.5988061200000001,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 66299,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 23,
+      "x": 627,
+      "y": 386.4000005722046,
+      "display": 6
+    },
+    {
+      "t": 66369,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 23,
+      "display": 6,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 5,
+          "next": 3
+        },
+        {
+          "netId": 4,
+          "target": 6,
+          "next": 4
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 4,
+      "diffAgainstKind": "target",
+      "fieldCount": 6,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 1132,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 7.0710678118654755,
+      "msAtDragStart": 70
+    },
+    {
+      "t": 66438,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 21,
+      "netId": 2,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": true,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 66695,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 23,
+      "netId": 4,
+      "reason": "capture",
+      "durationMs": 895,
+      "delayToGrabMs": 569,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 327,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 66695,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 4,
+      "oldTarget": 6,
+      "newTarget": 4,
+      "newNext": 10,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 24,
+          "display": 7,
+          "renewCount": 0
+        },
+        {
+          "bubbleId": 26,
+          "display": 10,
+          "renewCount": 0
+        },
+        {
+          "bubbleId": 27,
+          "display": 12,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 66695,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 23,
+      "targetNetId": 4,
+      "colorCorrect": true,
+      "display": 6,
+      "netTarget": 6,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 835,
+      "y": 572.4000005722046,
+      "dragDurationMs": 326,
+      "dragDistance": 285.14990039105845,
+      "countOnField": 5,
+      "distanceToNearestNetCenter": 12.440257572439096,
+      "reopenedAsNewWindow": false,
+      "netId": 4,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 6.493099999999977,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 66862,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 25,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 67001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 5,
+      "spawnRate": 0.60560612,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 2,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 67431,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 21,
+      "netId": 2,
+      "reason": "timerPassed",
+      "durationMs": 993,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 67869,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 25,
+      "netId": 2,
+      "reason": "timerPassed",
+      "durationMs": 1007,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 68001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 5,
+      "spawnRate": 0.61240612,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 68077,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 28,
+      "color": 3,
+      "initialTimer": 12,
+      "x": 743.9309871001649,
+      "y": 468.4402930042996,
+      "countOnField": 6,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 68577,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 24,
+      "netId": 3,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 68800,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 24,
+      "x": 781,
+      "y": 256.4000005722046,
+      "display": 5
+    },
+    {
+      "t": 68841,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 24,
+      "display": 5,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 5,
+          "next": 3
+        },
+        {
+          "netId": 4,
+          "target": 4,
+          "next": 10
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 3,
+      "diffAgainstKind": "target",
+      "fieldCount": 6,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 2146,
+      "nextOpenAtLastDrop": true,
+      "distanceAtDragStart": 9.486832980505138,
+      "msAtDragStart": 41
+    },
+    {
+      "t": 69001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 6,
+      "spawnRate": 0.6192068,
+      "anyHoldOrDrag": true,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 69091,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 24,
+      "netId": 3,
+      "reason": "capture",
+      "durationMs": 514,
+      "delayToGrabMs": 264,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 250,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 69091,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 3,
+      "oldTarget": 5,
+      "newTarget": 3,
+      "newNext": 6,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 26,
+          "display": 8,
+          "renewCount": 0
+        },
+        {
+          "bubbleId": 27,
+          "display": 9,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 69091,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 24,
+      "targetNetId": 3,
+      "colorCorrect": true,
+      "display": 5,
+      "netTarget": 5,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 917,
+      "y": 367.4000005722046,
+      "dragDurationMs": 250,
+      "dragDistance": 189.01512294118578,
+      "countOnField": 5,
+      "distanceToNearestNetCenter": 14.958609844120819,
+      "reopenedAsNewWindow": false,
+      "netId": 3,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 7.2153999999999945,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 69695,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 25,
+      "x": 630,
+      "y": 197.4000005722046,
+      "display": 6
+    },
+    {
+      "t": 69765,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 25,
+      "freezeDurationMs": 70
+    },
+    {
+      "t": 69834,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 25,
+      "x": 630,
+      "y": 197.4000005722046,
+      "display": 6
+    },
+    {
+      "t": 69911,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 25,
+      "remainingBefore": 6,
+      "round": 1,
+      "intervalMs": 139,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 3
+        },
+        {
+          "netId": 2,
+          "target": 8
+        }
+      ],
+      "intervalSinceLastActionMs": 820,
+      "hadOpenWindowAtLastAction": false,
+      "currentOpenWindowCount": 0,
+      "wasteful": true,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 70001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 5,
+      "spawnRate": 0.6260067999999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 70154,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 29,
+      "color": 2,
+      "initialTimer": 12,
+      "x": 636.5894203796234,
+      "y": 286.7893609162061,
+      "countOnField": 6,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 71001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 6,
+      "spawnRate": 0.6328067999999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 71279,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 30,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 507.60710881219984,
+      "y": 462.3890132849757,
+      "countOnField": 7,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 71431,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 21,
+      "netId": 1,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 71570,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 21,
+      "x": 780,
+      "y": 435.4000005722046,
+      "display": 3
+    },
+    {
+      "t": 71619,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 21,
+      "display": 3,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 3,
+          "next": 5
+        },
+        {
+          "netId": 2,
+          "target": 8,
+          "next": 9
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 1,
+      "diffAgainstKind": "target",
+      "fieldCount": 7,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 2528,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 9.055385138137417,
+      "msAtDragStart": 49
+    },
+    {
+      "t": 71994,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 21,
+      "netId": 1,
+      "reason": "capture",
+      "durationMs": 563,
+      "delayToGrabMs": 188,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 375,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 71994,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 1,
+      "oldTarget": 3,
+      "newTarget": 5,
+      "newNext": 7,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 25,
+          "display": 10,
+          "renewCount": 1
+        },
+        {
+          "bubbleId": 30,
+          "display": 12,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 71994,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 21,
+      "targetNetId": 1,
+      "colorCorrect": true,
+      "display": 3,
+      "netTarget": 3,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 656,
+      "y": 76.40000057220459,
+      "dragDurationMs": 375,
+      "dragDistance": 389.3496218650469,
+      "countOnField": 6,
+      "distanceToNearestNetCenter": 17.23252759534187,
+      "reopenedAsNewWindow": false,
+      "netId": 1,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 14.972399999999995,
+      "windowOrdinal": 3,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 72001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 6,
+      "spawnRate": 0.6396067999999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 72348,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 26,
+      "netId": 4,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 73001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 6,
+      "spawnRate": 0.6464068,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 73154,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 29,
+      "netId": 6,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 73300,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 31,
+      "color": 1,
+      "initialTimer": 12,
+      "x": 739.3997313961748,
+      "y": 343.899456258216,
+      "countOnField": 7,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 73348,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 26,
+      "netId": 4,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 73355,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 26,
+      "netId": 3,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 73466,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 28,
+      "x": 753,
+      "y": 485.4000005722046,
+      "display": 7
+    },
+    {
+      "t": 73522,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 28,
+      "freezeDurationMs": 56
+    },
+    {
+      "t": 73897,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 27,
+      "netId": 4,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 73918,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 25,
+      "netId": 2,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 3,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 74001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 7,
+      "spawnRate": 0.6532068,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 4,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 74147,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 29,
+      "netId": 6,
+      "reason": "timerPassed",
+      "durationMs": 993,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 74348,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 26,
+      "netId": 3,
+      "reason": "timerPassed",
+      "durationMs": 993,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 74577,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 32,
+      "color": 3,
+      "initialTimer": 12,
+      "x": 674.3607111484445,
+      "y": 425.42708740614927,
+      "countOnField": 8,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 74702,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 26,
+      "x": 729,
+      "y": 428.4000005722046,
+      "display": 2
+    },
+    {
+      "t": 74751,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 26,
+      "freezeDurationMs": 49
+    },
+    {
+      "t": 74827,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 26,
+      "x": 729,
+      "y": 428.4000005722046,
+      "display": 2
+    },
+    {
+      "t": 74897,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 27,
+      "netId": 4,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 74897,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 26,
+      "remainingBefore": 2,
+      "round": 1,
+      "intervalMs": 125,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 3
+        },
+        {
+          "netId": 4,
+          "target": 4
+        }
+      ],
+      "intervalSinceLastActionMs": 2903,
+      "hadOpenWindowAtLastAction": false,
+      "currentOpenWindowCount": 1,
+      "wasteful": false,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 74904,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 27,
+      "netId": 3,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 74918,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 25,
+      "netId": 2,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 75001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 8,
+      "spawnRate": 0.6600067999999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 75126,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 28,
+      "netId": 7,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 75272,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 30,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 75897,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 27,
+      "netId": 3,
+      "reason": "timerPassed",
+      "durationMs": 993,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 76001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 8,
+      "spawnRate": 0.6668074799999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 2,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 76043,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 28,
+      "x": 750,
+      "y": 477.4000005722046,
+      "display": 5
+    },
+    {
+      "t": 76063,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 28,
+      "display": 5,
+      "sameColorNets": [
+        {
+          "netId": 7,
+          "target": 5,
+          "next": 6
+        },
+        {
+          "netId": 8,
+          "target": 4,
+          "next": 8
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 7,
+      "diffAgainstKind": "target",
+      "fieldCount": 8,
+      "allOpenWindowCount": 2,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 4069,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 6.708203932499369,
+      "msAtDragStart": 20
+    },
+    {
+      "t": 76272,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 30,
+      "netId": 2,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": true
+    },
+    {
+      "t": 76334,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 33,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 745.2593093053189,
+      "y": 215.37451237594664,
+      "countOnField": 9,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 76543,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 28,
+      "netId": 7,
+      "reason": "capture",
+      "durationMs": 1417,
+      "delayToGrabMs": 937,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 479,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 76543,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 7,
+      "oldTarget": 5,
+      "newTarget": 6,
+      "newNext": 3,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 32,
+          "display": 11,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 76543,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 28,
+      "targetNetId": 7,
+      "colorCorrect": true,
+      "display": 5,
+      "netTarget": 5,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 368,
+      "y": 384.4000005722046,
+      "dragDurationMs": 480,
+      "dragDistance": 395.376160532694,
+      "countOnField": 8,
+      "distanceToNearestNetCenter": 30.320950313662404,
+      "reopenedAsNewWindow": false,
+      "netId": 7,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 7.9105,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 76911,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 25,
+      "netId": 1,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 77001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 8,
+      "spawnRate": 0.6736068,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 77126,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 27,
+      "x": 622,
+      "y": 452.4000005722046,
+      "display": 1
+    },
+    {
+      "t": 77175,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 27,
+      "display": 1,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 3,
+          "next": 6
+        },
+        {
+          "netId": 4,
+          "target": 4,
+          "next": 10
+        }
+      ],
+      "diff": -2,
+      "diffAgainstNetId": 3,
+      "diffAgainstKind": "target",
+      "fieldCount": 8,
+      "allOpenWindowCount": 1,
+      "sameColorOpenCount": 0,
+      "selectedIsOneOfOpen": false,
+      "selectedIsLowestDisplayAmongOpen": false,
+      "intervalSinceLastDropMs": 632,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 6.708203932499369,
+      "msAtDragStart": 49
+    },
+    {
+      "t": 77438,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 27,
+      "targetNetId": null,
+      "colorCorrect": null,
+      "display": 1,
+      "netTarget": null,
+      "numberMatches": null,
+      "outcome": "stayInner",
+      "x": 641,
+      "y": 474.4000005722046,
+      "dragDurationMs": 263,
+      "dragDistance": 36.31536079698078,
+      "countOnField": 8,
+      "distanceToNearestNetCenter": 175.60284678512974,
+      "reopenedAsNewWindow": false
+    },
+    {
+      "t": 77529,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 27,
+      "x": 641,
+      "y": 474.4000005722046,
+      "display": 1
+    },
+    {
+      "t": 77619,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 27,
+      "freezeDurationMs": 90
+    },
+    {
+      "t": 77668,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 27,
+      "x": 641,
+      "y": 474.4000005722046,
+      "display": 1
+    },
+    {
+      "t": 77758,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 27,
+      "remainingBefore": 1,
+      "round": 1,
+      "intervalMs": 139,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 3
+        },
+        {
+          "netId": 4,
+          "target": 4
+        }
+      ],
+      "intervalSinceLastActionMs": 320,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 1,
+      "wasteful": false,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 77911,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 25,
+      "netId": 1,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 78001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 8,
+      "spawnRate": 0.68040748,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 78147,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 29,
+      "netId": 5,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 78272,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 30,
+      "netId": 1,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 78307,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 34,
+      "color": 2,
+      "initialTimer": 12,
+      "x": 463.0766968375277,
+      "y": 380.77370987777795,
+      "countOnField": 9,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 78855,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 29,
+      "x": 632,
+      "y": 297.4000005722046,
+      "display": 4
+    },
+    {
+      "t": 78925,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 29,
+      "display": 4,
+      "sameColorNets": [
+        {
+          "netId": 5,
+          "target": 4,
+          "next": 3
+        },
+        {
+          "netId": 6,
+          "target": 9,
+          "next": 10
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 5,
+      "diffAgainstKind": "target",
+      "fieldCount": 9,
+      "allOpenWindowCount": 2,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 1487,
+      "nextOpenAtLastDrop": true,
+      "distanceAtDragStart": 7.211102550927978,
+      "msAtDragStart": 70
+    },
+    {
+      "t": 79001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 9,
+      "spawnRate": 0.68720748,
+      "anyHoldOrDrag": true,
+      "openWindowCount": 2,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 79272,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 30,
+      "netId": 1,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 79452,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 29,
+      "netId": 5,
+      "reason": "capture",
+      "durationMs": 1305,
+      "delayToGrabMs": 778,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 528,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 79452,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 5,
+      "oldTarget": 4,
+      "newTarget": 3,
+      "newNext": 8,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 34,
+          "display": 11,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 79452,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 29,
+      "targetNetId": 5,
+      "colorCorrect": true,
+      "display": 4,
+      "netTarget": 4,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 634,
+      "y": 610.4000005722046,
+      "dragDurationMs": 527,
+      "dragDistance": 328.4324639576269,
+      "countOnField": 8,
+      "distanceToNearestNetCenter": 40.05196567812118,
+      "reopenedAsNewWindow": false,
+      "netId": 5,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 8.700700000000012,
+      "windowOrdinal": 2,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 79626,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 35,
+      "color": 3,
+      "initialTimer": 12,
+      "x": 583.5935116816615,
+      "y": 527.1485271764245,
+      "countOnField": 9,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 80001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 9,
+      "spawnRate": 0.6940074799999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 80327,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 33,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 80570,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 32,
+      "netId": 7,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 81001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 9,
+      "spawnRate": 0.7008074799999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 2,
+      "overlapPairCount": 0,
+      "hp": 4
+    },
+    {
+      "t": 81293,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 31,
+      "netId": 4,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 81307,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 34,
+      "netId": 6,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 3,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 81328,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 33,
+      "netId": 2,
+      "reason": "timerPassed",
+      "durationMs": 1001,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 81522,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 36,
+      "color": 2,
+      "initialTimer": 12,
+      "x": 572.1887191355767,
+      "y": 238.56777063966513,
+      "countOnField": 10,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 81543,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 34,
+      "x": 463,
+      "y": 375.4000005722046,
+      "display": 9
+    },
+    {
+      "t": 81571,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 32,
+      "netId": 7,
+      "reason": "timerPassed",
+      "durationMs": 1001,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 81598,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 34,
+      "display": 9,
+      "sameColorNets": [
+        {
+          "netId": 5,
+          "target": 3,
+          "next": 8
+        },
+        {
+          "netId": 6,
+          "target": 9,
+          "next": 10
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 6,
+      "diffAgainstKind": "target",
+      "fieldCount": 10,
+      "allOpenWindowCount": 2,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 2146,
+      "nextOpenAtLastDrop": false,
+      "distanceAtDragStart": 9,
+      "msAtDragStart": 55
+    },
+    {
+      "t": 81800,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 34,
+      "netId": 6,
+      "reason": "capture",
+      "durationMs": 493,
+      "delayToGrabMs": 291,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 201,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 81800,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 6,
+      "oldTarget": 9,
+      "newTarget": 10,
+      "newNext": 4,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 36,
+          "display": 12,
+          "renewCount": 0
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 81800,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 34,
+      "targetNetId": 6,
+      "colorCorrect": true,
+      "display": 9,
+      "netTarget": 9,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 426,
+      "y": 568.4000005722046,
+      "dragDurationMs": 202,
+      "dragDistance": 194.4684288171823,
+      "countOnField": 9,
+      "distanceToNearestNetCenter": 9.620810978861996,
+      "reopenedAsNewWindow": false,
+      "netId": 6,
+      "hpBefore": 4,
+      "secFromSpawnToCaptureExcludingFreeze": 3.2361000000000057,
+      "windowOrdinal": 1,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 81911,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "expire",
+      "bubbleId": 25,
+      "color": 0,
+      "everGrabbed": true,
+      "renewCount": 1,
+      "countOnField": 8,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 5
+        },
+        {
+          "netId": 2,
+          "target": 8
+        }
+      ],
+      "lastWindowCloseReason": "timerPassed",
+      "draggingAtExpiry": false
+    },
+    {
+      "t": 81911,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "hpChange",
+      "reason": "expire",
+      "countOnField": 8,
+      "hp": 3
+    },
+    {
+      "t": 82001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 8,
+      "spawnRate": 0.70760748,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 3
+    },
+    {
+      "t": 82293,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 31,
+      "netId": 4,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 82300,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 31,
+      "netId": 3,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 82570,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 32,
+      "netId": 8,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 82897,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 26,
+      "netId": 4,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 82918,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 30,
+      "x": 506,
+      "y": 467.4000005722046,
+      "display": 1
+    },
+    {
+      "t": 82980,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 30,
+      "freezeDurationMs": 62
+    },
+    {
+      "t": 83001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 8,
+      "spawnRate": 0.71440748,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 3,
+      "overlapPairCount": 0,
+      "hp": 3
+    },
+    {
+      "t": 83064,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 30,
+      "x": 506,
+      "y": 467.4000005722046,
+      "display": 1
+    },
+    {
+      "t": 83070,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 37,
+      "color": 2,
+      "initialTimer": 12,
+      "x": 562.9943447848342,
+      "y": 295.6749247125944,
+      "countOnField": 9,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 83140,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 30,
+      "remainingBefore": 1,
+      "round": 1,
+      "intervalMs": 146,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 5
+        },
+        {
+          "netId": 2,
+          "target": 8
+        }
+      ],
+      "intervalSinceLastActionMs": 1340,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 3,
+      "wasteful": false,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 83293,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 31,
+      "netId": 3,
+      "reason": "timerPassed",
+      "durationMs": 993,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 83327,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 33,
+      "netId": 1,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 83515,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 36,
+      "netId": 6,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 3,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 83570,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 32,
+      "netId": 8,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 83897,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 26,
+      "netId": 4,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 83904,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 26,
+      "netId": 3,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 84001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 9,
+      "spawnRate": 0.72120816,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 3,
+      "overlapPairCount": 0,
+      "hp": 3
+    },
+    {
+      "t": 84112,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 26,
+      "x": 737,
+      "y": 421.4000005722046,
+      "display": 3
+    },
+    {
+      "t": 84189,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 26,
+      "display": 3,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 3,
+          "next": 6
+        },
+        {
+          "netId": 4,
+          "target": 4,
+          "next": 10
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 3,
+      "diffAgainstKind": "target",
+      "fieldCount": 9,
+      "allOpenWindowCount": 3,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 2389,
+      "nextOpenAtLastDrop": true,
+      "distanceAtDragStart": 8,
+      "msAtDragStart": 77
+    },
+    {
+      "t": 84328,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 33,
+      "netId": 1,
+      "reason": "timerPassed",
+      "durationMs": 1001,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 84480,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 26,
+      "netId": 3,
+      "reason": "grabbedNotCaptured",
+      "durationMs": 576,
+      "delayToGrabMs": 285,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 292,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 84480,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 26,
+      "netId": 3,
+      "round": 2,
+      "isReopen": true,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 84480,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 26,
+      "targetNetId": null,
+      "colorCorrect": null,
+      "display": 3,
+      "netTarget": null,
+      "numberMatches": null,
+      "outcome": "stayInner",
+      "x": 737,
+      "y": 451.4000005722046,
+      "dragDurationMs": 291,
+      "dragDistance": 97.52650419983712,
+      "countOnField": 9,
+      "distanceToNearestNetCenter": 156.74488785920616,
+      "reopenedAsNewWindow": true
+    },
+    {
+      "t": 84515,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 36,
+      "netId": 6,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 84758,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 27,
+      "x": 632,
+      "y": 479.4000005722046,
+      "display": 5
+    },
+    {
+      "t": 84793,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 27,
+      "freezeDurationMs": 35
+    },
+    {
+      "t": 84862,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 38,
+      "color": 2,
+      "initialTimer": 12,
+      "x": 810.5991113471632,
+      "y": 312.53498568482996,
+      "countOnField": 10,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 85001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 10,
+      "spawnRate": 0.72800816,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 3
+    },
+    {
+      "t": 85064,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 37,
+      "netId": 6,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 85265,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 26,
+      "netId": 3,
+      "reason": "timerPassed",
+      "durationMs": 785,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 85293,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "expire",
+      "bubbleId": 31,
+      "color": 1,
+      "everGrabbed": false,
+      "renewCount": 0,
+      "countOnField": 9,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 3
+        },
+        {
+          "netId": 4,
+          "target": 4
+        }
+      ],
+      "lastWindowCloseReason": "timerPassed",
+      "draggingAtExpiry": false
+    },
+    {
+      "t": 85293,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "hpChange",
+      "reason": "expire",
+      "countOnField": 9,
+      "hp": 2
+    },
+    {
+      "t": 85619,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 35,
+      "netId": 7,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 85723,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 26,
+      "x": 733,
+      "y": 443.4000005722046,
+      "display": 2
+    },
+    {
+      "t": 85793,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 27,
+      "netId": 4,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": true,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 85800,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 26,
+      "freezeDurationMs": 77
+    },
+    {
+      "t": 85862,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 26,
+      "x": 733,
+      "y": 443.4000005722046,
+      "display": 2
+    },
+    {
+      "t": 85946,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 26,
+      "remainingBefore": 2,
+      "round": 2,
+      "intervalMs": 139,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 3
+        },
+        {
+          "netId": 4,
+          "target": 4
+        }
+      ],
+      "intervalSinceLastActionMs": 1466,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 3,
+      "wasteful": false,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 86001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 9,
+      "spawnRate": 0.73480952,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 3,
+      "overlapPairCount": 0,
+      "hp": 2
+    },
+    {
+      "t": 86064,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 37,
+      "netId": 6,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": true
+    },
+    {
+      "t": 86244,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 27,
+      "x": 638,
+      "y": 473.4000005722046,
+      "display": 4
+    },
+    {
+      "t": 86334,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "grab",
+      "bubbleId": 27,
+      "display": 4,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 3,
+          "next": 6
+        },
+        {
+          "netId": 4,
+          "target": 4,
+          "next": 10
+        }
+      ],
+      "diff": 0,
+      "diffAgainstNetId": 4,
+      "diffAgainstKind": "target",
+      "fieldCount": 9,
+      "allOpenWindowCount": 2,
+      "sameColorOpenCount": 1,
+      "selectedIsOneOfOpen": true,
+      "selectedIsLowestDisplayAmongOpen": true,
+      "intervalSinceLastDropMs": 1854,
+      "nextOpenAtLastDrop": true,
+      "distanceAtDragStart": 9.219544457292887,
+      "msAtDragStart": 90
+    },
+    {
+      "t": 86508,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 27,
+      "netId": 4,
+      "reason": "capture",
+      "durationMs": 715,
+      "delayToGrabMs": 541,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 174,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 86508,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "hpChange",
+      "reason": "captureGain",
+      "countOnField": 8,
+      "hp": 3
+    },
+    {
+      "t": 86508,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "retarget",
+      "netId": 4,
+      "oldTarget": 4,
+      "newTarget": 10,
+      "newNext": 7,
+      "reason": "capture",
+      "perColorSnapshot": [
+        {
+          "bubbleId": 26,
+          "display": 12,
+          "renewCount": 2
+        }
+      ],
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 86508,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "drop",
+      "bubbleId": 27,
+      "targetNetId": 4,
+      "colorCorrect": true,
+      "display": 4,
+      "netTarget": 4,
+      "numberMatches": true,
+      "outcome": "capture",
+      "x": 837,
+      "y": 576.4000005722046,
+      "dragDurationMs": 174,
+      "dragDistance": 225.5241229371817,
+      "countOnField": 8,
+      "distanceToNearestNetCenter": 13.926952755224848,
+      "reopenedAsNewWindow": false,
+      "netId": 4,
+      "hpBefore": 2,
+      "secFromSpawnToCaptureExcludingFreeze": 19.81250000000003,
+      "windowOrdinal": 3,
+      "becameUnreachableCount": 0
+    },
+    {
+      "t": 86571,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "expire",
+      "bubbleId": 32,
+      "color": 3,
+      "everGrabbed": false,
+      "renewCount": 0,
+      "countOnField": 7,
+      "sameColorNets": [
+        {
+          "netId": 7,
+          "target": 6
+        },
+        {
+          "netId": 8,
+          "target": 4
+        }
+      ],
+      "lastWindowCloseReason": "timerPassed",
+      "draggingAtExpiry": false
+    },
+    {
+      "t": 86571,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "hpChange",
+      "reason": "expire",
+      "countOnField": 7,
+      "hp": 2
+    },
+    {
+      "t": 86584,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 39,
+      "color": 1,
+      "initialTimer": 12,
+      "x": 691.8772574064822,
+      "y": 492.1121295251361,
+      "countOnField": 8,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 86619,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 35,
+      "netId": 7,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 86862,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 38,
+      "netId": 6,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 87001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 8,
+      "spawnRate": 0.74160816,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 2
+    },
+    {
+      "t": 87140,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 30,
+      "netId": 2,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 87466,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 35,
+      "x": 588,
+      "y": 527.4000005722046,
+      "display": 5
+    },
+    {
+      "t": 87522,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 35,
+      "freezeDurationMs": 56
+    },
+    {
+      "t": 87675,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 35,
+      "netId": 8,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 87800,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 35,
+      "x": 588,
+      "y": 526.4000005722046,
+      "display": 4
+    },
+    {
+      "t": 87855,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 38,
+      "netId": 6,
+      "reason": "timerPassed",
+      "durationMs": 993,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": true
+    },
+    {
+      "t": 87883,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 35,
+      "netId": 8,
+      "reason": "renewed",
+      "durationMs": 208,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 87883,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 35,
+      "remainingBefore": 4,
+      "round": 1,
+      "intervalMs": 334,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 1,
+      "sameColorNets": [
+        {
+          "netId": 7,
+          "target": 6
+        },
+        {
+          "netId": 8,
+          "target": 4
+        }
+      ],
+      "intervalSinceLastActionMs": 1375,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 2,
+      "wasteful": true,
+      "windowMidRenew": true,
+      "roundStateAtRenew": "open"
+    },
+    {
+      "t": 87946,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 26,
+      "netId": 4,
+      "round": 3,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 88001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 8,
+      "spawnRate": 0.74840816,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 2,
+      "overlapPairCount": 0,
+      "hp": 2
+    },
+    {
+      "t": 88043,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 40,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 679.7330232833244,
+      "y": 195.34355943515078,
+      "countOnField": 9,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 88140,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 30,
+      "netId": 2,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 88328,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "expire",
+      "bubbleId": 33,
+      "color": 0,
+      "everGrabbed": false,
+      "renewCount": 0,
+      "countOnField": 8,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 5
+        },
+        {
+          "netId": 2,
+          "target": 8
+        }
+      ],
+      "lastWindowCloseReason": "timerPassed",
+      "draggingAtExpiry": false
+    },
+    {
+      "t": 88328,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "hpChange",
+      "reason": "expire",
+      "countOnField": 8,
+      "hp": 1
+    },
+    {
+      "t": 88584,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 39,
+      "netId": 4,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 88946,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 26,
+      "netId": 4,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 89001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 8,
+      "spawnRate": 0.75520816,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 1
+    },
+    {
+      "t": 89043,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 40,
+      "x": 687,
+      "y": 203.4000005722046,
+      "display": 11
+    },
+    {
+      "t": 89091,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 40,
+      "freezeDurationMs": 48
+    },
+    {
+      "t": 89105,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 41,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 586.2656478147151,
+      "y": 373.8271573109193,
+      "countOnField": 9,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 89168,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 40,
+      "x": 687,
+      "y": 203.4000005722046,
+      "display": 11
+    },
+    {
+      "t": 89237,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 40,
+      "remainingBefore": 11,
+      "round": 1,
+      "intervalMs": 125,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 5
+        },
+        {
+          "netId": 2,
+          "target": 8
+        }
+      ],
+      "intervalSinceLastActionMs": 2729,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 1,
+      "wasteful": true,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "neverOpened"
+    },
+    {
+      "t": 89578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 39,
+      "netId": 4,
+      "reason": "timerPassed",
+      "durationMs": 994,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 89932,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 42,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 625.6636060985189,
+      "y": 258.57391931714,
+      "countOnField": 10,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 90001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 10,
+      "spawnRate": 0.76200884,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 1
+    },
+    {
+      "t": 90140,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 30,
+      "netId": 1,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 90515,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 36,
+      "netId": 5,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 90522,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 37,
+      "x": 568,
+      "y": 292.4000005722046,
+      "display": 5
+    },
+    {
+      "t": 90578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 37,
+      "freezeDurationMs": 56
+    },
+    {
+      "t": 90654,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 37,
+      "x": 568,
+      "y": 292.4000005722046,
+      "display": 5
+    },
+    {
+      "t": 90730,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 37,
+      "remainingBefore": 5,
+      "round": 1,
+      "intervalMs": 132,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 5,
+          "target": 3
+        },
+        {
+          "netId": 6,
+          "target": 10
+        }
+      ],
+      "intervalSinceLastActionMs": 4222,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 2,
+      "wasteful": true,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 90932,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 36,
+      "x": 576,
+      "y": 230.4000005722046,
+      "display": 3
+    },
+    {
+      "t": 91001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 10,
+      "spawnRate": 0.7688088399999999,
+      "anyHoldOrDrag": true,
+      "openWindowCount": 2,
+      "overlapPairCount": 0,
+      "hp": 1
+    },
+    {
+      "t": 91008,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 36,
+      "freezeDurationMs": 76
+    },
+    {
+      "t": 91078,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 36,
+      "x": 576,
+      "y": 230.4000005722046,
+      "display": 3
+    },
+    {
+      "t": 91133,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 43,
+      "color": 3,
+      "initialTimer": 12,
+      "x": 544.913380461105,
+      "y": 415.29752228908535,
+      "countOnField": 11,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 91140,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 30,
+      "netId": 1,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 91154,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 36,
+      "netId": 5,
+      "reason": "renewed",
+      "durationMs": 639,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 91154,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 36,
+      "remainingBefore": 3,
+      "round": 1,
+      "intervalMs": 146,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 5,
+          "target": 3
+        },
+        {
+          "netId": 6,
+          "target": 10
+        }
+      ],
+      "intervalSinceLastActionMs": 4646,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 1,
+      "wasteful": true,
+      "windowMidRenew": true,
+      "roundStateAtRenew": "open"
+    },
+    {
+      "t": 91758,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 35,
+      "x": 585,
+      "y": 529.4000005722046,
+      "display": 9
+    },
+    {
+      "t": 91834,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 35,
+      "freezeDurationMs": 76
+    },
+    {
+      "t": 91911,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 35,
+      "x": 585,
+      "y": 529.4000005722046,
+      "display": 9
+    },
+    {
+      "t": 91973,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 35,
+      "remainingBefore": 9,
+      "round": 2,
+      "intervalMs": 153,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 7,
+          "target": 6
+        },
+        {
+          "netId": 8,
+          "target": 4
+        }
+      ],
+      "intervalSinceLastActionMs": 5465,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 0,
+      "wasteful": true,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "neverOpened"
+    },
+    {
+      "t": 92001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 11,
+      "spawnRate": 0.77560816,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 0,
+      "overlapPairCount": 0,
+      "hp": 1
+    },
+    {
+      "t": 92501,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 26,
+      "x": 730,
+      "y": 455.4000005722046,
+      "display": 6
+    },
+    {
+      "t": 92536,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 26,
+      "freezeDurationMs": 35
+    },
+    {
+      "t": 92633,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 26,
+      "x": 730,
+      "y": 455.4000005722046,
+      "display": 6
+    },
+    {
+      "t": 92710,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 26,
+      "remainingBefore": 6,
+      "round": 3,
+      "intervalMs": 132,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 3
+        },
+        {
+          "netId": 4,
+          "target": 10
+        }
+      ],
+      "intervalSinceLastActionMs": 6202,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 0,
+      "wasteful": true,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 92730,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 37,
+      "netId": 6,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 0,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 92876,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 44,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 686.5193563408931,
+      "y": 293.50825697035157,
+      "countOnField": 12,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 93001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 12,
+      "spawnRate": 0.78240884,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 1
+    },
+    {
+      "t": 93098,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 41,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 93161,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 36,
+      "netId": 6,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 93237,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 40,
+      "netId": 2,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 3,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 93453,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 41,
+      "x": 596,
+      "y": 375.4000005722046,
+      "display": 8
+    },
+    {
+      "t": 93522,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 41,
+      "freezeDurationMs": 69
+    },
+    {
+      "t": 93605,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 41,
+      "x": 596,
+      "y": 375.4000005722046,
+      "display": 8
+    },
+    {
+      "t": 93668,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 41,
+      "netId": 2,
+      "reason": "renewed",
+      "durationMs": 570,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 93668,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 41,
+      "remainingBefore": 8,
+      "round": 1,
+      "intervalMs": 152,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 5
+        },
+        {
+          "netId": 2,
+          "target": 8
+        }
+      ],
+      "intervalSinceLastActionMs": 7160,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 4,
+      "wasteful": true,
+      "windowMidRenew": true,
+      "roundStateAtRenew": "open"
+    },
+    {
+      "t": 93730,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 37,
+      "netId": 6,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": true,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": true
+    },
+    {
+      "t": 93855,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 38,
+      "netId": 5,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 93925,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 42,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 3,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 93994,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 30,
+      "x": 508,
+      "y": 464.4000005722046,
+      "display": 2
+    },
+    {
+      "t": 94001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 12,
+      "spawnRate": 0.78920884,
+      "anyHoldOrDrag": true,
+      "openWindowCount": 4,
+      "overlapPairCount": 0,
+      "hp": 1
+    },
+    {
+      "t": 94064,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 30,
+      "freezeDurationMs": 70
+    },
+    {
+      "t": 94133,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 30,
+      "x": 508,
+      "y": 464.4000005722046,
+      "display": 2
+    },
+    {
+      "t": 94161,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 36,
+      "netId": 6,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": true
+    },
+    {
+      "t": 94223,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 30,
+      "remainingBefore": 2,
+      "round": 2,
+      "intervalMs": 139,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 5
+        },
+        {
+          "netId": 2,
+          "target": 8
+        }
+      ],
+      "intervalSinceLastActionMs": 7715,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 3,
+      "wasteful": false,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 94237,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 40,
+      "netId": 2,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 94474,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 45,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 618.7472736532277,
+      "y": 424.93495403782424,
+      "countOnField": 13,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 94717,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 26,
+      "netId": 4,
+      "round": 4,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 94855,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 38,
+      "netId": 5,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 94932,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 42,
+      "netId": 2,
+      "reason": "timerPassed",
+      "durationMs": 1007,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 95001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 13,
+      "spawnRate": 0.7960088399999999,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 1
+    },
+    {
+      "t": 95349,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 42,
+      "x": 624,
+      "y": 254.4000005722046,
+      "display": 7
+    },
+    {
+      "t": 95418,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 42,
+      "freezeDurationMs": 69
+    },
+    {
+      "t": 95494,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 42,
+      "x": 624,
+      "y": 253.4000005722046,
+      "display": 7
+    },
+    {
+      "t": 95564,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 42,
+      "remainingBefore": 7,
+      "round": 1,
+      "intervalMs": 145,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 1,
+      "sameColorNets": [
+        {
+          "netId": 1,
+          "target": 5
+        },
+        {
+          "netId": 2,
+          "target": 8
+        }
+      ],
+      "intervalSinceLastActionMs": 9056,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 1,
+      "wasteful": true,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 95578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 39,
+      "netId": 3,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 95717,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 26,
+      "netId": 4,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": true
+    },
+    {
+      "t": 95953,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 38,
+      "x": 810,
+      "y": 307.4000005722046,
+      "display": 1
+    },
+    {
+      "t": 95987,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 38,
+      "freezeDurationMs": 34
+    },
+    {
+      "t": 95994,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 46,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 488.13406355190057,
+      "y": 405.3313171518557,
+      "countOnField": 14,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 96001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 14,
+      "spawnRate": 0.80280884,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 1,
+      "overlapPairCount": 0,
+      "hp": 1
+    },
+    {
+      "t": 96085,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 38,
+      "x": 812,
+      "y": 307.4000005722046,
+      "display": 1
+    },
+    {
+      "t": 96161,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 38,
+      "remainingBefore": 1,
+      "round": 1,
+      "intervalMs": 132,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 2,
+      "sameColorNets": [
+        {
+          "netId": 5,
+          "target": 3
+        },
+        {
+          "netId": 6,
+          "target": 10
+        }
+      ],
+      "intervalSinceLastActionMs": 9653,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 1,
+      "wasteful": false,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 96237,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 40,
+      "netId": 1,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 96265,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 38,
+      "x": 812,
+      "y": 307.4000005722046,
+      "display": 12
+    },
+    {
+      "t": 96342,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 38,
+      "freezeDurationMs": 77
+    },
+    {
+      "t": 96578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 39,
+      "netId": 3,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 96758,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 47,
+      "color": 1,
+      "initialTimer": 12,
+      "x": 484.9992340209078,
+      "y": 341.71621372516114,
+      "countOnField": 15,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 96876,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 44,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 1,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 97001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 15,
+      "spawnRate": 0.80960884,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 2,
+      "overlapPairCount": 0,
+      "hp": 1
+    },
+    {
+      "t": 97126,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 43,
+      "netId": 7,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 97237,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 40,
+      "netId": 1,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 97515,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "spawn",
+      "bubbleId": 48,
+      "color": 0,
+      "initialTimer": 12,
+      "x": 669.2371757799334,
+      "y": 244.68779812083784,
+      "countOnField": 16,
+      "forcedPlacement": false,
+      "overlapCountAtPlacement": 0
+    },
+    {
+      "t": 97675,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 41,
+      "netId": 2,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 97869,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 44,
+      "netId": 2,
+      "reason": "timerPassed",
+      "durationMs": 993,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 97973,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 35,
+      "netId": 7,
+      "round": 3,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 98001,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "sample",
+      "countOnField": 16,
+      "spawnRate": 0.81640884,
+      "anyHoldOrDrag": false,
+      "openWindowCount": 3,
+      "overlapPairCount": 0,
+      "hp": 1
+    },
+    {
+      "t": 98126,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 43,
+      "netId": 7,
+      "reason": "timerPassed",
+      "durationMs": 1000,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": false
+    },
+    {
+      "t": 98133,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 37,
+      "x": 563,
+      "y": 287.4000005722046,
+      "display": 5
+    },
+    {
+      "t": 98223,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "holdRelease",
+      "bubbleId": 37,
+      "freezeDurationMs": 90
+    },
+    {
+      "t": 98230,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 30,
+      "netId": 2,
+      "round": 3,
+      "isReopen": false,
+      "otherOpenWindowCount": 2,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 98237,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 38,
+      "netId": 6,
+      "round": 2,
+      "isReopen": false,
+      "otherOpenWindowCount": 3,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 98286,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "press",
+      "bubbleId": 37,
+      "x": 563,
+      "y": 287.4000005722046,
+      "display": 5
+    },
+    {
+      "t": 98362,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "doubleClick",
+      "bubbleId": 37,
+      "remainingBefore": 5,
+      "round": 2,
+      "intervalMs": 153,
+      "secondHitByTolerance": false,
+      "displacementBetweenClicks": 0,
+      "sameColorNets": [
+        {
+          "netId": 5,
+          "target": 3
+        },
+        {
+          "netId": 6,
+          "target": 10
+        }
+      ],
+      "intervalSinceLastActionMs": 11854,
+      "hadOpenWindowAtLastAction": true,
+      "currentOpenWindowCount": 4,
+      "wasteful": true,
+      "windowMidRenew": false,
+      "roundStateAtRenew": "closed:timerPassed"
+    },
+    {
+      "t": 98474,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowOpen",
+      "bubbleId": 45,
+      "netId": 2,
+      "round": 1,
+      "isReopen": false,
+      "otherOpenWindowCount": 4,
+      "playerDraggingNow": false,
+      "thisBubbleReturning": false
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "expire",
+      "bubbleId": 39,
+      "color": 1,
+      "everGrabbed": false,
+      "renewCount": 0,
+      "countOnField": 15,
+      "sameColorNets": [
+        {
+          "netId": 3,
+          "target": 3
+        },
+        {
+          "netId": 4,
+          "target": 10
+        }
+      ],
+      "lastWindowCloseReason": "timerPassed",
+      "draggingAtExpiry": false
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "hpChange",
+      "reason": "expire",
+      "countOnField": 15,
+      "hp": 0
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 26,
+      "color": 1,
+      "spawnElapsedMs": 64355,
+      "display": 7,
+      "renewCount": 3
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 30,
+      "netId": 2,
+      "reason": "gameEnd",
+      "durationMs": 348,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": true
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 30,
+      "color": 0,
+      "spawnElapsedMs": 71279,
+      "display": 8,
+      "renewCount": 2
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 35,
+      "netId": 7,
+      "reason": "gameEnd",
+      "durationMs": 605,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": true
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 35,
+      "color": 3,
+      "spawnElapsedMs": 79626,
+      "display": 6,
+      "renewCount": 2
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 36,
+      "color": 2,
+      "spawnElapsedMs": 81522,
+      "display": 5,
+      "renewCount": 1
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 37,
+      "color": 2,
+      "spawnElapsedMs": 83070,
+      "display": 12,
+      "renewCount": 2
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 38,
+      "netId": 6,
+      "reason": "gameEnd",
+      "durationMs": 341,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": true
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 38,
+      "color": 2,
+      "spawnElapsedMs": 84862,
+      "display": 10,
+      "renewCount": 1
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 40,
+      "color": 0,
+      "spawnElapsedMs": 88043,
+      "display": 3,
+      "renewCount": 1
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 41,
+      "netId": 2,
+      "reason": "gameEnd",
+      "durationMs": 903,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": true
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 41,
+      "color": 0,
+      "spawnElapsedMs": 89105,
+      "display": 8,
+      "renewCount": 1
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 42,
+      "color": 0,
+      "spawnElapsedMs": 89932,
+      "display": 9,
+      "renewCount": 1
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 43,
+      "color": 3,
+      "spawnElapsedMs": 91133,
+      "display": 5,
+      "renewCount": 0
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 44,
+      "color": 0,
+      "spawnElapsedMs": 92876,
+      "display": 7,
+      "renewCount": 0
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "windowClose",
+      "bubbleId": 45,
+      "netId": 2,
+      "reason": "gameEnd",
+      "durationMs": 104,
+      "delayToGrabMs": null,
+      "wasHandFreeAtOpen": false,
+      "dragMsDuringWindow": 0,
+      "otherReachableWithLowerDisplayAtClose": true
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 45,
+      "color": 0,
+      "spawnElapsedMs": 94474,
+      "display": 8,
+      "renewCount": 0
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 46,
+      "color": 0,
+      "spawnElapsedMs": 95994,
+      "display": 10,
+      "renewCount": 0
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 47,
+      "color": 1,
+      "spawnElapsedMs": 96758,
+      "display": 11,
+      "renewCount": 0
+    },
+    {
+      "t": 98578,
+      "gameId": "p_mulccdz4_wvl318ww#4",
+      "type": "fieldEnd",
+      "bubbleId": 48,
+      "color": 0,
+      "spawnElapsedMs": 97515,
+      "display": 11,
+      "renewCount": 0
+    }
+  ]
+}
