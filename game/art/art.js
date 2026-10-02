@@ -171,6 +171,7 @@
       again: { x: 450, y: 470, w: 180, h: 60 },
       title: { x: 650, y: 470, w: 180, h: 60 }
     },
+    credits: { x: 40, y: 604, w: 1200, h: 106 }, // 署名可佔範圍(不可點), 與所有按鈕判定框不重疊
     guide: {
       close: { x: 1150, y: 20, w: 110, h: 48 },
       prev: { x: 20, y: 652, w: 140, h: 48 },
@@ -958,6 +959,27 @@
     ctx.restore();
   }
 
+  // 背景音樂署名: 標題與結束畫面底部, 小字低對比, 底下墊半透明暗帶保證可讀。
+  // lines: 字串陣列(或單一字串); y: 最後一行的中心 y(預設 698)。行往上疊, 最高不超過 y 604(所有按鈕判定框之下)
+  function drawCredits(ctx, state) {
+    var s = state || {}, t = THEMES[1];
+    var lines = s.lines == null ? [] : (Array.isArray(s.lines) ? s.lines : [String(s.lines)]);
+    if (!lines.length) return;
+    var px = 13, lh = 18, yLast = num(s.y, 698), maxW = 1200;
+    if (yLast - (lines.length - 1) * lh - lh / 2 < 604) lh = Math.max(14, (yLast - 604 - 7) / Math.max(1, lines.length - 1));
+    ctx.save();
+    ctx.font = font(px, 'normal');
+    var wMax = 0, i;
+    for (i = 0; i < lines.length; i++) wMax = Math.max(wMax, ctx.measureText(String(lines[i])).width);
+    if (wMax > maxW) { px = Math.max(10, Math.floor(px * maxW / wMax)); ctx.font = font(px, 'normal'); wMax = Math.min(wMax, maxW); }
+    var top = yLast - (lines.length - 1) * lh - lh / 2 - 3, h = (lines.length - 1) * lh + lh + 6;
+    roundRect(ctx, CX - wMax / 2 - 12, top, wMax + 24, h, 8); ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fill();
+    for (i = 0; i < lines.length; i++) {
+      text(ctx, String(lines[i]), CX, yLast - (lines.length - 1 - i) * lh, px, t.inkDim, 'center', { weight: 'normal' });
+    }
+    ctx.restore();
+  }
+
   // ---------------------------------------------------------------- 說明頁(第 1 關風格)
   function inGame(ctx, ox, oy, sc, fn) {
     ctx.save(); ctx.translate(ox, oy); ctx.scale(sc, sc); ctx.translate(-CX, -CY); fn(); ctx.restore();
@@ -1206,6 +1228,7 @@
     drawTitle: drawTitle,
     drawDeviceSelect: drawDeviceSelect,
     drawGameOver: drawGameOver,
+    drawCredits: drawCredits,
     drawGuidePage: drawGuidePage
   };
 })();

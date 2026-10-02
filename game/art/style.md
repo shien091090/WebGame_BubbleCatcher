@@ -90,6 +90,7 @@
 | 輸入裝置選擇 | `drawDeviceSelect(ctx, state)` | `hover`('mouse' / 'touchpad'), `selected`('mouse' / 'touchpad' / null) | 疊在標題上: 「你用哪種裝置操作?」+ 滑鼠 / 觸控板; 目前選的那顆是主色 |
 | 說明畫面 | `drawGuidePage(ctx, state)` | `page`(1~7), `hover`('close' / 'prev' / 'next') | 自帶背景, 整頁覆蓋。右上「關閉」每頁都有; 左下「上一頁」第 1 頁沒有; 右下「下一頁」第 7 頁沒有。圖裡的遊戲物件直接呼叫遊戲內畫法, 一律第 1 首風格 |
 | 結束畫面 | `drawGameOver(ctx, state)` | `survival`(秒), `score`, `hover`('again' / 'title') | 疊在最後一幀上: 結束、存活 xx.x 秒、分數; 再玩一次 / 回標題(不顯示清場次數) |
+| 背景音樂署名 | `drawCredits(ctx, state)` | `lines`(字串陣列或單一字串, 內容照 `game/audio/credits.md`), `y?`(最後一行的中心 y, 預設 698) | 只在標題畫面與結束畫面呼叫, 遊戲中不畫。畫面底部置中, 13px 一般字重、inkDim 低對比, 底下墊半透明暗帶(任何背景上都讀得到)。行距 18 往上疊; 行太多會壓縮行距, 最高不超過 y 604; 單行寬超過 1200 會自動縮字(最小 10px)。不可點、不參與判定 |
 | 拍子時鐘、背景音樂 | 不畫 | — | 非視覺物件; 拍子時鐘的畫面就是拍子提示 |
 
 ### 說明頁內容(第 1 首風格)
@@ -120,6 +121,7 @@
 | 換關提示 | 220 × 52 膠囊, 中心 (640,258) |
 | 左上 HUD | x 20~260, y 20~100; 命條 x 60~248、y 32~56(每 1 點命 1.88 像素); 歌曲進度條 x 184~248、y 77~85 |
 | 右上 HUD | x 960~1180, y 20~100; 分數 30px, 連續 22px |
+| 背景音樂署名 | 13px, 行距 18, 最後一行中心 y 698, 置中; 暗帶左右各留 12 |
 | 暫停按鈕 | x 1206~1254, y 26~74(中心 1230,50) |
 | 靜音按鈕 | x 1206~1254, y 86~134(中心 1230,110) |
 
@@ -127,7 +129,7 @@
 
 ### 繪製層級(由下到上)
 
-1. drawBackground → 2. drawArena → 3. drawBeatCue → 4. drawDyeFloor / drawShapeFloor → 5. drawNetWall → 6. drawBubble(閒置 / 彈回中先畫, 被按住次之, 拖曳中 / 帶過的那一顆最後)→ 7. drawStickFx → 8. drawBeatFx → 9. drawChainFx → 10. drawClearFx → 11. drawLevelIntro / drawCountIn → 12. drawHud → 13. drawPauseButton / drawMuteButton → 14. drawPauseMenu(之後再畫一次兩顆按鈕)/ drawGameOver / drawDeviceSelect / drawGuidePage
+1. drawBackground → 2. drawArena → 3. drawBeatCue → 4. drawDyeFloor / drawShapeFloor → 5. drawNetWall → 6. drawBubble(閒置 / 彈回中先畫, 被按住次之, 拖曳中 / 帶過的那一顆最後)→ 7. drawStickFx → 8. drawBeatFx → 9. drawChainFx → 10. drawClearFx → 11. drawLevelIntro / drawCountIn → 12. drawHud → 13. drawPauseButton / drawMuteButton → 14. drawPauseMenu(之後再畫一次兩顆按鈕)/ drawGameOver / drawDeviceSelect / drawGuidePage → 15. drawCredits(只在標題畫面: drawTitle 之後、drawDeviceSelect 之前; 結束畫面: drawGameOver 之後)
 
 ### 時長 `Art.timing`(秒)
 
@@ -135,7 +137,7 @@ spawn 0.3(spawnT = 已冒出秒數 ÷ 0.3)/ stickFx 0.8 / beatFx 0.55 / chainFx 
 
 ### 按鈕判定框 `Art.layout`
 
-左上 / 右上 HUD、暫停、靜音; `title.start/guide/device`; `device.mouse/touchpad`; `pauseMenu.resume/restart/quit/guide`; `gameOver.again/title`; `guide.close/prev/next`。皆為 `{ x, y, w, h }`。
+左上 / 右上 HUD、暫停、靜音; `title.start/guide/device`; `device.mouse/touchpad`; `pauseMenu.resume/restart/quit/guide`; `gameOver.again/title`; `guide.close/prev/next`; `credits`(署名可佔範圍 x 40~1240、y 604~710, 不可點)。皆為 `{ x, y, w, h }`。
 
 ### 判定幾何自查(node 計算)
 
@@ -149,3 +151,5 @@ spawn 0.3(spawnT = 已冒出秒數 ÷ 0.3)/ stickFx 0.8 / beatFx 0.55 / chainFx 
 | 預備拍數字 | 158.6(在內圈內) | — |
 
 全部不與內圈、網牆重疊; 換關提示與預備拍數字在內圈內, 不遮網牆與舊亮邊。
+
+署名範圍 y 604~710 與按鈕判定框的間距: 標題「輸入裝置」底 y 592 → 12 像素; 結束畫面「再玩一次 / 回標題」底 y 530 → 74 像素(結束面板底 y 570 → 34)。兩行預設版位實際佔 y 667~709。
