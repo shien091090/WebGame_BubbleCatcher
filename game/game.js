@@ -459,6 +459,8 @@
   // ==================================================================
   var mouse = { x: 0, y: 0, btn: false, press: null, uiDownKey: null, inside: false, lastDropPos: null, pathSinceDrop: 0, netSeqAtLastDrop: null };
   var inputQueue = [];
+  var releaseSweeping = false;           // 正在處理「放開前最後一段路徑」(埋點用)
+  var releaseSweepPxForDrop = 0;         // 放開時補掃的那一段長度(埋點用)
 
   // ==================================================================
   // 建立新局
@@ -1610,7 +1612,7 @@
       colorMatch: b.color === cond.color, shapeMatch: cond.shape == null ? '不比對' : (b.shape === cond.shape),
       netSeq: net.seq, netLevelSeq: net.levelSeq, slotId: slotObj.id, netCondition: { color: cond.color, shape: cond.shape },
       inJumpCue: inJumpCue(g), netChangedDuringDrag: !!(b.netSeqAtGrab != null && b.netSeqAtGrab !== net.seq) || !!b.jumpDuringDrag,
-      isCarried: isCarried, judgedLevel: net.level, releaseAfterMs: null
+      isCarried: isCarried, judgedLevel: net.level, releaseAfterMs: null, viaReleaseSweep: releaseSweeping
     };
     var touchRec;
     if (ok) {
@@ -1705,7 +1707,7 @@
       dragDistance: Math.round(b.dragPathTotal),
       lastSwipeToDropPathLen: b.dragLastSwipePathLen == null ? null : Math.round(b.dragPathLen - b.dragLastSwipePathLen),
       lastSwipeToDropMs: b.dragLastSwipeGT == null ? null : Math.round((gnow - b.dragLastSwipeGT) * 1000),
-      countOnField: fieldCount(g), inPreview: inPreviewPeriod(g)
+      countOnField: fieldCount(g), inPreview: inPreviewPeriod(g), releaseSweepPx: Math.round(releaseSweepPxForDrop)
     };
     var rec = emit(g, 'drop', evt, lt);
     g.totals.drops++;
@@ -1837,7 +1839,7 @@
         if (overlap && already == null) already = z.id;
       }
       var net = g.net;
-      b.touchFlag = net ? touchesLit(b.x, b.y, net.slot) : false;
+      b.touchFlag = false;   // 抓起時一律從「沒貼著亮邊」起算(只有換位當下不符才會設成 true, 等離開再碰回); 若第一筆移動就已越過亮邊, 下一筆移動立即判碰網
       var colorMatch = net ? (b.color === net.cond.color) : null;
       var shapeMatch = net ? (net.cond.shape == null ? '不比對' : (b.shape === net.cond.shape)) : null;
       var neededDist = function (attr) {
@@ -1893,19 +1895,39 @@
     emit(g, 'holdNoDrag', { bubbleId: b.id, freezeDurationMs: Math.round((gnow - (b.pressGT == null ? gnow : b.pressGT)) * 1000), endReason: endKind }, lt);
   }
 
+  // 放開事件自帶的指標位置, 可能比最後一筆被處理的移動更遠(瀏覽器每幀只合併送一筆移動, 放開又是即時送出)。
+  // 拖曳中放開時, 先把「氣泡最後處理位置 → 放開位置」這一段當成一次移動掃過(擦過 / 碰網照路徑判),
+  // 否則一記快速甩過亮邊的放開會整段漏判, 氣泡明明已越過亮邊卻被當成「放在內圈外」彈回。
+  // 視窗外放開走獨立的強制路徑(不看座標), 不掃。
+  function sweepToReleasePos(g, press, ev, lt) {
+    if (!press || !press.dragging || ev.outWin) return 0;
+    var b = press.bubble;
+    if (!b || b.dead) return 0;
+    var endPos = clampDrag(ev.x, ev.y);
+    var gap = dist(b.x, b.y, endPos.x, endPos.y);
+    if (gap <= 0.5) return 0;
+    releaseSweeping = true;
+    try { handleMove(g, { k: 'move', x: ev.x, y: ev.y, ts: ev.ts }, lt); } finally { releaseSweeping = false; }
+    return gap;
+  }
+
   function handleUp(g, ev, lt) {
     var press = mouse.press;
+    var sweptPx = sweepToReleasePos(g, press, ev, lt);
     if (g.pendingTouchRec) {
       var ptr = g.pendingTouchRec; g.pendingTouchRec = null;
       ptr.rec.releaseAfterMs = Math.max(0, Math.round((gtAt(g, lt) - ptr.gt) * 1000));
     }
     if (!press) return;
+    if (mouse.press !== press) return;          // 放開前的最後一段路徑上已碰網 / 沾錯消失, 拖曳已結束, 放開不產生事件
     mouse.press = null;
     var b = press.bubble;
     if (!b || b.dead) return;
     if (!press.dragging) { releaseHoldNoDrag(g, b, '放開', lt); return; }
     if (b.lastMoveLT != null && lt < b.lastMoveLT) lt = b.lastMoveLT;
+    releaseSweepPxForDrop = sweptPx;
     resolveRelease(g, b, ev, lt);
+    releaseSweepPxForDrop = 0;
   }
 
   function processInputs(g, ltPrev, rafTs) {
