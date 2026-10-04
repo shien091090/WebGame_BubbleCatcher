@@ -392,6 +392,9 @@
         if (f(m1) < f(m2)) h2 = m2; else l2 = m1;
       }
       var tmin = (l2 + h2) / 2;
+      // 三分搜尋永遠到不了端點 t = 1: 指標整數座標剛好落在相切位置(軸對齊的槽 1 / 3 / 5 / 7, 氣泡中心距圓心恰 268)時, 最近點就是 t = 1 本身,
+      // 搜尋回傳的 tmin 略小於 1 而距離略大於容差, 會誤判成沒碰到(但位置式的 touchesLit 判成碰到), 所以端點要單獨比
+      if (f(1) <= f(tmin)) tmin = 1;
       if (f(tmin) <= LIM) {
         var lb = 0, hb = tmin;
         for (var k2 = 0; k2 < 40; k2++) {
@@ -523,7 +526,7 @@
         spawned: 0, captured: 0, expired: 0, missColor: 0, missShape: 0, levelCleared: 0, bounceCond: 0, bounceOuter: 0, stayInner: 0, putBack: 0,
         holdNoDrag: 0, swipeEffective: 0, swipeLocked: 0, batches: 0, nodeCounted: 0, nodeUncounted: 0, nodeOnBeat: 0, nodeByType: {},
         presses: 0, grabs: 0, drops: 0, heals: 0, netAppears: 0, levelSwitches: 0, carryCaptured: 0, carryCleared: 0, touches: 0,
-        swapJudged: 0, swapNoJudge: 0, jumpPreviewCaptures: 0, jumpOnlyCount: 0, jumpCondCount: 0, hitOffEdge: 0, emptyPresses: 0, suspects: 0, suspectsSure: 0, rotations: 0
+        swapJudged: 0, swapNoJudge: 0, touchGuard: 0, jumpPreviewCaptures: 0, jumpOnlyCount: 0, jumpCondCount: 0, hitOffEdge: 0, emptyPresses: 0, suspects: 0, suspectsSure: 0, rotations: 0
       },
       frame: { rotated: false, expired: false, overflow: false, expireCount: 0, expiredBatchSeqs: [], misses: [] },
       lastDropGT: null, lastDropProcessable: null, lastPressGT: null, lastDropRec: null,
@@ -1403,7 +1406,8 @@
       var wasOverlap = !!b.floorOverlap[z.id];
       var interval = sweepCircleInterval(p0, p1, z.x, z.y, combinedR);
       var endInside = dist(p1.x, p1.y, z.x, z.y) <= combinedR;
-      if (!wasOverlap && interval) items.push({ kind: 'floor', t: interval[0], z: z, order: z.kind === 'dye' ? 0 : 1 });
+      // 終點恰好落在相切位置(整數座標對上整數圓心)時, 二次方程式的根可能比 1 大一點點而回傳 null, 但 endInside 已把「已相交」記成 true, 這次擦過就整個漏掉; 終點在內就補一筆 t = 1
+      if (!wasOverlap && (interval || endInside)) items.push({ kind: 'floor', t: interval ? interval[0] : 1, z: z, order: z.kind === 'dye' ? 0 : 1 });
       b.floorOverlap[z.id] = endInside;
       var closeD = closestDistanceOnSegment(p0, p1, z.x, z.y);
       if (b.dragMinDist[z.id] == null || closeD < b.dragMinDist[z.id]) b.dragMinDist[z.id] = closeD;
@@ -1411,7 +1415,9 @@
     var net = g.net;
     if (net) {
       // 碰網未觸發嫌疑用: 本次拖曳(對當下這張網)氣泡圓離判定帶的最小距離、越過亮邊直線的最大深度、最接近那一刻的幀間隔
-      if (b.minBandNetSeq !== net.seq) { b.minBandNetSeq = net.seq; b.minBandDist = null; b.minBandFrameMs = null; b.maxLitDepth = 0; }
+      // 第 2 關跳位只換位置、網序號不變, 所以量測起點要連槽位一起認(否則最小距離與越線深度會混到跳位前的舊亮邊)
+      var mbKey = net.seq + '/' + net.slot;
+      if (b.minBandNetSeq !== mbKey) { b.minBandNetSeq = mbKey; b.minBandDist = null; b.minBandFrameMs = null; b.maxLitDepth = 0; }
       var mdist = Math.max(0, minBandDistOnPath(p0, p1, net.slot) - BUBBLE_R);
       if (b.minBandDist == null || mdist < b.minBandDist) { b.minBandDist = mdist; b.minBandFrameMs = g.lastDtMs; }
       var sl = slotByNo(net.slot);
@@ -1476,8 +1482,15 @@
       var wasLit = dist(p0.x, p0.y, CX, CY) > INNER_R && sectorOf(p0.x, p0.y) === g.net.slot;
       if (inLit && !wasLit) b.lastEnterLitLT = lt1;
     }
-    // 目前是否貼在亮邊上(換位當下不符時要先離開再碰回才判)
-    b.touchFlag = g.net ? touchesLit(p1.x, p1.y, g.net.slot) : false;
+    // 到這裡代表本段路徑沒有碰網。氣泡若已貼著亮邊(位置式判定), 代表路徑式的掃描與位置式判定不一致(例如剛好相切的邊界), 依規格「屬性相符、碰到判定帶一律必須判成捕捉」
+    // 仍以本段終點判碰網(只在沒有被換位當下不符擋住時); 觸發過就在 resolveTouch 內結束拖曳
+    if (g.net && !b.touchFlag && touchesLit(p1.x, p1.y, g.net.slot)) {
+      g.totals.touchGuard++;
+      resolveTouch(g, b, { x: p1.x, y: p1.y }, lt1, null, null, true);
+      return;
+    }
+    // 目前是否仍貼在亮邊上: 旗標只會由「換位當下不符」設成 true, 這裡只負責在氣泡離開亮邊後解除, 絕不能因為位置貼著就自己設成 true(那會把之後整段碰網判定擋掉)
+    if (b.touchFlag) b.touchFlag = !!g.net && touchesLit(p1.x, p1.y, g.net.slot);
   }
   // 拖曳中碰到不亮邊: 沒有任何作用, 只記次數(埋點)
   function countDarkTouches(g, b, p0, p1, litNet, lt1) {
@@ -1692,7 +1705,7 @@
   }
 
   // 碰網: 拖曳中的氣泡碰到亮邊的那一刻立即判定, 拖曳結束
-  function resolveTouch(g, b, pos, lt, method, swapWaitMs) {
+  function resolveTouch(g, b, pos, lt, method, swapWaitMs, viaGuard) {
     var net = g.net;
     if (!net) return;
     var isCarried = !!b.carried;
@@ -1722,6 +1735,7 @@
       inJumpCue: inJumpCue(g), netChangedDuringDrag: !!(b.netSeqAtGrab != null && b.netSeqAtGrab !== net.seq) || !!b.jumpDuringDrag,
       isCarried: isCarried, judgedLevel: net.level, releaseAfterMs: null, viaReleaseSweep: releaseSweeping
     };
+    if (viaGuard) base.viaPositionGuard = true;      // 路徑式掃描漏判、由位置式保險補判(正常應為 0, 出現就代表兩種判定不一致)
     var touchRec;
     if (ok) {
       dragEndEvent(g, b, '碰網捕捉', lt);
