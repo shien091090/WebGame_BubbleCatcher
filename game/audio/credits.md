@@ -6,7 +6,7 @@
 
 ### 遊戲畫面要放的署名文字
 
-建議放在說明頁最後或結束畫面(位置由製作人決定)。**上一版的 "Aerosol of my Love", "Disco Medusae", "EDM Detection Mode" 署名要整段換掉**:
+建議放在開始畫面或結束畫面(v20 已沒有說明頁; 位置由製作人決定)。**上一版的 "Aerosol of my Love", "Disco Medusae", "EDM Detection Mode" 署名要整段換掉**:
 
 ```
 音樂 / Music
@@ -41,7 +41,7 @@
 
 ## 短音效(CC0)
 
-全部出自 Kenney(www.kenney.nl), 授權 Creative Commons Zero (CC0 1.0), 不需署名; 此處仍記錄出處供查核。授權原文見各包內 License.txt(http://creativecommons.org/publicdomain/zero/1.0/)。10 個檔全部沿用上一版(game-v17), 檔案未再改動。
+全部出自 Kenney(www.kenney.nl), 授權 Creative Commons Zero (CC0 1.0), 不需署名; 此處仍記錄出處供查核。授權原文見各包內 License.txt(http://creativecommons.org/publicdomain/zero/1.0/)。前 10 個檔沿用上一版(game-v17), 檔案未再改動; v20 新增最後 2 個新手教學音(同一包 Interface Sounds)。
 
 共同處理(每個檔都做過): 轉單聲道、剪掉開頭靜音(峰值 1% 以下)、剪掉尾端(峰值 0.4% 以下)並加 15 毫秒淡出、10 kHz 低通後降取樣到 22050 Hz、峰值正規化到 0.89、輸出 mp3。同一份內容另以 16-bit PCM base64 內嵌在 `sound.js`(主要播放路徑), mp3 是沒有 Web Audio 時的退路。
 
@@ -57,3 +57,5 @@
 | stage_change_steel.mp3 | stageChange(換關) | Music Jingles / Steel jingles / jingles_STEEL02.ogg | https://kenney.nl/assets/music-jingles | Kenney | CC0 | 共同處理 |
 | floor_rotate_switch.mp3 | floorRotate(第 3 關地板輪轉) | Interface Sounds / switch_002.ogg | https://kenney.nl/assets/interface-sounds | Kenney | CC0 | 共同處理 |
 | wrong_dye_error.mp3 | wrongDye(沾錯消失) | Interface Sounds / error_005.ogg | https://kenney.nl/assets/interface-sounds | Kenney | CC0 | 共同處理 |
+| tutorial_show_drop.mp3 | tutorialShow(新手教學提示彈出) | Interface Sounds / drop_002.ogg | https://kenney.nl/assets/interface-sounds | Kenney | CC0 | 共同處理(v20 新增) |
+| tutorial_done_confirm.mp3 | tutorialDone(新手教學階段完成) | Interface Sounds / confirmation_003.ogg | https://kenney.nl/assets/interface-sounds | Kenney | CC0 | 共同處理(v20 新增) |

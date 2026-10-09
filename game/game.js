@@ -1,4 +1,5 @@
 // 捕泡手 遊戲邏輯(spec v19)。純傳統 script, 不用 ES module。繪製一律呼叫 window.Art, 聲音一律呼叫 window.Sound。
+// 本版(v20)相對 v19: 刪除說明畫面(5 頁、開場自動開、已看過說明標記)、標題與暫停選單的「說明」、形狀說明對話框整套; 新增開始畫面(只剩「開始」)與嵌入式新手教學(8 階段狀態機, 每幀呼叫 Art.drawTutorial; 這次開網頁期間不重置、不存本機); 埋點 tutorial_show / tutorial_done / tutorial_hide。舊的本機說明標記一律忽略。
 // 本版(v19)相對 v18: 拿掉輸入裝置選擇(標題按鈕與選擇畫面刪除、舊本機設定一律忽略、紀錄無裝置欄)、第 1 → 2 換關的形狀說明對話框(換關第 1~5 步後、預備拍前停住; 0.6 秒防誤點; 本機只自動出現一次)、
 // 看錯保底(同一張光門亮 >= N 秒且期間沾錯消失 + 條件不符碰網 >= 2 次 → 連條件一起換; 第 2 關在下一次跳位、第 1、3 關在嚴格晚於成立的第 2 個拍點)、說明畫面 5 頁、telemetry v19(錯色配對表、缺形狀彈回、同條件鎖住段、形狀說明期間核對等)、
 // 第 2 關門檻後備改只計死在第 2 關後段的熟手局、踩拍分類最低樣本 12 筆。
@@ -26,9 +27,8 @@
   var ctx = canvas.getContext('2d');
   var L = Art.layout;
   var W = Art.canvas.width, H = Art.canvas.height;
-  var GUIDE_PAGES = Art.guidePages || 5;
   var TAU = Math.PI * 2;
-  var BUILD_VERSION = 'demo-v19-0.1.0';
+  var BUILD_VERSION = 'demo-v20-0.1.0';
 
   var CX = 640, CY = 360;
   var INNER_R = 210;
@@ -78,7 +78,7 @@
     fallback: { l2ThresholdHandyDiedGames: 2, l2ThresholdBackOnly: true, l2BackDrain: 5.2, l2BackDrainAfter: 4.9, l3UpperStayOverSec: 95, l3LowerStayUnderSec: 45, l3MinGames: 2, l3SlopeAfterUpper: 0.040, l3StartAfterLower: 4.9, item28MinAccum: 10, item28HitRateMin: 0.65, item28PerGameMedianMin: 3, swapJudgeShareOver: 0.25, misreadPerGame: 3, misreadNoTriggerWithinSec: 6, misreadNoTriggerShare: 0.5 },
     beatClassMinSample: 12,               // v19: 第 2、3 關送進網計次不足 12 筆記「未分類」(原分類另欄記)
     misread: { l2Sec: 6, l13Sec: 8, minErrors: 2, l13BeatPoint: 2 },   // 看錯保底: 第 2 關 N = 6 秒 + 下一次跳位; 第 1、3 關 N = 8 秒 + 嚴格晚於成立的第 2 個拍點; 期間沾錯消失 + 條件不符碰網 >= 2 次
-    shapeDialog: { lockSec: 0.6, targetFloorId: '賦形方', level: 2 },       // 形狀說明對話框: 0.6 秒內不能按; 指著第 2 關的方形狀區
+    tutorial: { appearSec: (Art.timing && Art.timing.tutorialShow) || 0.25, doneSec: (Art.timing && Art.timing.tutorialDone) || 0.8, gapSec: 0.5, hideSec: 12, grabStartSec: 0.5, beatAutoSec: 2.5, hpLowFrac: 0.5 },      // 新手教學: 彈出 0.25 秒、完成特效 0.8 秒、完成後隔 0.5 秒、條件式 12 秒收起、階段 1 在第 0 拍後 0.5 秒、階段 7 出現 2.5 秒自動完成、階段 6 血量低於上限 50%
 
     // 第 10 輪分布套 ±100 / +20 的基準踩拍率(常數, 各關; 送進網約 78 / 91 / 84%、染上約 90%, 待數值精算)
     baselineRound10: { deliver: { 1: 0.78, 2: 0.91, 3: 0.84 }, stick: { 1: 0.90, 2: 0.90, 3: 0.90 }, note: '約值, 待數值精算' },
@@ -164,9 +164,6 @@
   // ---------- 本機狀態(命名空間 bcv19_; 玩家 ID、局數、靜音、已看過說明、最高關沿用 v18 / v17 / v16 的值; 輸入裝置設定一律忽略(v19 拿掉輸入裝置選擇, 不讀也不寫舊的 device 鍵); 跨局後備累積 bcv19_history 重新累積) ----------
   var PLAYER_ID_KEY = 'bcv19_playerId';
   var GAME_COUNT_KEY = 'bcv19_gameCount';
-  var SEEN_GUIDE_KEY = 'bcv19_seenGuide';
-  var SEEN_SHAPE_DIALOG_KEY = 'bcv19_seenShapeDialog';       // 已看過形狀說明標記: 只在玩家點對話框「知道了」時寫入
-  var SHAPE_DIALOG_COUNT_KEY = 'bcv19_shapeDialogCount';     // 這位玩家形狀說明對話框出現過幾次(出現時 +1)
   var MUTED_KEY = 'bcv19_muted';
   var MAXLEVEL_KEY = 'bcv19_maxLevel';
   var HISTORY_KEY = 'bcv19_history';
@@ -193,10 +190,6 @@
     n += 1; lsSet(GAME_COUNT_KEY, String(n));
     return n;
   }
-  function hasSeenGuide() { return lsGetCompat(SEEN_GUIDE_KEY) === '1'; }
-  function markSeenGuide() { lsSet(SEEN_GUIDE_KEY, '1'); }
-  function hasSeenShapeDialog() { return lsGet(SEEN_SHAPE_DIALOG_KEY) === '1'; }
-  function markSeenShapeDialog() { lsSet(SEEN_SHAPE_DIALOG_KEY, '1'); }
   function loadMuted() { return lsGetCompat(MUTED_KEY) === '1'; }
   function saveMuted(m) { lsSet(MUTED_KEY, m ? '1' : '0'); }
   var PLAYER_ID = getPlayerId();
@@ -241,15 +234,11 @@
   window.addEventListener('resize', fitCanvas);
 
   // ---------- 畫面狀態機 ----------
-  var SCREEN = { TITLE: 'title', PLAYING: 'playing', PAUSED: 'paused', GUIDE: 'guide', END: 'end' };
+  var SCREEN = { TITLE: 'title', PLAYING: 'playing', PAUSED: 'paused', END: 'end' };
   var screen = SCREEN.TITLE;
-  var guideReturnTo = null;
-  var guidePage = 1;
-  var pendingAutoGuideClose = false;
-  if (!hasSeenGuide()) { guideReturnTo = SCREEN.TITLE; screen = SCREEN.GUIDE; pendingAutoGuideClose = true; }
   var endInfo = null;
   var lastGameEndWall = null;
-  var hov = { title: null, pauseBtn: false, muteBtn: false, pauseMenu: null, guide: null, end: null, dialogOk: false };
+  var hov = { title: null, pauseBtn: false, muteBtn: false, pauseMenu: null, end: null };
   var game = null;
   var animT = 0;                   // 背景 / HUD 動態用的遞增秒數(暫停凍結)
   // 署名: credits.md 的新署名(三首新曲; 前兩首已調速、第 3 首已截取並循環)。標題與結束畫面的署名區只有約 106 像素高, 所以把每首的「曲名 / 作者 / 授權 / 修改說明」併成一行, 授權網址放最後一行
@@ -316,12 +305,6 @@
   function floorState(g, f) {
     var a = f.appear[g.lvl - 1];
     if (!a) return { exists: false };
-    if (g.phase === 'shapeDialog') {
-      // 形狀說明對話框開著: 第 2 關前段的地板已顯示、不生效(standby, t = 0); 被指著的方形狀區用 spotlight(說明標示中); 三角形狀區未出場
-      if (a === 'back') return { exists: false };
-      var spot = !!(g.dialog && g.dialog.open && f.shape === 'square');
-      return { exists: true, active: false, status: spot ? 'spotlight' : 'standby', r: PARAMS.floorR, t: 0 };
-    }
     var bs = g.bs, beat = g.lt / bs;
     if (g.phase === 'countIn') {
       if (a === 'back') return { exists: false };
@@ -587,7 +570,7 @@
       wave: newWave(), batches: [], batchSeq: 0,
       net: null, netSeq: 0, netLevelSeq: 0, recent: [], pendingGuarantee: null, netAppearRec: null, netAppearList: [], netFirstPressDone: false, netApproached: false,
       carry: null, endFrame: false, holdStartGT: null,
-      clipSec: 0, dialog: null, dialogShown: false, pendingDialogRec: null, pendingMisreadRecs: [], sampleCount: 0, l2Drift: { song: [], level: [] }, crossedDialogSurv: null,
+      clipSec: 0, tutDone: [], pendingMisreadRecs: [], sampleCount: 0, l2Drift: { song: [], level: [] },
       stuck: null, stuckSeq: 0, stuckHint: '網輪替後', autoSwapCount: 0, rotateSeq: 0, jumpSeq: 0, rotatePreviewRec: null, jumpPreviewRec: null, lastRotateBeat: null, lastJumpBeat: null, lastRotateRec: null,
       pendingEmpty: [], lastDtMs: 0, multiBatchFrames: 0,
       events: [], spawnSegOf: {},
@@ -596,7 +579,7 @@
         spawned: 0, captured: 0, expired: 0, missColor: 0, missShape: 0, levelCleared: 0, bounceCond: 0, bounceOuter: 0, stayInner: 0, putBack: 0,
         holdNoDrag: 0, swipeEffective: 0, swipeLocked: 0, batches: 0, nodeCounted: 0, nodeUncounted: 0, nodeOnBeat: 0, nodeByType: {},
         presses: 0, grabs: 0, drops: 0, heals: 0, netAppears: 0, levelSwitches: 0, carryCaptured: 0, carryCleared: 0, touches: 0,
-        misreadEstablished: 0, misreadExecuted: 0, misreadCancelled: 0, misreadDeferrals: 0, shapeDialogs: 0, swapJudged: 0, swapNoJudge: 0, touchGuard: 0, swipeUnasked: 0, jumpPreviewCaptures: 0, jumpOnlyCount: 0, jumpCondCount: 0, hitOffEdge: 0, emptyPresses: 0, suspects: 0, suspectsSure: 0, rotations: 0
+        misreadEstablished: 0, misreadExecuted: 0, misreadCancelled: 0, misreadDeferrals: 0, swapJudged: 0, swapNoJudge: 0, touchGuard: 0, swipeUnasked: 0, jumpPreviewCaptures: 0, jumpOnlyCount: 0, jumpCondCount: 0, hitOffEdge: 0, emptyPresses: 0, suspects: 0, suspectsSure: 0, rotations: 0
       },
       frame: { rotated: false, expired: false, overflow: false, expireCount: 0, expiredBatchSeqs: [], misses: [] },
       lastDropGT: null, lastDropProcessable: null, lastPressGT: null, lastDropRec: null,
@@ -640,7 +623,7 @@
     return { phase: r3(phase), toNextMs: Math.round(((fl + 1) * bs - lt) * 1000), nearestDiffMs: r1((lt - nearest * bs) * 1000), nearestBeat: nearest, showing: phase < PARAMS.beatChangeShowFrac };
   }
   function segLabel(g) {
-    if (g.phase === 'countIn' || g.phase === 'shapeDialog') return '預備拍';
+    if (g.phase === 'countIn') return '預備拍';
     return g.curBack ? '後段' : '前段';
   }
   function segKeyNow(g) { return segKeyOf(g.lvl, !!g.curBack); }
@@ -1397,6 +1380,7 @@
     if (extra) for (var k in extra) rec[k] = extra[k];
     emit(g, 'heal', rec, atLT);
     noteHp80(g);
+    tutNote(g, 'heal');
     return { before: before, applied: applied, overflow: overflow, overflowPts: overflowPts, after: g.hp };
   }
   function scoreForCombo(combo) {
@@ -1451,6 +1435,7 @@
     g.frame.expired = true; g.frame.expireCount++; g.stuckHint = '過期後';
     g.totals.expired++;
     g.levelStats[g.lvl].expires++;
+    tutNote(g, 'expire');
     if (!g.firstExpire) g.firstExpire = { surv: g.surv, key: segKeyNow(g), batchSeq: b.batchSeq, processable: processableCount(g) };
     snd('expire', { x: b.x });
     var before = g.hp;
@@ -1821,6 +1806,7 @@
       noteMisread(g, 'miss', nodeLT);
       g.missFxs.push({ x: pos.x, y: pos.y, color: attr === 'color' ? value : null, t: 0, paletteLevel: b.carried && g.carry ? g.carry.oldLevel : null });
       snd('wrongDye', { x: pos.x });
+      tutNote(g, 'wrong', { x: pos.x, y: pos.y });
       g.combo = 0;
       g.stuckHint = '沾錯消失後';
       g.levelStats[g.lvl].miss++;
@@ -1844,7 +1830,7 @@
     if (!wantedAttr) {
       // 光門沒要的屬性(光門沒列形狀時賦上形狀): 照常染上並鎖定, 不算染錯; 不是節點 —— 不計次、不判踩拍、不回血、不給踩拍回饋 / 聲音、不影響漸強級數、不算進整串
       evt.wantedClass = '沒要求染上'; evt.feedbackKind = '沾上(光門沒要)';
-      if (attr === 'shape') noteDialogFirstShape(g, false, nodeLT);
+      if (attr === 'shape') tutNote(g, 'shape');
       evt.detourBeforePath = Math.round(b.dragPathLen - prevActPath); evt.detourBeforeSec = r3(gtAt(g, nodeLT) - prevActGT);
       g.totals.swipeUnasked++; b.unaskedCount++; b.unaskedThisDrag++;
       var swU = emit(g, 'swipe', evt, nodeLT);
@@ -1854,7 +1840,7 @@
       return 'ok';
     }
     evt.wantedClass = '光門要的'; evt.feedbackKind = '沾上(光門要的)';
-    if (attr === 'shape') noteDialogFirstShape(g, true, nodeLT);
+    tutNote(g, attr === 'shape' ? 'shape' : 'dye');
     emit(g, 'swipe', evt, nodeLT);
     pushStickFx(g, b, 'stick', attr, value, b.carried && g.carry ? g.carry.oldLevel : null);
     b.effSwipeCount++;
@@ -1865,6 +1851,7 @@
       b.beatHealTotal += PARAMS.hpBeatGain;
       heal(g, b, PARAMS.hpBeatGain, 'beat', { nodeType: nodeType, tier: chk.tier }, nodeLT);
       pushBeatFx(g, b, b.x, b.y, chk.tier, true);
+      tutNote(g, 'beatHeal', { bubble: b, x: b.x, y: b.y });
       snd('onBeat', { step: chk.tier, x: pos.x });
     }
     return 'ok';
@@ -1895,6 +1882,7 @@
   // 捕捉(一般與帶過的那一顆共用): 得分、連續數、回血、送進網節點(踩拍、漸強、整串); 回傳摘要供碰網 / 捕捉事件使用
   function captureBubble(g, b, lt, net, isCarried, pos, method) {
     var gnow = gtAt(g, lt);
+    tutNote(g, 'capture');       // 新手教學: 在回血與網的輪替之前記(階段 3 / 5 完成; 之後的踩拍才看得到階段 3 已完成)
     var newCombo = g.combo + 1;
     var pts = scoreForCombo(newCombo);
     g.score += pts; g.captureScoreTotal += pts; g.combo = newCombo;
@@ -1929,6 +1917,7 @@
     var fxX = clampNum(pos.x, 0, W), fxY = clampNum(pos.y, 0, H);
     if (deliverChk.on && !fallbackActive) {
       pushBeatFx(g, b, fxX, fxY, deliverChk.tier, false);
+      tutNote(g, 'beatHeal', { x: fxX, y: fxY });
       snd('onBeat', { step: deliverChk.tier, x: fxX });
     }
     if (chain && !fallbackActive) {
@@ -2256,6 +2245,7 @@
       b.mode = 'drag';
       b.grabCount++; b.dragSessionId++;
       g.totals.grabs++;
+      tutNote(g, 'grab', { x: b.x, y: b.y });
       var gnow = gtAt(g, lt);
       b.dragPathLen = 0; b.lockedSameThis = 0; b.lockedDiffThis = 0; b.touchedDarkThisDrag = 0; b.jumpDuringDrag = false; b.darkSince = {};
       b.netSeqAtGrab = g.net ? g.net.seq : null;
@@ -2399,12 +2389,6 @@
     g.pauseCount++;
     var rec = emit(g, 'pause', { startRealMs: Date.now() - g.startWall, endRealMs: null, reason: reason === 'blur' ? '失焦' : '按鈕', atSeg: segLabel(g) });
     g.openPauseRecord = rec;
-    if (g.phase === 'shapeDialog' && g.dialog && g.dialog.open) {
-      // 暫停選單疊在形狀說明對話框上: 「知道了」不可按; 按下狀態作廢(恢復後要重新按下)
-      rec.overDialog = true;
-      g.dialog.pressValid = false; g.dialog.pressed = false;
-      (reason === 'blur' ? g.dialog.pauseBlur : g.dialog.pauseBtn).n++;
-    }
     screen = SCREEN.PAUSED;
     mouse.btn = false;
     try { Sound.pauseMusic(); } catch (e) {}
@@ -2415,7 +2399,6 @@
     rec.endRealMs = Date.now() - g.startWall;
     var ms = rec.endRealMs - rec.startRealMs;
     g.pauseRealMs += ms;
-    if (rec.overDialog && g.dialog) { g.dialog.pauseOverlayMs += ms; (rec.reason === '失焦' ? g.dialog.pauseBlur : g.dialog.pauseBtn).ms += ms; }
     g.openPauseRecord = null;
   }
   function resumePause(g) {
@@ -2423,7 +2406,7 @@
     g.paused = false;
     endPauseRecord(g);
     screen = SCREEN.PLAYING;
-    if (g.phase !== 'shapeDialog') { try { Sound.resumeMusic(g.lt / g.bs); } catch (e) {} }      // 對話框開著時沒有背景音樂, 恢復也不能開始播
+    try { Sound.resumeMusic(g.lt / g.bs); } catch (e) {}
   }
 
   // ==================================================================
@@ -2682,9 +2665,6 @@
     var oldBs = g.bs;
     var endT = LEVELS[oldLvl].endBeat * oldBs;
     var overshoot = Math.max(0, g.lt - endT);
-    // 第 1 → 2 換關且本機沒有「已看過形狀說明」標記: 第 1~5 步後出現形狀說明對話框並停住; 關末那一幀超過關末的時間捨去(不併入預備拍、不計入局時間)
-    var willDialog = (oldLvl === 1 && !hasSeenShapeDialog());
-    if (willDialog) { g.gt -= overshoot; overshoot = 0; }
     if (g.net) cancelMisread(g, '換關', g.net);
     var w = g.wave;
     g.totals.levelSwitches++;
@@ -2695,7 +2675,7 @@
       clearedCount: 0, clearedSatisfiable: { 可滿足: 0, 不能滿足: 0 }, clearedHoldNoDrag: 0, clearedRemainLife: [], processableAtEnd: processableCount(g),
       cancelledBatch: w.cur && w.cur.rec.nextBatchCancelled ? { had: true, originalBeat: w.cur.rec.cancelledOriginalBeat } : { had: !!(w.nextStartBeat != null), originalBeat: w.nextStartBeat },
       discardedGuarantee: g.pendingGuarantee ? { kind: g.pendingGuarantee.kind, value: g.pendingGuarantee.value } : null,
-      hadCarry: false, shapeDialog: false, carryMatchedOldNet: null, carryResult: null, carryResultMs: null, carryOverflowHp: null, carryOverflowPts: null, hpAfterRefill: null,
+      hadCarry: false, carryMatchedOldNet: null, carryResult: null, carryResultMs: null, carryOverflowHp: null, carryOverflowPts: null, hpAfterRefill: null,
       countInStartMs: Math.round((g.gt - overshoot) * 1000), countInEndMs: null, newFirstNet: null,
       idleBeforeEndBeats: null, batchFromStartToEndBeats: null
     };
@@ -2712,17 +2692,6 @@
     g.events.push(lr);
     // 1. 場上氣泡清掉, 只有拖曳中那一顆例外
     var carried = (mouse.press && mouse.press.dragging) ? mouse.press.bubble : null;
-    var carriedByDialog = false;
-    if (willDialog && carried && !carried.dead) {
-      // 形狀說明出現那一刻帶過的那一顆中止並清掉: 不彈回、不扣血、不改連續數、不記「放下」事件(拖曳結束方式記換關中止); 舊網熄滅; 之後到左鍵放開前指標不觸發任何按鈕、放開不產生事件(對話框開著時不收輸入佇列)
-      lr.hadCarry = true; lr.carryMatchedOldNet = fullyMatchesNet(carried, g.net);
-      carried.carried = true; g.carry = { bubble: carried, oldLevel: oldLvl };
-      carried.dragPathTotal += carried.dragPathLen;
-      var deRec = dragEndEvent(g, carried, '換關中止', g.lt);
-      if (deRec) deRec.byShapeDialog = true;
-      clearCarried(g, carried, '形狀說明中止清掉', g.lt);
-      carried = null; carriedByDialog = true;
-    }
     g.bubbles.slice().forEach(function (b) {
       if (b === carried) return;
       if (b.mode === 'hold') {
@@ -2800,84 +2769,8 @@
     if (newLvl > prevMax) { lsSet(MAXLEVEL_KEY, String(newLvl)); lsSet(FIRST_REACH_KEY + newLvl, String(g.gameIndex)); }
     // 5. 音樂與提示音(順序: 換關 → 新歌 → 預備拍第 −4 拍)
     snd('stageChange');
-    if (willDialog) {
-      // 對話框開著: 拍子時鐘不起動、新關背景音樂不開始(第 1 關的歌已在關末結束)、沒有預備拍音效、換關提示不顯示; 點「知道了」才走換關第 7 步
-      try { Sound.stopMusic(); } catch (e) {}
-      openShapeDialog(g, lr, carriedByDialog);
-      return;
-    }
     try { Sound.playMusic(LEVELS[newLvl].music, { beat: g.lt / g.bs }); } catch (e) {}
     snd('countIn', { left: 4 });
-  }
-
-  // ==================================================================
-  // 形狀說明對話框(第 1 → 2 換關、本機首次): 遊戲停住(局時間 / 存活時間 / 拍子時鐘 / 音樂 / 波次 / 扣血全不動); 只有左鍵點「知道了」(出現後 >= 0.6 秒、按下與放開都落在按鈕上、按下在出現之後、暫停選單沒開)能關
-  // ==================================================================
-  function dialogReady(g) {
-    var d = g && g.dialog;
-    return !!(d && d.open && !g.paused && d.t >= (Art.timing.shapeDialogLock || PARAMS.shapeDialog.lockSec));
-  }
-  function openShapeDialog(g, lr, abortedCarry) {
-    var cnt = parseInt(lsGet(SHAPE_DIALOG_COUNT_KEY), 10) || 0;
-    lsSet(SHAPE_DIALOG_COUNT_KEY, String(cnt + 1));
-    g.phase = 'shapeDialog';
-    g.dialogShown = true;
-    g.totals.shapeDialogs++;
-    inputQueue = []; mouse.uiDownKey = null; hov.dialogOk = false;
-    var nowReal = Date.now();
-    var d = g.dialog = {
-      open: true, t: 0, pressValid: false, pressed: false, frozenTime: animT, prevCount: cnt, isFirst: cnt === 0,
-      openGT: g.gt, openSurv: g.surv, openRealMs: nowReal - g.startWall, openWall: nowReal, pauseOverlayMs: 0, pauseBtn: { n: 0, ms: 0 }, pauseBlur: { n: 0, ms: 0 },
-      sampleCountAtOpen: g.sampleCount, drainAtOpen: g.drainTotal, rec: null
-    };
-    d.rec = emit(g, 'shapeDialog', {
-      openGameMs: gtMs(g), openSurvMs: survMs(g), openRealMs: d.openRealMs, isFirst: d.isFirst, previousShownCount: cnt, abortedCarry: !!abortedCarry, hpAtOpen: r1(g.hp),
-      endHow: null, stayRealSec: null, stayLevel: g.lvl, check: null, pauseOverDialog: null, firstShapeAfterCloseSec: null, firstShapeKind: null
-    });
-    lr.shapeDialog = true;
-    // 跨過形狀說明: 拖曳結束到下一次按下的間隔 / 最長無捕捉間隔加標記
-    if (g.lastDragEndRec && g.lastDragEndRec.intervalToNextPressMs == null) g.lastDragEndRec.crossedShapeDialog = true;
-    if (g.lastCaptureRec && g.lastCaptureRec.pathToNextPress == null) g.lastCaptureRec.crossedShapeDialog = true;
-    g.crossedDialogSurv = g.surv;
-  }
-  function closeShapeDialog(g, how) {
-    var d = g.dialog;
-    if (!d || !d.open) return;
-    d.open = false; d.pressValid = false; d.pressed = false;
-    var now = Date.now(), rec = d.rec;
-    rec.endHow = how;
-    rec.stayRealSec = r3(Math.max(0, now - d.openWall - d.pauseOverlayMs) / 1000);       // 出現到結束的真實經過秒數, 扣除暫停選單疊在上面的時間
-    rec.check = {
-      openGameMs: rec.openGameMs, closeGameMs: gtMs(g), gameMsDelta: gtMs(g) - rec.openGameMs, openSurvMs: rec.openSurvMs, closeSurvMs: survMs(g), survMsDelta: survMs(g) - rec.openSurvMs,
-      openRealMs: d.openRealMs, closeRealMs: now - g.startWall, samplesDuring: g.sampleCount - d.sampleCountAtOpen, drainDuring: r3(g.drainTotal - d.drainAtOpen)
-    };
-    rec.pauseOverDialog = { button: { n: d.pauseBtn.n, sec: r3(d.pauseBtn.ms / 1000) }, blur: { n: d.pauseBlur.n, sec: r3(d.pauseBlur.ms / 1000) } };
-    g.phase = 'countIn';
-    if (how !== '知道了') return;           // 以重開 / 放棄結束: 局即將結束, 不起動預備拍與音樂, 不寫標記
-    markSeenShapeDialog();
-    // 換關第 7 步: 新關背景音樂從頭開始、預備拍從點「知道了」那一刻起算(第 −4 拍)、換關提示隨預備拍出現
-    g.introT = 0; g.lastCountInBeat = -PARAMS.countInBeats;
-    var lr = levelRecOpen(g);
-    if (lr && lr.toLevel === g.lvl) lr.countInStartMs = gtMs(g);
-    inputQueue = []; mouse.uiDownKey = null;
-    g.pendingDialogRec = { rec: rec, closeSurv: g.surv };
-    try { Sound.playMusic(LEVELS[g.lvl].music, { beat: g.lt / g.bs }); } catch (e) {}
-    snd('countIn', { left: 4 });
-  }
-  // 關閉後第一筆賦形生效擦過(光門要的 / 沒要求染上): 回填到對話框事件
-  function noteDialogFirstShape(g, wanted, nodeLT) {
-    var p = g.pendingDialogRec;
-    if (!p || p.rec.firstShapeAfterCloseSec != null) return;
-    var survAt = Math.max(0, g.surv - (g.lt - nodeLT));
-    p.rec.firstShapeAfterCloseSec = r3(Math.max(0, survAt - p.closeSurv));
-    p.rec.firstShapeKind = wanted ? '光門要的' : '沒要求染上';
-    g.pendingDialogRec = null;
-  }
-  function tickDialog(g, dt) {
-    var d = g.dialog;
-    if (!d || !d.open) { g.phase = 'countIn'; return; }       // 防呆: 對話框狀態不一致時回到預備拍
-    d.t += dt;                                                // 對話框出現後經過的秒數(暫停時 tick 不跑, 自然凍結)
-    updateFx(g, dt);                                          // 只推進血量環回滿那段的短動畫; 局時間 / 存活時間 / 拍子時鐘都不動
   }
 
   function abortCarried(g) {
@@ -2953,8 +2846,12 @@
   // 主更新(一幀)。順序見 spec「同一幀的處理順序」
   // ==================================================================
   function tick(dt, rafTs) {
+    var g0 = game;
+    tickCore(dt, rafTs);
+    if (g0 && game === g0) { try { tutUpdate(g0, dt); } catch (e) { if (window.console) console.error(e); } }
+  }
+  function tickCore(dt, rafTs) {
     var g = game;
-    if (g.phase === 'shapeDialog') { tickDialog(g, dt); return; }       // 形狀說明對話框開著: 遊戲停住
     if (muted) g.muteSecAcc += dt;
     var ltPrev = g.lt;
     g.lt += dt; g.gt += dt;
@@ -4522,60 +4419,32 @@
   }
   function computeV19Summary(g, endReason, X, result) {
     var E = g.events, hz = endReason === 'hpZero', survEnd = X.survEnd, res = {};
-    var touches = byType(E, 'netTouch'), misses = byType(E, 'missVanish'), nets = byType(E, 'netAppear'), dialogs = byType(E, 'shapeDialog');
+    var touches = byType(E, 'netTouch'), misses = byType(E, 'missVanish'), nets = byType(E, 'netAppear');
     var caps = byType(E, 'capture'), presses = byType(E, 'press'), swipes = byType(E, 'swipe'), dragEnds = byType(E, 'dragEnd');
     var capsReal = caps.filter(function (c) { return !c.isCarried; });
 
-    // ----- 形狀說明: 本局是否出現、是否首次、結束方式、停留秒數分三檔(< 2 秒未閱讀 / 2 秒到(字數 ÷ 8 + 1)秒略讀 / 超過已讀; 字數 15 時分界 2.875 秒; 只當描述) -----
-    var readCut = 15 / 8 + 1;
-    function readClass(sec) { return sec == null ? null : (sec < 2 ? '未閱讀' : (sec <= readCut ? '略讀' : '已讀')); }
+    // ----- 第 2 關形狀染錯讀數(形狀說明已刪除, 保留第 2 關形狀染錯率對照) -----
     var l2Shape = function (lvlSeg) {
       var m = misses.filter(function (e) { return e.level === 2 && e.floorKind === '賦形' && (lvlSeg == null || e.seg === lvlSeg); }).length;
       var eff = swipes.filter(function (e) { return e.floorLevel === 2 && e.classification === '生效' && e.floorKind === '賦形' && (lvlSeg == null || e.seg === lvlSeg); }).length;
       return { shapeMiss: m, shapeEffective: eff, shapeMissShare: ratio(m, m + eff) };
     };
-    res.shapeDialog = {
-      reachedLevel2: g.maxLevel >= 2, shown: dialogs.length > 0, count: dialogs.length,
-      records: dialogs.map(function (d) { return { isFirst: d.isFirst, previousShownCount: d.previousShownCount, endHow: d.endHow, stayRealSec: d.stayRealSec, readClass: readClass(d.stayRealSec), abortedCarry: d.abortedCarry, firstShapeAfterCloseSec: d.firstShapeAfterCloseSec, firstShapeKind: d.firstShapeKind }; }),
-      readCutSec: r3(readCut), note: '只當描述(每台機器只自動出現一次, 樣本 1 筆); 主讀數是缺形狀彈回(missingShapeBounce)',
-      level2ShapeMiss: { all: l2Shape(null), front: l2Shape('前段'), back: l2Shape('後段'), note: '第 2 關前段只有方形狀區, 結構上形狀染錯必為 0; 跨版本對照依第幾局列出並列上一版同口徑' }
-    };
+    res.level2ShapeMiss = { all: l2Shape(null), front: l2Shape('前段'), back: l2Shape('後段'), note: '第 2 關前段只有方形狀區, 結構上形狀染錯必為 0; 教學第 8 階段在第 2 關遊玩中教形狀' };
 
-    // ----- 形狀說明期間核對: 出現與關閉當下的局時間 / 存活時間 / 真實時間, 差(應 0), 期間每秒取樣筆數(應 0)與持續扣血量(應 0) -----
-    res.shapeDialogCheck = dialogs.map(function (d) {
-      var c = d.check;
-      return c ? { openGameMs: c.openGameMs, closeGameMs: c.closeGameMs, gameMsDelta: c.gameMsDelta, openSurvMs: c.openSurvMs, closeSurvMs: c.closeSurvMs, survMsDelta: c.survMsDelta, openRealMs: c.openRealMs, closeRealMs: c.closeRealMs, samplesDuring: c.samplesDuring, drainDuring: c.drainDuring, allZero: c.gameMsDelta === 0 && c.survMsDelta === 0 && c.samplesDuring === 0 && c.drainDuring === 0 } : { open: true, note: '對話框結束欄位未填' };
-    });
-
-    // ----- 逐局時間核對: 真實經過 − 局時間 − 暫停真實秒數 − 形狀說明停留秒數(− 幀間隔超過上限被裁掉的秒數)應在 ± 0.1 內; 第 2 關第 0 拍的存活時間 = 8640 ÷ B1 -----
+    // ----- 逐局時間核對: 真實經過 − 局時間 − 暫停真實秒數(− 幀間隔超過上限被裁掉的秒數)應在 ± 0.1 內; 第 2 關第 0 拍的存活時間 = 8640 ÷ B1 -----
     var realSec = (Date.now() - g.startWall) / 1000;
     var gameElapsed = g.gt + PARAMS.countInBeats * LEVELS[1].beatSec;
-    var dialogStay = sumOf(dialogs.map(function (d) { return d.stayRealSec || 0; }));
-    var resid = realSec - gameElapsed - g.pauseRealMs / 1000 - dialogStay - (g.clipSec || 0);
+    var resid = realSec - gameElapsed - g.pauseRealMs / 1000 - (g.clipSec || 0);
     res.timeCheck = {
-      realElapsedSec: r3(realSec), gameElapsedSec: r3(gameElapsed), pauseRealSec: r3(g.pauseRealMs / 1000), dialogStaySec: r3(dialogStay), frameClippedSec: r3(g.clipSec || 0),
-      residualSec: r3(resid), withinTolerance: Math.abs(resid) <= 0.1, note: '真實經過 − 局時間 − 暫停真實秒數 − 形狀說明停留秒數 − 幀間隔上限裁掉的秒數(切分頁等)',
+      realElapsedSec: r3(realSec), gameElapsedSec: r3(gameElapsed), pauseRealSec: r3(g.pauseRealMs / 1000), frameClippedSec: r3(g.clipSec || 0),
+      residualSec: r3(resid), withinTolerance: Math.abs(resid) <= 0.1, note: '真實經過 − 局時間 − 暫停真實秒數 − 幀間隔上限裁掉的秒數(切分頁等)',
       level2StartSurvSec: g.levelEnterSurv[2] == null ? null : r3(g.levelEnterSurv[2]), level2StartExpectedSec: r3(LEVELS[1].levelSec),
       level2StartDiffSec: g.levelEnterSurv[2] == null ? null : r3(g.levelEnterSurv[2] - LEVELS[1].levelSec)
     };
 
-    // ----- 對話框上疊暫停: 次數與秒數, 依按鈕 / 失焦分開 -----
-    res.pauseOverShapeDialog = {
-      button: { n: sumOf(dialogs.map(function (d) { return d.pauseOverDialog ? d.pauseOverDialog.button.n : 0; })), sec: r3(sumOf(dialogs.map(function (d) { return d.pauseOverDialog ? d.pauseOverDialog.button.sec : 0; }))) },
-      blur: { n: sumOf(dialogs.map(function (d) { return d.pauseOverDialog ? d.pauseOverDialog.blur.n : 0; })), sec: r3(sumOf(dialogs.map(function (d) { return d.pauseOverDialog ? d.pauseOverDialog.blur.sec : 0; }))) }
-    };
-
     // ----- 第 2 關第 1 小節音樂偏差(音樂對拍子時鐘, 毫秒帶正負; 依有無形狀說明分開): 歌曲第 1 小節 = 預備拍(第 −4 ~ −1 拍)、關內第 1 小節 = 第 0 ~ 3 拍 -----
     function driftInfo(arr) { return { n: arr.length, medianMs: arr.length ? r1(median(arr)) : null, maxAbsMs: arr.length ? r1(Math.max.apply(null, arr.map(Math.abs))) : null }; }
-    res.level2Bar1MusicDrift = { hadShapeDialog: g.dialogShown, songBar1CountIn: driftInfo(g.l2Drift.song), levelBar1: driftInfo(g.l2Drift.level) };
-
-    // ----- 跨過形狀說明標記: 拖曳結束到下一次按下的間隔清單與最長無捕捉間隔加欄 -----
-    var lng = result.indicator3LongestNoCapture || {};
-    res.crossedShapeDialog = {
-      dragIntervalsCrossing: dragEnds.filter(function (d) { return d.crossedShapeDialog; }).map(function (d) { return { bubbleId: d.bubbleId, intervalToNextPressMs: d.intervalToNextPressMs, pathToNextPress: d.pathToNextPress }; }),
-      capturesCrossing: capsReal.filter(function (c) { return c.crossedShapeDialog; }).map(function (c) { return { bubbleId: c.bubbleId, pathToNextPress: c.pathToNextPress }; }),
-      longestNoCapture: { sec: lng.sec == null ? null : lng.sec, fromSurvSec: lng.fromSurvSec, toSurvSec: lng.toSurvSec, crossedShapeDialog: (g.crossedDialogSurv != null && lng.fromSurvSec != null) ? (g.crossedDialogSurv >= lng.fromSurvSec - 1e-6 && g.crossedDialogSurv <= lng.toSurvSec + 1e-6) : false }
-    };
+    res.level2Bar1MusicDrift = { songBar1CountIn: driftInfo(g.l2Drift.song), levelBar1: driftInfo(g.l2Drift.level) };
 
     // ----- 缺形狀彈回(形狀說明主讀數): 第 2 關條件不符碰網中, 顏色相符、形狀仍是圓的次數; 該顆按下到觸發(或離場)的秒數; 前段 / 後段分開; 上一版基準第 5 / 6 / 7 局 = 0 / 2 / 0 -----
     var missShape = touches.filter(function (t) { return t.level === 2 && !t.isCarried && t.result === '條件不符彈回' && t.colorMatch === true && t.netCondition && t.netCondition.shape != null && t.bubbleShape === 'circle'; });
@@ -4590,7 +4459,7 @@
         var en = endOfBubble(t.bubbleId, t.t);
         return { bubbleId: t.bubbleId, seg: t.seg, touchMs: t.t, pressToEndSec: (pr && en) ? r3((en.t - pr.t) / 1000) : null, endHow: en ? en.how : '換關清掉或局結束殘留' };
       }),
-      previousBuildBaselineGames567: [0, 2, 0], note: '主讀數(形狀說明有沒有解決第 2 關突然出現形狀區); 停留秒數只當描述'
+      previousBuildBaselineGames567: [0, 2, 0], note: '主讀數(教學第 8 階段有沒有解決第 2 關突然出現形狀區)'
     };
 
     // ----- 同條件鎖住段: 每張光門亮起到結束的秒數(第 2 關只換位置的跳位不中斷)、期間沒觸發的跳位次數、期間染錯消失與條件不符彈回數; 逐局最長一段 -----
@@ -4619,8 +4488,8 @@
     if (sh2f && sec2f > 0) {
       var exitHp2f = sh2f.exitHp != null ? sh2f.exitHp : g.hp;
       var capN = capsReal.filter(function (c) { return c.level === 2 && c.seg === '前段'; }).length;
-      res.level2FrontAfterDialog = { hadShapeDialog: g.dialogShown, isFirstDialog: dialogs.length ? dialogs[0].isFirst : null, frontSec: r3(sec2f), ended: l2fEnded, captures: capN, capturesPerSec: r3(capN / sec2f), enterHp: r1(sh2f.enterHp), exitHp: r1(exitHp2f), netHpPerSec: r3((exitHp2f - sh2f.enterHp) / sec2f), note: '淨血含換關回滿後的起點(進第 2 關血量 100)' };
-    } else res.level2FrontAfterDialog = null;
+      res.level2Front = { frontSec: r3(sec2f), ended: l2fEnded, captures: capN, capturesPerSec: r3(capN / sec2f), enterHp: r1(sh2f.enterHp), exitHp: r1(exitHp2f), netHpPerSec: r3((exitHp2f - sh2f.enterHp) / sec2f), note: '淨血含換關回滿後的起點(進第 2 關血量 100)' };
+    } else res.level2Front = null;
 
     // ----- 錯色配對表: 各關兩張 -----
     //   (一) 沾錯消失中, 光門要的顏色 × 實際染上的顏色(形狀染錯另列: 光門要的形狀 × 染上的形狀); (二) 條件不符碰網中顏色錯的, 光門要的顏色 × 氣泡當下顏色(透明記「透明」)
@@ -4652,15 +4521,13 @@
     res.totalsV19 = {
       misreadEstablished: g.totals.misreadEstablished, misreadExecuted: g.totals.misreadExecuted, misreadCancelled: g.totals.misreadCancelled, misreadDeferrals: g.totals.misreadDeferrals,
       misreadRecordsMatchTotals: ms.established === g.totals.misreadEstablished && ms.executed === g.totals.misreadExecuted && ms.cancelled === g.totals.misreadCancelled,
-      shapeDialogs: g.totals.shapeDialogs, shapeDialogEvents: dialogs.length, levelRefills: byType(E, 'levelRefill').length, levelSwitches: g.totals.levelSwitches,
-      carryClearedByShapeDialog: byType(E, 'levelSwitch').filter(function (l) { return l.carryResult === '形狀說明中止清掉'; }).length
+      levelRefills: byType(E, 'levelRefill').length, levelSwitches: g.totals.levelSwitches
     };
     return res;
   }
 
   function finalizeAndDownload(g, endReason) {
     endPauseRecord(g);
-    if (g.dialog && g.dialog.open) closeShapeDialog(g, g.deathReasons.indexOf('放棄') >= 0 ? '放棄' : '重開');     // 以重開 / 放棄結束時, 對話框紀錄補結束欄位
     if (mouse.press) {
       var pb = mouse.press.bubble;
       if (pb && !pb.dead) {
@@ -4683,7 +4550,6 @@
     closeStuck(g, '局結束');
     if (g.net) cancelMisread(g, '局結束', g.net);
     g.pendingMisreadRecs.forEach(function (pm) { if (pm.rec.afterExecToCaptureSec == null) pm.rec.afterExecToCaptureSec = '未觸發'; });      // 換後到觸發的秒數: 局結束前沒觸發記「未觸發」
-    if (g.pendingDialogRec && g.pendingDialogRec.rec.firstShapeAfterCloseSec == null) g.pendingDialogRec.rec.firstShapeAfterCloseSec = (g.deathReasons.indexOf('重開') >= 0 || g.deathReasons.indexOf('放棄') >= 0) ? null : '未染上';      // 局結束前沒染上形狀記「未染上」; 重開或放棄結束記空
     if (g.wave.cur) flushBatch(g, g.wave.cur, '局結束');
     if (g.net) closeNetRec(g.net, '局結束');
     emit(g, 'netFinal', Object.assign({
@@ -4692,6 +4558,7 @@
     }, netFields(g)));
     if (g.curSegKey && g.segHp[g.curSegKey] && g.segHp[g.curSegKey].exitHp == null) g.segHp[g.curSegKey].exitHp = g.hp;
     var summary = computeSummary(g, endReason);
+    summary.tutorialDone = (g.tutDone || []).slice();
     // 跨局累積(後備判定欄用): 本局的精簡紀錄存進本機
     try { if (summary.v17 && summary.v17.historyRecord) saveHistory(loadHistory().filter(function (h) { return !(h.gameIndex === g.gameIndex && h.sessionIndex === g.sessionIndex && h.build === BUILD_VERSION); }).concat([summary.v17.historyRecord])); } catch (e) { if (window.console) console.error(e); }
     var out = {
@@ -4722,7 +4589,6 @@
         jump: { level: 2, everyBeats: PARAMS.jumpEveryBeats, previewBeats: PARAMS.jumpPreviewBeats, lastJumpBeat: PARAMS.jumpLastBeat },
         autoSwapLevels: [1, 3], autoSwapBeatPoint: PARAMS.autoSwapBeatPoint,
         misreadRule: { minErrors: PARAMS.misread.minErrors, level2Sec: PARAMS.misread.l2Sec, level13Sec: PARAMS.misread.l13Sec, level2Execute: '成立後的下一次跳位那一刻(位置用跳位預告的目標槽位, 條件一起換)', level13Execute: '嚴格晚於成立那一刻的第 2 個拍點(成立剛好在拍點上時那一拍不算); 位置照輪替第 2 步抽', defer: '執行那一刻拖曳中的氣泡已沾上的屬性全符合舊網條件(不衝突)且至少已沾上一項 → 延後到下一次跳位 / 下一個拍點再判', cancel: ['捕捉', '關末', '換關', '讓給卡住', '局結束'], newCondition: '自動換位抽法(只從場上至少一顆能滿足的條件中抽)並排除舊網顏色; 排除後沒得抽才允許舊網顏色; 疊形狀依當段機率; 同條件最多連續 2 張', isGuaranteeNet: false, usesGuarantee: false, stuckPriority: '與卡住同時成立只執行卡住', doesNotCountAsStuck: true },
-        shapeDialogRule: { when: '第 1 → 2 換關、本機沒有已看過形狀說明標記(換關第 1~5 步後、預備拍前)', freezes: ['拍子時鐘', '背景音樂', '存活時間', '局時間', '扣血', '出批', '亮網'], lockSec: PARAMS.shapeDialog.lockSec, closeRule: '左鍵點「知道了」: 出現 >= 0.6 秒、按下在出現之後、按下與放開都落在按鈕上、暫停選單沒開', markWrittenOn: '點「知道了」', countInStart: '點「知道了」那一刻起算(第 −4 拍)', overshootDropped: true, targetFloor: '賦形方(第 2 關 330°)', localKeys: { seen: SEEN_SHAPE_DIALOG_KEY, count: SHAPE_DIALOG_COUNT_KEY } },
         beatClassMinSample: PARAMS.beatClassMinSample,
         gate: { widenPx: PARAMS.gateWiden, bandInnerApothem: BAND_IN, edgeApothem: WALL_APO, truncation: '兩端在亮邊線段端點垂直截斷並限亮扇區(梯形)', bandVertices: SLOTS.map(function (s) { return { id: s.id, pts: s.band.map(function (p) { return { x: r1(p.x), y: r1(p.y) }; }) }; }) },
         sectors: SLOTS.map(function (s) { return { id: s.id, midAngle: s.angle, range: [((s.angle - 22.5) + 360) % 360, (s.angle + 22.5) % 360], edgeVertices: [{ x: Math.round(s.v1.x), y: Math.round(s.v1.y) }, { x: Math.round(s.v2.x), y: Math.round(s.v2.y) }] }; }),
@@ -4755,7 +4621,7 @@
       },
       countedForMainStats: (g.deathReasons.indexOf('放棄') === -1 && g.deathReasons.indexOf('重開') === -1),
       durationSec: r3(g.surv), score: g.score, deathReasons: g.deathReasons, maxLevelReached: g.maxLevel, pauseCount: g.pauseCount,
-      shapeDialogShown: !!g.dialogShown,
+      tutorialDone: (g.tutDone || []).slice(),
       group: summary.v18 ? summary.v18.group : null, level3StaySec: summary.v18 ? summary.v18.level3StaySec : null,
       crossGame: { maxLevelEver: parseInt(lsGetCompat(MAXLEVEL_KEY), 10) || 1, firstReachLevel2Game: lsGetCompat(FIRST_REACH_KEY + 2), firstReachLevel3Game: lsGetCompat(FIRST_REACH_KEY + 3) },
       summary: summary, events: g.events
@@ -4805,9 +4671,184 @@
     mouse.press = null; mouse.lastDropPos = null; mouse.netSeqAtLastDrop = null; mouse.pathSinceDrop = 0; mouse.btn = false;
     inputQueue = [];
     game = createGame(idx);
+    tutNewRun(game);
     endInfo = null;
     screen = SCREEN.PLAYING;
     try { Sound.playMusic(LEVELS[1].music, { beat: game.lt / game.bs }); } catch (e) {}
+  }
+
+  // ==================================================================
+  // 新手教學(spec v20「新手教學」): 嵌在遊戲裡, 不暫停、不按下一步; 玩家做到才算完成。畫面一律交 Art.drawTutorial, 這裡只管狀態與錨點
+  //   已完成階段存在 TUT.done(這次開網頁期間有效, 再玩 / 重開不重置, 不存本機); 每局的顯示狀態存在 TUT.run(新局重置)
+  //   計時(0.5 秒起點、12 秒收起、完成後隔 0.5 秒、階段 7 的 2.5 秒)只在遊玩中(phase = playing)走; 暫停時 tick 不跑所以自然凍結; 完成特效(0.8 秒)在預備拍照播完
+  // ==================================================================
+  var TUT_DEFS = {
+    grab: { text: '按住氣泡拖著走', icon: 'press', line: 'main' },
+    dye: { text: '擦過顏色一樣的染色區', icon: null, line: 'main' },
+    gate: { text: '碰到亮著的光門', icon: null, line: 'main' },
+    hold: { text: '抓著的氣泡不會消失', icon: 'press', line: 'cond' },
+    wrong: { text: '染到光門不要的, 氣泡會消失', icon: null, line: 'cond' },
+    heal: { text: '送進光門、對上拍子能補血量', icon: null, line: 'cond' },
+    beat: { text: '對上拍子了! 血量補回來了', icon: null, line: 'cond' },
+    shape: { text: '光門要形狀時, 拖過形狀區變形', icon: null, line: 'shape' }
+  };
+  var TUT_MAIN = ['grab', 'dye', 'gate'];
+  var TUT_COND = ['hold', 'wrong', 'heal', 'beat'];
+  var TUT = { done: {}, run: null };
+
+  // ---- 標示(mark): 被標示物件的判定幾何。格式集中在這幾個函式, 之後照 style.md 對齊只改這裡 ----
+  function tutMarkFloor(x, y, r) { return { kind: 'floor', x: x, y: y, r: r }; }
+  function tutMarkGate(s) { return { kind: 'gate', slot: s.no }; }
+  function tutHpRingR() { return (Art.geometry && Art.geometry.hpRingRadius) || 221; }
+  function tutMarkRing() { return { kind: 'hpRing' }; }
+
+  function tutNewRun(g) {
+    TUT.run = { gameId: g.id, cur: null, susp: null, fx: null, gap: 0, pend: { hold: false, wrong: null, heal: false, beat: null }, healLatched: false };
+  }
+  function tutActive(r, id) { return !!((r.cur && r.cur.id === id) || (r.susp && r.susp.id === id)); }
+
+  // 錨點(每幀依當下狀態重算, 錨點是氣泡 / 光門 / 地板時跟著走); 找不到回 null(這幀不畫泡泡)
+  function tutAnchor(g, c) {
+    var id = c.id, i, b, best = null, d, fl, s;
+    if (id === 'grab') {
+      for (i = 0; i < g.bubbles.length; i++) {
+        b = g.bubbles[i];
+        if (b.mode !== 'idle' || b.color != null || b.carried) continue;
+        d = dist(b.x, b.y, CX, CY);
+        if (!best || d < best.d) best = { b: b, d: d };
+      }
+      return best ? { x: best.b.x, y: best.b.y, mark: null } : null;
+    }
+    if (id === 'hold') {
+      for (i = 0; i < g.bubbles.length; i++) {
+        b = g.bubbles[i];
+        if ((b.mode !== 'idle' && b.mode !== 'return') || b.carried) continue;
+        if (!best || b.life < best.b.life) best = { b: b };
+      }
+      return best ? { x: best.b.x, y: best.b.y, mark: null } : null;
+    }
+    if (id === 'dye') {
+      if (!g.net) return null;
+      fl = floorList(g, false);
+      for (i = 0; i < fl.length; i++) if (fl[i].kind === 'dye' && fl[i].color === g.net.cond.color) return { x: fl[i].x, y: fl[i].y, mark: tutMarkFloor(fl[i].x, fl[i].y, fl[i].r) };
+      return null;
+    }
+    if (id === 'gate') {
+      if (!g.net) return null;
+      s = slotByNo(g.net.slot);
+      return { x: s.x, y: s.y, mark: tutMarkGate(s) };
+    }
+    if (id === 'wrong') {
+      if (!c.fixed) return null;
+      return { x: c.fixed.x, y: c.fixed.y, mark: g.net ? tutMarkGate(slotByNo(g.net.slot)) : null };
+    }
+    if (id === 'heal') return { x: CX, y: CY - tutHpRingR(), mark: tutMarkRing() };
+    if (id === 'beat') {
+      if (!c.fixed) return null;
+      if (c.fixed.bubble && !c.fixed.bubble.dead) return { x: c.fixed.bubble.x, y: c.fixed.bubble.y, mark: null };
+      return { x: c.fixed.x, y: c.fixed.y, mark: null };
+    }
+    if (id === 'shape') {
+      if (g.lvl !== 2) return null;
+      fl = floorList(g, false);
+      for (i = 0; i < fl.length; i++) if (fl[i].kind === 'shape' && fl[i].shape === 'square') return { x: fl[i].x, y: fl[i].y, mark: tutMarkFloor(fl[i].x, fl[i].y, fl[i].r) };
+      return null;
+    }
+    return null;
+  }
+
+  function tutShow(g, id) {
+    var r = TUT.run, c = { id: id, appearT: 0, shownT: 0, fixed: null };
+    if (id === 'wrong') { c.fixed = r.pend.wrong; r.pend.wrong = null; }
+    else if (id === 'beat') { c.fixed = r.pend.beat; r.pend.beat = null; }
+    else if (id === 'hold') r.pend.hold = false;
+    else if (id === 'heal') r.pend.heal = false;
+    r.cur = c;
+    emit(g, 'tutorial_show', { stage: id, sinceStart: r3(g.gt + PARAMS.countInBeats * LEVELS[1].beatSec), level: g.lvl });
+    snd('tutorialShow');
+  }
+  function tutComplete(g, d) {
+    var r = TUT.run, c = r.cur;
+    if (!c) return;
+    var a = tutAnchor(g, c), x = CX, y = CY;
+    if (d && d.x != null && (c.id === 'grab' || c.id === 'hold')) { x = d.x; y = d.y; }      // 抓起類: 特效播在被抓起的那顆上
+    else if (a) { x = a.x; y = a.y; }
+    TUT.done[c.id] = true; g.tutDone.push(c.id);
+    emit(g, 'tutorial_done', { stage: c.id, shownFor: r3(c.shownT), level: g.lvl });
+    r.sndDone = true;       // 完成音留到本幀最後再播(同一刻有捕捉 / 踩拍時, 先響遊戲回饋音、再響 tutorialDone)
+    r.fx = { id: c.id, t: 0, x: x, y: y, mark: a ? a.mark : null, level: g.lvl };
+    r.cur = null;
+  }
+  function tutMainReady(g, id) {
+    if (id === 'grab') return g.lvl > 1 || g.lt >= PARAMS.tutorial.grabStartSec;      // 第 1 關第 0 拍後 0.5 秒(第一批已出現)
+    return true;                                                                      // 階段 2 / 3: 前一階段完成後(依序進行)
+  }
+
+  // 遊戲事件進來: 記下條件式階段的觸發、判斷目前顯示中的階段是否完成。只在遊玩中判完成
+  function tutNote(g, kind, d) {
+    var r = TUT.run;
+    if (!r || !g || r.gameId !== g.id || g.done) return;
+    var D = TUT.done, pn = r.pend;
+    if (kind === 'expire') { if (D.grab && !D.hold && !tutActive(r, 'hold')) pn.hold = true; }
+    else if (kind === 'wrong') { if (!D.wrong && !tutActive(r, 'wrong')) pn.wrong = { x: d.x, y: d.y }; }
+    else if (kind === 'beatHeal') { if (D.gate && !D.beat && !tutActive(r, 'beat')) pn.beat = { bubble: d.bubble || null, x: d.x, y: d.y }; }
+    var c = r.cur;
+    if (!c || g.phase !== 'playing') return;
+    var ok = (c.id === 'grab' && kind === 'grab') || (c.id === 'hold' && kind === 'grab') || (c.id === 'dye' && kind === 'dye') ||
+      (c.id === 'gate' && kind === 'capture') || (c.id === 'wrong' && kind === 'capture') || (c.id === 'heal' && kind === 'heal') || (c.id === 'shape' && kind === 'shape');
+    if (ok) tutComplete(g, d);
+  }
+
+  // 每幀更新(在遊戲本幀之後)
+  function tutUpdate(g, dt) {
+    var r = TUT.run, T = PARAMS.tutorial, D = TUT.done;
+    if (!r || r.gameId !== g.id || g.done) return;
+    if (r.sndDone) { r.sndDone = false; snd('tutorialDone'); }
+    if (r.fx) { r.fx.t += dt; if (r.fx.t >= T.doneSec) { r.fx = null; r.gap = T.gapSec; } }      // 完成特效 0.8 秒, 之後隔 0.5 秒才輪到下一個
+    if (r.cur && r.cur.id === 'shape' && g.lvl !== 2) r.cur = null;                              // 階段 8 只在第 2 關; 離開第 2 關還沒完成就收掉(不記收起事件)
+    if (g.phase !== 'playing') return;                                                           // 預備拍 / 換關預備拍: 不出新泡泡, 計時凍結
+    if (r.gap > 0) r.gap -= dt;
+    // 階段 6 的條件: 階段 3 完成後, 血量低於上限的 50%(進入條件的那一刻; 回到 50% 以上才會再成立)
+    if (!(g.hp < PARAMS.hpMax * T.hpLowFrac)) r.healLatched = false;
+    else if (D.gate && !D.heal && !r.healLatched) { r.healLatched = true; if (!tutActive(r, 'heal')) r.pend.heal = true; }
+    // 階段 8: 第 2 關第 0 拍後(方形狀區生效)一出現就蓋過其他提示(其他提示暫藏、進度保留); 正在播的完成特效先播完, 不看完成後的 0.5 秒間隔
+    if (!D.shape && g.lvl === 2 && !r.fx && !(r.cur && r.cur.id === 'shape')) {
+      if (r.cur) { r.susp = r.cur; r.cur = null; }
+      tutShow(g, 'shape');
+    }
+    var c = r.cur;
+    if (c) {
+      c.appearT += dt; c.shownT += dt;
+      if (c.id === 'beat' && c.shownT >= T.beatAutoSec) tutComplete(g, null);                    // 階段 7: 出現 2.5 秒自動完成
+      else if (TUT_DEFS[c.id].line === 'cond' && c.shownT >= T.hideSec) {                         // 條件式: 12 秒內沒完成就收起, 條件下次再成立時再出現
+        emit(g, 'tutorial_hide', { stage: c.id, level: g.lvl });
+        r.cur = null;
+      }
+    }
+    if (!r.cur && !r.fx && r.gap <= 0) {
+      if (r.susp) { r.cur = r.susp; r.susp = null; r.cur.appearT = 0; return; }                  // 階段 8 完成後回到被蓋過的提示(重新彈出, 不重記出現事件)
+      var next = null, i;
+      for (i = 0; i < TUT_MAIN.length; i++) { if (!D[TUT_MAIN[i]]) { if (tutMainReady(g, TUT_MAIN[i])) next = TUT_MAIN[i]; break; } }   // 主線依序: 前一階段完成才輪到下一個
+      if (!next) for (i = 0; i < TUT_COND.length; i++) { var id = TUT_COND[i]; if (!D[id] && r.pend[id]) { next = id; break; } }                // 條件式不插隊: 主線有階段在等 / 在顯示時排在後面
+      if (next) tutShow(g, next);
+    }
+  }
+
+  // 給 Art.drawTutorial 的 state; 沒有東西要畫回 null。完成特效在預備拍照播; 結束畫面不畫
+  function tutDrawState(g) {
+    var r = TUT.run, T = PARAMS.tutorial, def;
+    if (!r || r.gameId !== g.id || screen === SCREEN.END) return null;
+    if (r.fx) {
+      def = TUT_DEFS[r.fx.id];
+      return { stage: r.fx.id, text: def.text, icon: def.icon, x: r.fx.x, y: r.fx.y, mark: r.fx.mark, appear: 1, done: Math.max(1e-4, clamp01(r.fx.t / T.doneSec)), level: r.fx.level, time: animT, litSlot: g.net ? g.net.slot : 0 };
+    }
+    if (r.cur && g.phase === 'playing') {
+      var a = tutAnchor(g, r.cur);
+      if (!a) return null;
+      def = TUT_DEFS[r.cur.id];
+      return { stage: r.cur.id, text: def.text, icon: def.icon, x: a.x, y: a.y, mark: a.mark, appear: clamp01(r.cur.appearT / T.appearSec), done: 0, level: g.lvl, time: animT, litSlot: g.net ? g.net.slot : 0 };
+    }
+    return null;
   }
 
   // ==================================================================
@@ -4815,7 +4856,6 @@
   // ==================================================================
   function titleLocate(p) {
     if (inRect(p.x, p.y, L.title.start)) return 'start';
-    if (inRect(p.x, p.y, L.title.guide)) return 'guide';
     return null;
   }
   function pauseMenuLocate(p) {
@@ -4823,14 +4863,6 @@
     if (inRect(p.x, p.y, m.resume)) return 'resume';
     if (inRect(p.x, p.y, m.restart)) return 'restart';
     if (inRect(p.x, p.y, m.quit)) return 'quit';
-    if (inRect(p.x, p.y, m.guide)) return 'guide';
-    return null;
-  }
-  function guideLocate(p) {
-    var g2 = L.guide;
-    if (inRect(p.x, p.y, g2.close)) return 'close';
-    if (guidePage > 1 && inRect(p.x, p.y, g2.prev)) return 'prev';
-    if (guidePage < GUIDE_PAGES && inRect(p.x, p.y, g2.next)) return 'next';
     return null;
   }
   function endLocate(p) {
@@ -4843,21 +4875,12 @@
 
   function doTitleAction(key) {
     if (key === 'start') startNewGame();
-    else if (key === 'guide') { guideReturnTo = SCREEN.TITLE; guidePage = 1; screen = SCREEN.GUIDE; }
   }
   function doPauseMenuAction(key) {
     var g = game;
     if (key === 'resume') resumePause(g);
     else if (key === 'restart') endGame('restart');
     else if (key === 'quit') endGame('quit');
-    else if (key === 'guide') { guideReturnTo = SCREEN.PAUSED; guidePage = 1; screen = SCREEN.GUIDE; }
-  }
-  function doGuideAction(key) {
-    if (key === 'close') {
-      screen = guideReturnTo || SCREEN.TITLE; guideReturnTo = null;
-      if (pendingAutoGuideClose) { markSeenGuide(); pendingAutoGuideClose = false; }
-    } else if (key === 'prev') { if (guidePage > 1) guidePage--; }
-    else if (key === 'next') { if (guidePage < GUIDE_PAGES) guidePage++; }
   }
   function doEndAction(key) {
     if (key === 'again') startNewGame();
@@ -4883,19 +4906,13 @@
     if (screen === SCREEN.PLAYING) {
       if (pauseBtnLocate(p)) mouse.uiDownKey = 'pause';
       else if (muteBtnLocate(p)) mouse.uiDownKey = 'mute';
-      else if (game && game.phase === 'shapeDialog') {
-        // 形狀說明對話框開著: 只有「知道了」有反應; 按下必須發生在對話框出現之後(此事件本身就在對話框出現後才進來)、已過 0.6 秒、暫停選單沒開。點別處無反應(不記空按、不進輸入佇列)
-        var dlg = game.dialog;
-        if (dlg && dlg.open && dialogReady(game) && inRect(p.x, p.y, L.shapeDialog.ok)) { dlg.pressValid = true; dlg.pressed = true; }
-      }
       else inputQueue.push({ k: 'down', x: p.x, y: p.y, ts: e.timeStamp });
     } else if (screen === SCREEN.PAUSED) {
       if (muteBtnLocate(p)) mouse.uiDownKey = 'mute';
       else mouse.uiDownKey = pauseMenuLocate(p);
     } else if (screen === SCREEN.TITLE) {
       mouse.uiDownKey = titleLocate(p);
-    } else if (screen === SCREEN.GUIDE) mouse.uiDownKey = guideLocate(p);
-    else if (screen === SCREEN.END) mouse.uiDownKey = endLocate(p);
+    } else if (screen === SCREEN.END) mouse.uiDownKey = endLocate(p);
   });
   canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
@@ -4909,14 +4926,12 @@
     else if (screen === SCREEN.PLAYING) {
       hov.pauseBtn = inside && pauseBtnLocate(p); hov.muteBtn = inside && muteBtnLocate(p);
       mouse.pathSinceDrop += dist(px0, py0, p.x, p.y);
-      if (game && game.phase === 'shapeDialog') hov.dialogOk = inside && game.dialog && game.dialog.open && inRect(p.x, p.y, L.shapeDialog.ok);
-      else if (game && !game.paused) {
+      if (game && !game.paused) {
         if (mouse.btn && inputQueue.length < 4000) inputQueue.push({ k: 'move', x: p.x, y: p.y, ts: e.timeStamp });
         var gm = game;
         if (gm.net && !gm.netFirstPressDone && gm.phase === 'playing' && dist(p.x, p.y, CX, CY) > INNER_R && sectorOf(p.x, p.y) === gm.net.slot) gm.netApproached = true;
       }
     } else if (screen === SCREEN.PAUSED) { hov.pauseMenu = inside ? pauseMenuLocate(p) : null; hov.muteBtn = inside && muteBtnLocate(p); }
-    else if (screen === SCREEN.GUIDE) hov.guide = inside ? guideLocate(p) : null;
     else if (screen === SCREEN.END) hov.end = inside ? endLocate(p) : null;
   });
 
@@ -4933,15 +4948,6 @@
     if (screen === SCREEN.PLAYING) {
       if (key === 'pause') { if (inside && pauseBtnLocate(p) && game) { drainInputsNow(game); openPause(game, 'button'); } return; }
       if (key === 'mute') { if (inside && muteBtnLocate(p)) toggleMute(); return; }
-      if (game && game.phase === 'shapeDialog') {
-        // 對話框: 按下與放開都落在「知道了」上才算; 對話框出現前已按著的左鍵放開時不觸發任何東西(沒有有效的按下)
-        var dl = game.dialog;
-        if (dl && dl.open && dl.pressValid) {
-          dl.pressValid = false; dl.pressed = false;
-          if (inside && inRect(p.x, p.y, L.shapeDialog.ok) && dialogReady(game)) closeShapeDialog(game, '知道了');
-        }
-        return;
-      }
       if (wasDown && game && !game.paused) inputQueue.push({ k: 'up', x: p.x, y: p.y, ts: e.timeStamp, outCanvas: !inside, outWin: !inWindow });
       return;
     }
@@ -4951,8 +4957,6 @@
       else if (pauseMenuLocate(p) === key) doPauseMenuAction(key);
     } else if (screen === SCREEN.TITLE) {
       if (titleLocate(p) === key) doTitleAction(key);
-    } else if (screen === SCREEN.GUIDE) {
-      if (guideLocate(p) === key) doGuideAction(key);
     } else if (screen === SCREEN.END) {
       if (endLocate(p) === key) doEndAction(key);
     }
@@ -5065,6 +5069,8 @@
       Art.drawCountIn(ctx, { level: lvl, beatsLeft: left, phase: phase });
       if (lvl > 1 && (g.introT || 0) < g.countInLen) Art.drawLevelIntro(ctx, { level: lvl, t: g.introT || 0, dur: g.countInLen });
     }
+    var tst = tutDrawState(g);
+    if (tst && Art.drawTutorial) Art.drawTutorial(ctx, tst);
     var endBeat = LEVELS[lvl].endBeat;
     var songProgress = (g.phase === 'playing' && endBeat != null) ? clamp01(beat / endBeat) : null;
     Art.drawHud(ctx, {
@@ -5073,39 +5079,17 @@
     Art.drawPauseButton(ctx, { level: lvl, hover: hov.pauseBtn && !paused });
     Art.drawMuteButton(ctx, { level: lvl, hover: hov.muteBtn, muted: muted });
   }
-  // 形狀說明對話框開著的畫面(style.md 第 7 節): level 2 的背景(time / beat 固定)、內圈、整圈血量環、拍子提示固定 phase、染色地板 standby t = 0、方形狀區 spotlight、沒有亮著的網、HUD(歌曲進度不顯示)→ 對話框 → 暫停 / 靜音按鈕; 不畫氣泡、換關提示、預備拍
-  function renderShapeDialogScene(g, paused) {
-    var d = g.dialog, lvl = 2, ft = d ? d.frozenTime : animT;
-    Art.drawBackground(ctx, { level: lvl, time: ft, beat: -PARAMS.countInBeats });
-    Art.drawArena(ctx, { level: lvl });
-    Art.drawHpRing(ctx, { level: lvl, hp: g.hp, danger: g.danger, time: ft, hpFx: g.hpFx });
-    Art.drawBeatCue(ctx, { level: lvl, phase: 0, beat: -PARAMS.countInBeats });
-    var floors = floorList(g, false);
-    for (var i = 0; i < floors.length; i++) {
-      var z = floors[i], st = z.st;
-      var fs = { level: lvl, x: z.x, y: z.y, r: st.r, status: st.status, t: st.t || 0 };
-      if (z.kind === 'dye') { fs.color = z.color; Art.drawDyeFloor(ctx, fs); }
-      else { fs.shape = z.shape; Art.drawShapeFloor(ctx, fs); }
-    }
-    Art.drawNetWall(ctx, { level: lvl, lit: null });
-    Art.drawHud(ctx, { level: lvl, hp: g.hp, danger: g.danger, hpFx: g.hpFx, time: ft, survival: g.surv, songProgress: null, score: g.score, combo: g.combo });
-    if (d && d.open) Art.drawShapeDialog(ctx, { t: d.t, hover: hov.dialogOk ? 'ok' : null, pressed: !!d.pressed, menu: !!paused });
-    Art.drawPauseButton(ctx, { level: lvl, hover: hov.pauseBtn && !paused });
-    Art.drawMuteButton(ctx, { level: lvl, hover: hov.muteBtn, muted: muted });
-  }
   function render() {
     if (screen === SCREEN.TITLE) {
       Art.drawTitle(ctx, { hover: hov.title });
       Art.drawCredits(ctx, { lines: CREDITS_LINES });
     } else if (screen === SCREEN.PLAYING) {
-      if (game.phase === 'shapeDialog') renderShapeDialogScene(game, false); else renderGame(game, false);
+      renderGame(game, false);
     } else if (screen === SCREEN.PAUSED) {
-      if (game.phase === 'shapeDialog') renderShapeDialogScene(game, true); else renderGame(game, true);
+      renderGame(game, true);
       Art.drawPauseMenu(ctx, { level: game.lvl, hover: hov.pauseMenu });
       Art.drawPauseButton(ctx, { level: game.lvl, hover: false });
       Art.drawMuteButton(ctx, { level: game.lvl, hover: hov.muteBtn, muted: muted });
-    } else if (screen === SCREEN.GUIDE) {
-      Art.drawGuidePage(ctx, { page: guidePage, hover: hov.guide });
     } else if (screen === SCREEN.END) {
       if (game) renderGame(game, true);
       Art.drawGameOver(ctx, { survival: endInfo ? endInfo.time : 0, score: endInfo ? endInfo.score : 0, hover: hov.end });
@@ -5124,7 +5108,7 @@
     var dt = Math.min(Math.max(rawDt, 0) / 1000, 1 / 30); // 切分頁回來不瞬移
     if (screen === SCREEN.PLAYING && game && !game.paused && !game.done) {
       if (game.frameIntervalCount < 600) { game.frameIntervalSum += rawDt; game.frameIntervalCount++; }
-      if (game.phase !== 'shapeDialog') { animT += dt; game.clipSec += Math.max(0, rawDt / 1000 - dt); }       // 逐局時間核對用: dt 上限裁掉的秒數(切分頁、卡頓)
+      animT += dt; game.clipSec += Math.max(0, rawDt / 1000 - dt);       // 逐局時間核對用: dt 上限裁掉的秒數(切分頁、卡頓)
       try { tick(dt, ts); } catch (e) { if (window.console) console.error(e); }
     }
     try { render(); } catch (e) { if (window.console) console.error(e); }

@@ -1,21 +1,23 @@
-# 捕泡手 美術規格(對應 spec v19)
+# 捕泡手 美術規格(對應 spec v20)
 
 > index.html 必須宣告 `<meta charset="utf-8">`, 否則 art.js 裡的中文字串在 file:// 下會變亂碼。
 > art.js 以一般 `<script>` 載入, 產生全域 `window.Art`。全部 Canvas 2D 幾何, 無外部資源。
 
-## v19 build 與上一版(v18)的差異, RD 要接的
+## v20 與 v19 的差異, RD 要接的
 
-沿用 v18 的三套皮(林間 / 舞廳 / 魔龍)、骨、函式名、參數、繪製層級與時長表; 只動下表幾項。
+沿用 v19 的三套皮(林間 / 舞廳 / 魔龍)、骨、色票、函式名、參數與時長; 只動下表幾項。
 
 | 類別 | 項目 | RD 要做什麼 |
 |---|---|---|
-| 刪除 | `drawDeviceSelect`、`Art.layout.device`、`Art.layout.title.device`; 標題不再有「輸入裝置」按鈕 | 拿掉呼叫與按鈕判定 |
-| 新增 | **`drawShapeDialog(ctx, state)`** 形狀說明對話框; `Art.layout.shapeDialog`; `Art.timing.shapeDialogLock` / `shapeDialogIn` | 需要 RD 接(見第 5 節物件表與第 7 節) |
-| 新增狀態 | `drawShapeFloor` 的 `status: 'spotlight'`(說明標示中) | 對話框開著時, 第 2 關的方形狀區用這個狀態畫 |
-| 修改 | `drawGuidePage` 支援 `page: 5`(形狀; 第 2 關風格); `Art.guidePages` = 5 | 翻頁上限改讀 `Art.guidePages` |
-| 換色 | 第 2 首 4 色重定(B / C 混淆對, 見第 2 節) | 若有寫死色碼, 改讀 `Art.palette[2]` |
-| 畫法 | 第 2 首亮著的光門色帶往外由 4 改 10、外光由雙層(22 + 34)改單層 16; 第 2 首染色區棋盤格壓淡 | 無(內緣位置不變, 已重驗) |
-| state 欄位異動 | 只有上面兩個新增; 其他沿用 | — |
+| 新增 | **`drawTutorial(ctx, state)`** 新手教學提示(提示泡泡 + 脈動標示 + 完成特效) | **需要 RD 接**。state 與 `mark` 格式見第 5 節「新手教學提示」; 繪製層級在 HUD 之前(第 7 節) |
+| 新增(規格外的選填欄位) | `drawTutorial` 的 `time?`(標示呼吸用的秒數, 暫停凍結)、`litSlot?`(亮著的光門槽, 泡泡避開它) | 建議傳。不傳 `time` = 標示靜止不呼吸; 不傳 `litSlot` = 泡泡不避光門(規格要求泡泡不遮亮著的光門, 所以請傳) |
+| 新增 | `Art.timing.tutorialShow = 0.25`、`tutorialDone = 0.8` | `appear` = 經過秒數 ÷ 0.25, `done` = 經過秒數 ÷ 0.8 |
+| 修改 | `drawTitle`: 只剩「開始」; `hover` 只認 `'start'` | `Art.layout.title` 只剩 `start`(位置不變) |
+| 修改 | `drawPauseMenu`: 拿掉「說明」, 剩三顆; 面板與按鈕往下移 35 讓面板上下置中 | 判定框改讀新的 `Art.layout.pauseMenu`(見第 7 節), `hover` 不再有 `'guide'` |
+| 刪除 | `drawGuidePage`、`Art.guidePages`、`Art.layout.guide`、`Art.layout.title.guide`、`Art.layout.pauseMenu.guide` | 拿掉呼叫與判定 |
+| 刪除 | `drawShapeDialog`、`Art.layout.shapeDialog`、`Art.timing.shapeDialogIn` / `shapeDialogLock` | 拿掉呼叫與判定 |
+| 刪除 | 賦形地板的 `status: 'spotlight'`(說明標示中) | 不再傳; 傳了會畫成生效外觀(不拋錯) |
+| 不變 | 其餘 22 個函式的 state 欄位與畫法 | — |
 
 ## 1. 邏輯畫布尺寸
 
@@ -29,10 +31,11 @@
 
 | 名稱 | 色碼 | 用途 |
 |---|---|---|
-| capture | #ffffff | 一般觸發的白閃、白環與勾; 光門換位掃光與角框; 血量環上「觸發回血」那一段; 說明標示中的地板光圈(只在遊戲停住時出現) |
+| capture | #ffffff | 一般觸發的白閃、白環與勾; 光門換位掃光與角框; 血量環上「觸發回血」那一段 |
 | frozen | #ffffff | 被按住 / 拖曳中(壽命凍結)的壽命環 |
 | locked | #c9ced8 | 已鎖定回饋的灰虛線環 |
 | danger | #ff2b3d | **三關同一色**: 危險紅光脈動、血條危險框、壽命剩 < 25% 的環、過期 / 沾錯扣血那一段、沾錯消失的叉、靜音中按鈕 |
+| 教學紙色 / 教學深色(v20) | 該關 ink / 林間 #0f3326、舞廳 #1e0f3a、魔龍 #14101e | 只給新手教學: 泡泡底與標示 = 紙色, 字、描邊、滑鼠圖示、完成勾 = 深色 |
 | underlay | rgba(0,0,0,0.38~0.62) | 亮邊黑襯底、血量環軌、氣泡外緣軌、回饋外描、內圈外圈襯底 |
 
 各關色票(`Art.palette[1|2|3]`)。三關明暗: 明亮 / 暗 + 點狀光 / 近黑。
@@ -41,7 +44,7 @@
 |---|---|---|---|---|
 | bgTop / bgMid / bgBottom | #d9f7c8 / #8fd88a / #2f7a4c | #120a2a / #1e0f3a / #2a1240 | #06040c / #0d0818 / #160c22 | 背景漸層 |
 | ground | #163d36 深苔青 | #1a1236 暗紫(棋盤另一格 #2a1f52) | #1a1622 黑石 | 內圈地面 |
-| rim | #eaffd2 嫩葉白 | #ffd77a 金 | #cfc6e0 骨銀 | 內圈邊線、歌曲進度已播段、主按鈕、對話框框線 |
+| rim | #eaffd2 嫩葉白 | #ffd77a 金 | #cfc6e0 骨銀 | 內圈邊線、歌曲進度已播段、主按鈕 |
 | wallDim | #2f6b3a 藤綠 | #5a4a8a 紫磚 | #4a4258 鐵灰 | 不亮的網牆邊 |
 | colorA | #e2459a 莓洋紅(328°, 灰階 126) | **#ffc83a 金(43°, 200)** | #ffc03a 熔金(41°, 196) | 色 A(染色區、光門條件、氣泡、沾上光環) |
 | colorB | #ffd83a 陽光黃(48°, 210) | **#4ee04a 正綠(118°, 163)** | #5ad636 毒綠(107°, 159) | 色 B |
@@ -52,10 +55,10 @@
 | glass | #f6fff2 | #f0f6ff | #f0ecff | 透明氣泡的玻璃本體、出批水紋 |
 | lifeRing | #f4ffe0 | #fff4d8 | #d8d0e8 | 壽命環(一般) |
 | shapeFloorBase / Glyph | #0c2a26 / #f4fff0 | #0e0822 / #fff6e6 | #0a0810 / #f2eeff | 賦形地板的深色盤 / 實心白形狀 |
-| ink / inkDim | #f4fff0 / #bfe3c4 | #fff6e6 / #c8b8e8 | #f2eeff / #a49cbc | 文字 |
+| ink / inkDim | #f4fff0 / #bfe3c4 | #fff6e6 / #c8b8e8 | #f2eeff / #a49cbc | 文字; ink 另當教學紙色 |
 | 背景專用(不匯出) | 樹冠、葉片、草叢 | flower #ec4f9c 粉洋紅(331°)/ flowerLight #ff9ccc / flowerDark #9c2a6a / leaf #2c5a3e | dragon #1c1430 / dragonEdge #3a2a56 / ember #ffd27a / eye #e8f0b0 | 只在八邊形距離 ≥ 360 的背景裝飾用 |
 
-### 第 2 首 B / C 重定色(本版優先驗收項)
+### 第 2 首 B / C 重定色(v19 定色, 本版沿用)
 
 第 12 輪實測 3 局 5 次顏色染錯中 4 次染成 B(B / C 混淆對)。v18 的 B 翡翠綠(130°)與 C 藍寶(208°)HSV 色相差 78°, 數字上過了「≥ 60°」, 但兩色都往中間的「青」偏: 綠帶藍、藍帶青, 而且舊光門色帶在第 2 首疊了 22 + 34 兩層外光, 條件色在暗紫底上被暈成一片青光。改法(node 驗算):
 
@@ -97,25 +100,25 @@
 
 ## 3. 形狀語言
 
-可拿起的(氣泡)= 立體(放射漸層 + 高光 + 反光弧 + 常駐落影)、外緣一圈壽命環且外緣 = 判定圓; 場景的(地板、內圈)= 平塗、無影、無高光; 會被「碰到」的東西畫面邊界 = 判定邊界, 外光只往外放。每關只換「皮」, 不換「骨」。三套皮: 林間 = 柔圓、藤葉、年輪; 舞廳 = 8-bit 像素方塊、棋盤、金邊; 魔龍 = 尖角、鐵甲、寶石切面、法陣。
+可拿起的(氣泡)= 立體(放射漸層 + 高光 + 反光弧 + 常駐落影)、外緣一圈壽命環且外緣 = 判定圓; 場景的(地板、內圈)= 平塗、無影、無高光; 會被「碰到」的東西畫面邊界 = 判定邊界, 外光只往外放; 教學(v20)= 全畫面唯一「淺底深字」的東西(紙色底 + 深色字與描邊), 標示是紙色實線圈原地呼吸。每關只換「皮」, 不換「骨」。三套皮: 林間 = 柔圓、藤葉、年輪; 舞廳 = 8-bit 像素方塊、棋盤、金邊; 魔龍 = 尖角、鐵甲、寶石切面、法陣。
 
 ## 4. 理念落實
 
 (經驗文件中狀態為「成立」的理念, 每條一句)
 
-- P0 辨識度先於好看: 主題氛圍交給背景、地面紋理與網牆造型; 第 2 首老闆實測的 B / C 混淆, 寧可把舞廳的冷色調(翡翠 + 藍寶)換成正綠 + 鈷藍 + 紫紅, 也不保留原本較協調的配色; 光門的華麗雙層外光一併拿掉。
-- P1 視覺權重跟著決策迫切度: 亮著的光門與操作中的氣泡最亮; 形狀說明對話框開著時遊戲停住, 全畫面壓暗, 只留被指著的方形狀區原亮度加白色光圈, 視線落點只有「對話框」與「那塊地板」兩處。
-- P2 規則上存在的東西畫面上就存在: 光門判定加寬 12 像素直接畫成亮邊的一部分(第 2 首色帶改寬後重驗 24 個光門, 內緣在往內 10.5~12.5 像素); 「知道了」0.6 秒內不能按, 畫成看得出的不可按狀態, 而不是按了沒反應。
-- P3 一本字典: 白 = 觸發 / 凍結(說明標示中的白光圈只在遊戲停住時出現, 不與觸發同框); 「虛線 + 由中心長大 = 還沒生效」這個詞同樣用在「知道了」的鎖定期(虛線框 + 由中間往兩端長的進度, 長滿 = 能按); 能按的「知道了」與其他畫面的主按鈕同一個長相(金色實心); 示意圖裡的形狀區、染色區、光門、氣泡直接呼叫第 2 關的遊戲內畫法, 被指著的那塊在場上也畫成同一個長相(說明標示中 = 生效外觀)。
-- P4 關鍵區分兩條通道: 4 色 = 色相 + 明度, 第 2 首 B / C 兩條都拉開(109°、灰階差 79); 沾上 vs 踩拍 = 顏色 + 動態; 沾上 vs 已鎖定 = 顏色 + 線型 + 方向; 沾上(光門沒要)= 外形 + 靜止; 血量環 vs 壽命環 = 尺度 + 顏色; 紅花 vs 危險 = 色相 + 位置 + 動態 + 形狀; 「知道了」不能按 vs 能按 = 線型(虛線 / 實線)+ 填色(深底淡字 / 金底深字)。
-- P7 每個元素掙得版面: 對話框只有一句話、一張圖、一個按鈕; 示意圖兩格不加圖說標籤(光門上有沒有形狀符號就是兩格唯一的差); 刪掉輸入裝置按鈕與選擇畫面。
-- P9 以最混亂那刻驗收: B / C 對照截圖用第 2 關實際背景、危險紅光、拍子提示在拍點、6 顆以上已染色氣泡(含拖曳中、方形)與光門條件同框, 不用單顆特寫。
-- P13 事件排隊: 對話框出現時換關提示不顯示, 關掉後才隨預備拍出現(規格時序); 內圈周邊分帶沿用: 危險紅光 174~211 → 血量環 214~228 → 拍子提示 229~266。
-- P15 回饋強度和份量成正比: 沿用 v18 分級(每拍變化 < 出批 < 沾上(光門沒要)< 觸發 < 沾上(光門要的)/ 踩拍第 1 級 < 第 2 級 < 第 3 級 < 整串), 本版未動。
-- P17 進度圖形與數字分工: 血量環畫總量、無數字; 「知道了」的鎖定進度只是一條無數字的填色, 長滿即可按。
-- P18 重要資訊不只一瞬間: 形狀說明對話框的內容在說明第 5 頁可隨時重看(同一張圖)。
-- P19 資訊貼著物件: 對話框的指向尖角從框右緣伸出, 尖端碰到被指地板的白光圈(不停在空白處); 光圈長在那塊地板本身。
-- P21 示意圖選分岔例子: 第 5 頁 / 對話框兩格同一條路線、同一組地板, 只差光門上有沒有「方」: 左格要方 + 色 A、右格只要色 A, 兩格都變成方形色 A、都打勾 — 對照「光門沒要形狀時變了形會不會出事」這個最可能的誤解。
+- P0 辨識度先於好看: 教學泡泡不做成跟各關主題融合的面板, 而是三關都用同一種「淺底深字」, 一眼就知道「這是在教你」, 不會跟遊戲物件或其他提示混在一起; 三關只換泡泡的角(圓角 / 像素直角 / 切角)與紙色的色調。
+- P1 視覺權重跟著決策迫切度走: 教學泡泡只有一行字、一顆; 遊戲不停, 所以泡泡預設在錨點上方、避開 HUD 與按鈕, 傳了 `litSlot` 時也避開亮著的光門(玩家當下要送去的地方), 不蓋被標示的物件(尾巴尖端停在標示圈外)。
+- P2 規則上存在的東西畫面上就存在: 標示沿判定幾何畫 — 染色區 / 形狀區 / 氣泡圈在判定圓外 8 像素, 光門圈住整條判定帶(含往內 12 的加寬), 血量環內外兩側各一圈夾住軌; 教學講的「那個東西」就是規則上那個範圍。
+- P3 一本字典: 教學是新的一類, 所以給它字典裡沒人用過的長相: 淺紙色底(其他面板都是深底)、紙色實線圈原地呼吸(白色外擴環 = 觸發 / 沾上、白角框 = 換位 / 出場、虛線 + 長大 = 還沒生效、深底白勾 = 觸發成功, 全部避開); 完成用「紙色圓牌 + 深色勾」, 與觸發的「深色圓 + 白勾」黑白相反; 不用危險紅、拍子色、4 色與血量色。刪除說明標示中狀態後, 白色實心光圈不再出現。
+- P4 關鍵區分兩條通道: 教學泡泡 vs 換關提示(深底膠囊 + 拍子色框)= 明暗反轉 + 尾巴; 教學標示 vs 觸發 / 沾上的環 = 動態(持續原地呼吸 vs 一次外擴淡出)+ 線型(紙色實線帶深色外描, 3~5 粗); 教學完成勾 vs 觸發勾 = 明暗反轉 + 四角星散開; 其餘沿用 v19。
+- P7 每個元素掙得版面: 泡泡只有一行字 + 必要時一個滑鼠圖示(只有「按住」需要); 沒有標題、頁碼、關閉鈕; 標示只在規格有寫「標示」的階段畫; 說明頁與形狀說明對話框整個刪除。
+- P9 以最混亂那刻驗收: 擺位在每一個錨點都跑同一套避讓(HUD、按鈕、亮著的光門、被標示物件、畫布邊), 不是只對階段表的預設位置調; 泡泡自帶深色描邊 + 落影, 壓在任何東西上都讀得到。
+- P13 事件排隊: 同時只畫一顆泡泡(規格); 完成特效 0.8 秒播完, 泡泡在前 0.3 秒內縮小淡出, 下一個提示要等規格的 0.5 秒後才出現, 不會跟完成特效疊在一起。內圈周邊分帶沿用: 危險紅光 174~211 → 血量環 214~228 → 拍子提示 229~266; 血量環標示的兩圈落在 211 與 231, 夾住軌、不蓋環本身。
+- P15 回饋強度和份量成正比: 教學完成特效(圓牌 17 + 8 顆小星散到 62)小於觸發以外的大回饋, 不搶踩拍與整串; 沿用 v18 分級。
+- P17 進度圖形與數字分工: 沿用(血量環無數字); 教學不顯示進度或第幾步。
+- P18 重要資訊不只一瞬間: 教學泡泡不會自己定時消失, 主線階段留到玩家做到為止; 條件式 12 秒沒做到才收起, 條件再成立會再出現。**張力**: 規格刪了說明頁, 教學完成後同一次開網頁不會再出現, 玩家沒有地方重看; 這是規格的決定, 美術不另補。
+- P19 資訊貼著物件: 泡泡的尾巴尖端直接指到錨點(停在標示圈外緣), 錨點會動時泡泡每幀跟著走; 標示長在被講的那個物件本身的外緣。
+- P21 示意圖選分岔例子: 教學沒有示意圖, 直接標在場上的實物上; 「染錯」那一段在玩家剛染錯的當下出現, 錨點是消失處、標示是亮著的光門, 這樣原因和結果會同時出現在畫面上。
 
 ### 沾上(光門沒要)回饋(v17 設計, 本版沿用不變)
 
@@ -127,40 +130,87 @@
 
 | 物件 | 函式 | state 欄位 | 狀態與視覺差異 |
 |---|---|---|---|
-| 背景 | `drawBackground(ctx, state?)` | `level`, `time?`(秒, 暫停凍結), `beat?`(浮點拍數 = 關內拍序號 + 拍內進度; 預備拍可為負) | 三關各一套(林間 / 舞廳 / 魔龍, 同 v18)。不傳 `time` / `beat` 畫靜止版; **形狀說明對話框開著時請傳固定值(拍子提示停住)**。契約註記: 多收一個可省略的 state |
-| 內圈(場地) | `drawArena(ctx, state)` | `level` | 同 v18 |
-| 血量環 + 危險紅光 | `drawHpRing(ctx, state)` | `level`, `hp`(0~100), `danger`(bool), `time`, `hpFx?` | 同 v18。換關回滿傳 `hp: 100`; 對話框開著時維持整圈 |
-| 拍子提示 | `drawBeatCue(ctx, state)` | `level`, `phase`(0~1), `beat` | 同 v18。對話框開著時傳固定的 `phase`(停住) |
-| 網牆 + 光門 + 光門條件 + 第 2 關跳位預告 | `drawNetWall(ctx, state)` | `level`; `lit`: `null` 或 `{ slot: 1~8, color: 'A'~'D', shape: null / 'square' / 'triangle', paletteLevel?, hintT?, fromSlot?, jump? }`; `catchFx`: `null` 或 `{ slot, t, x?, y? }` | 同 v18; **第 2 首色帶往外改 10、外光單層 16**。對話框開著時 `lit: null`(沒有亮著的網) |
+| 背景 | `drawBackground(ctx, state?)` | `level`, `time?`(秒, 暫停凍結), `beat?`(浮點拍數 = 關內拍序號 + 拍內進度; 預備拍可為負) | 三關各一套(林間 / 舞廳 / 魔龍)。不傳 `time` / `beat` 畫靜止版(標題用)。契約註記: 多收一個可省略的 state |
+| 內圈(場地) | `drawArena(ctx, state)` | `level` | 同 v19 |
+| 血量環 + 危險紅光 | `drawHpRing(ctx, state)` | `level`, `hp`(0~100), `danger`(bool), `time`, `hpFx?` | 同 v19。換關回滿傳 `hp: 100` |
+| 拍子提示 | `drawBeatCue(ctx, state)` | `level`, `phase`(0~1), `beat` | 同 v19 |
+| 網牆 + 光門 + 光門條件 + 第 2 關跳位預告 | `drawNetWall(ctx, state)` | `level`; `lit`: `null` 或 `{ slot: 1~8, color: 'A'~'D', shape: null / 'square' / 'triangle', paletteLevel?, hintT?, fromSlot?, jump? }`; `catchFx`: `null` 或 `{ slot, t, x?, y? }` | 同 v19 |
 | 扇區 | 不畫 | — | 規格明定不必畫出 |
-| 染色地板 | `drawDyeFloor(ctx, state)` | `level`, `x`, `y`, `r`(24 / 20), `color`('A'~'D'), `status`('active' / 'preview' / 'standby' / 'intro' / 'spotlight'), `t`(0~1 比例), `shrink?` | 同 v18(第 2 首棋盤格壓淡)。`'standby'` = 換關預備拍中(虛線外框 + 由中心長大的填色, `t` = 預備拍已過比例); **對話框開著時傳 `standby, t: 0`** |
-| 賦形地板 | `drawShapeFloor(ctx, state)` | 同上, `color` 換成 `shape`('square' / 'triangle') | 深色盤 + 實心白形狀。**新增 `'spotlight'`(說明標示中)**: 畫成生效外觀(與示意圖同一個長相)+ 外圍半徑 r+9 的白色實線光圈(帶白外光、深色外描)。只在形狀說明對話框開著時用在第 2 關的方形狀區(761,290); 關掉對話框那一刻改回 `'standby'` |
-| 第 3 關輪轉預告 | `drawRotateCue(ctx, state)` | `level`(3), `p`, `r?`, `floors` | 同 v18 |
-| 出批提示 | `drawBatchCue(ctx, state)` | `level`, `x`, `y`, `t` | 同 v18 |
-| 氣泡(含壽命環與隨拍變化) | `drawBubble(ctx, state)` | `level`, `x`, `y`, `color`(null / 'A'~'D'), `shape`, `status`('idle' / 'held' / 'dragging' / 'returning' / 'carried'), `life`(0~1), `spawnT?`, `hover?`, `paletteLevel?`, `beatPhase` | 同 v18 |
-| 沾地板回饋 | `drawStickFx(ctx, state)` | `level`, `x`, `y`, `kind`('stick' / 'unasked' / 'locked'), `attr`, `value`, `t`, `stack?`, `paletteLevel?` | 同 v18 |
-| 沾錯消失回饋 | `drawMissFx(ctx, state)` | `level`, `x`, `y`, `color?`, `t`, `paletteLevel?` | 同 v18 |
-| 踩拍回饋 | `drawBeatFx(ctx, state)` | `level`, `x`, `y`, `tier`(1~3), `t`, `onBubble` | 同 v18 |
-| 整串回饋 | `drawChainFx(ctx, state)` | `level`, `x`, `y`, `t` | 同 v18 |
-| 預備拍 | `drawCountIn(ctx, state)` | `level`, `beatsLeft`(4~1), `phase` | 同 v18 |
-| 換關提示 | `drawLevelIntro(ctx, state)` | `level`, `t`, `dur` | 同 v18。對話框開著時不畫, 關掉後隨預備拍出現 |
-| 血條 / 存活時間 / 歌曲進度 / 分數 / 連續數 | `drawHud(ctx, state)` | `level`, `hp`, `danger`, `hpFx`, `time`, `survival`, `songProgress`(0~1 / `null`), `score`, `combo` | 同 v18。對話框開著時 `songProgress: null`(不顯示)、`survival` 停住 |
-| 暫停按鈕 | `drawPauseButton(ctx, state)` | `level`, `hover` | 同 v18; 對話框開著時照畫(畫在對話框之後) |
-| 靜音按鈕 | `drawMuteButton(ctx, state)` | `level`, `hover`, `muted` | 同 v18; 對話框開著時照畫 |
-| 暫停選單 | `drawPauseMenu(ctx, state)` | `level`, `hover`('resume' / 'restart' / 'quit' / 'guide') | 同 v18; 對話框開著時疊在對話框上(之後再畫一次兩顆按鈕) |
-| **形狀說明對話框(新增)** | **`drawShapeDialog(ctx, state)`** | `t`(秒, 對話框出現後經過; 暫停時凍結), `hover?`('ok' / null), `pressed?`(bool, 左鍵在「知道了」上按著未放), `menu?`(bool, 暫停選單疊在上面) | 固定第 2 關風格(不收 `level`)。全畫面壓暗 50%, 被指著的方形狀區(761,290)挖一個半徑 42 的洞不壓; 左半邊對話框(框 x 36~680、y 118~692, 金框), 框右緣伸出指向尖角, 尖端碰到那塊地板的白光圈; 框內上方一句「光門可能要形狀, 拖過形狀區就變形」, 中間共用示意圖(兩格), 下方「知道了」。**「知道了」不能按**(`t < 0.6` 或 `menu: true`): 深底 + 金色虛線框 + 40% 淡字, 底下一條金色填色由中間往兩端長(`t / 0.6`, `menu` 時不畫), 長滿 = 能按。**能按**: 金色實心主按鈕 + 深字(與標題「開始」、暫停「繼續」同一個長相); `hover` 變亮加白框, `pressed` 變暗。前 0.18 秒整體淡入 |
-| 標題畫面 | `drawTitle(ctx, state)` | `hover`('start' / 'guide') | 林間背景 + 4 顆裝飾氣泡 + 「開始」「說明」兩顆按鈕(**拿掉「輸入裝置」**) |
-| 說明畫面 | `drawGuidePage(ctx, state)` | `page`(1~5), `hover`('close' / 'prev' / 'next') | 自帶背景。右上「關閉」每頁都有; 左下「上一頁」第 1 頁沒有; 右下「下一頁」第 5 頁沒有。第 1~4 頁第 1 首(林間)風格不變; **第 5 頁整頁第 2 首(舞廳)風格**, 圖與對話框共用 |
-| 結束畫面 | `drawGameOver(ctx, state)` | `survival`, `score`, `hover`('again' / 'title') | 同 v18 |
-| 背景音樂署名 | `drawCredits(ctx, state)` | `lines`(字串陣列), `y?` | 同 v18 |
-| 已看過形狀說明標記、拍子時鐘、背景音樂 | 不畫 | — | 非視覺物件 |
-| 輸入裝置選擇 | **刪除** | — | 規格刪除 |
+| 染色地板 | `drawDyeFloor(ctx, state)` | `level`, `x`, `y`, `r`(24 / 20), `color`('A'~'D'), `status`('active' / 'preview' / 'standby' / 'intro'), `t`(0~1 比例), `shrink?` | 同 v19。`'standby'` = 換關預備拍中(虛線外框 + 由中心長大的填色, `t` = 預備拍已過比例) |
+| 賦形地板 | `drawShapeFloor(ctx, state)` | 同上, `color` 換成 `shape`('square' / 'triangle') | 深色盤 + 實心白形狀。**v20 刪除 `'spotlight'`(說明標示中)** |
+| 第 3 關輪轉預告 | `drawRotateCue(ctx, state)` | `level`(3), `p`, `r?`, `floors` | 同 v19 |
+| 出批提示 | `drawBatchCue(ctx, state)` | `level`, `x`, `y`, `t` | 同 v19 |
+| 氣泡(含壽命環與隨拍變化) | `drawBubble(ctx, state)` | `level`, `x`, `y`, `color`(null / 'A'~'D'), `shape`, `status`('idle' / 'held' / 'dragging' / 'returning' / 'carried'), `life`(0~1), `spawnT?`, `hover?`, `paletteLevel?`, `beatPhase` | 同 v19 |
+| 沾地板回饋 | `drawStickFx(ctx, state)` | `level`, `x`, `y`, `kind`('stick' / 'unasked' / 'locked'), `attr`, `value`, `t`, `stack?`, `paletteLevel?` | 同 v19 |
+| 沾錯消失回饋 | `drawMissFx(ctx, state)` | `level`, `x`, `y`, `color?`, `t`, `paletteLevel?` | 同 v19 |
+| 踩拍回饋 | `drawBeatFx(ctx, state)` | `level`, `x`, `y`, `tier`(1~3), `t`, `onBubble` | 同 v19 |
+| 整串回饋 | `drawChainFx(ctx, state)` | `level`, `x`, `y`, `t` | 同 v19 |
+| 預備拍 | `drawCountIn(ctx, state)` | `level`, `beatsLeft`(4~1), `phase` | 同 v19 |
+| 換關提示 | `drawLevelIntro(ctx, state)` | `level`, `t`, `dur` | 同 v19 |
+| **新手教學提示(v20 新增)** | **`drawTutorial(ctx, state)`** | 見下方「新手教學提示」 | 提示泡泡 / 標示 / 彈出 / 完成特效, 見下方 |
+| 血條 / 存活時間 / 歌曲進度 / 分數 / 連續數 | `drawHud(ctx, state)` | `level`, `hp`, `danger`, `hpFx`, `time`, `survival`, `songProgress`(0~1 / `null`), `score`, `combo` | 同 v19 |
+| 暫停按鈕 | `drawPauseButton(ctx, state)` | `level`, `hover` | 同 v19 |
+| 靜音按鈕 | `drawMuteButton(ctx, state)` | `level`, `hover`, `muted` | 同 v19 |
+| 暫停選單 | `drawPauseMenu(ctx, state)` | `level`, `hover`('resume' / 'restart' / 'quit') | 壓暗 + 面板 + 「繼續」(金色實心主按鈕)、「重開」、「放棄」三顆。**v20 拿掉「說明」**, 面板縮短並上下置中 |
+| 開始畫面 | `drawTitle(ctx, state)` | `hover`('start' / null) | 林間背景 + 4 顆裝飾氣泡 + 標題字 + 副標 + **只有「開始」一顆**(金色實心主按鈕)。**v20 拿掉「說明」** |
+| 結束畫面 | `drawGameOver(ctx, state)` | `survival`, `score`, `hover`('again' / 'title') | 同 v19 |
+| 背景音樂署名 | `drawCredits(ctx, state)` | `lines`(字串陣列), `y?` | 同 v19 |
+| 拍子時鐘、背景音樂、教學進度 | 不畫 | — | 非視覺物件(教學進度由 RD 管, 美術只畫目前那一個) |
+| 說明畫面、形狀說明對話框 | **刪除** | — | 規格 v20 刪除 |
 
-### 說明頁內容
+### 新手教學提示 `drawTutorial(ctx, state)`
 
-1~4 頁圖與 v18 相同(第 1 首風格)。
+一次呼叫畫一個提示: 泡泡 + 標示(有 `mark` 時)+ 完成特效(`done > 0` 時)。教學文字、滑鼠圖示、標示、完成特效全部在這個函式裡畫, RD 不另畫字。
 
-5. 形狀(第 2 首風格; 與形狀說明對話框同一張圖): 兩格並排, 每格取景是第 2 關場上的右上一角(遊戲座標 x 602~938、y 56~476), 物件都在第 2 關的真實位置: 內圈、色 A 染色區(761,430)、方形狀區(761,290)= 對話框指著的那一塊、亮著的光門在槽 8。路線一條: 透明氣泡(650,440)→ 擦過色 A 變色 A(776,372)→ 擦過方形狀區 → 方形色 A 碰到光門(853,194), 三個位置都帶按著的指標; 碰到處上方打勾。**左格光門要方 + 色 A(光門上有方形符號), 右格光門只要色 A(無符號)**, 其餘完全相同。無血量環、無拍子提示、無壽命環、無三角形狀區、不畫形狀染錯。
+**state 欄位**
+
+| 欄位 | 型別 | 說明 |
+|---|---|---|
+| `stage` | `'grab'` `'dye'` `'gate'` `'hold'` `'wrong'` `'heal'` `'beat'` `'shape'` | 階段 id。影響尾巴尖端停在錨點前多遠, 以及「錨點是光門」時可以靠近光門 |
+| `text` | 字串 | 提示文字, 照規格階段表(RD 傳入)。單行, 不換行 |
+| `icon` | `'press'` / `null` | `'press'` = 文字左邊畫滑鼠圖示(左鍵塗滿 = 按著) |
+| `x`, `y` | 數字 | 錨點(邏輯畫布座標)。錨點會動時每幀傳新的 |
+| `mark` | `null` 或下表物件 | 要標示的物件, 照它的判定幾何畫脈動標示 |
+| `appear` | 0~1 | 彈出進度 = 出現後經過秒數 ÷ `Art.timing.tutorialShow`(0.25)。≥ 1 傳 1 |
+| `done` | 0~1 | 完成特效進度 = 完成後經過秒數 ÷ `Art.timing.tutorialDone`(0.8); 0 = 還沒完成。到 1 就停止呼叫 |
+| `level` | 1~3 | 目前關卡, 泡泡與標示的配色跟著這一關 |
+| `time?` | 秒(選填, 規格外新增) | 任意遞增、暫停時凍結的秒數(可直接傳關內時間)。標示與滑鼠圖示的呼吸用; 不傳 = 靜止 |
+| `litSlot?` | 1~8 / null(選填, 規格外新增) | 亮著的光門槽位。泡泡擺位時避開它(規格: 泡泡不能遮住亮著的光門); 不傳就不避。`mark` 是光門時不傳也會避開那一道 |
+
+**mark 格式**(座標都是邏輯畫布; 直接傳遊戲裡的判定值)
+
+| 要標示的東西 | 格式 | 美術畫成 |
+|---|---|---|
+| 一顆氣泡 | `{ kind: 'bubble', x, y, r? }` | `r` 缺省 20(判定圓)。判定圓外 8 像素一圈 |
+| 一塊染色區 / 形狀區 | `{ kind: 'floor', x, y, r }` | `r` = 該地板當下的判定半徑(24, 第 3 關後段 20)。判定圓外 8 像素一圈 |
+| 一道光門 | `{ kind: 'gate', slot }` | `slot` 1~8(與 `drawNetWall` 的 `lit.slot` 同一套編號)。圈住整條判定帶(法向往內 12 到往外 10)外再留 8、兩端各多 8 的圓角膠囊 |
+| 血量環 | `{ kind: 'hpRing' }` | 軌(半徑 214~228)內外各一圈: 半徑 211 與 231 |
+
+格式不對或 `kind` 不認得 → 不畫標示(不拋錯)。
+
+**各階段建議傳法**(對照規格階段表)
+
+| 階段 | `x, y` | `mark` | `icon` |
+|---|---|---|---|
+| 1 `grab` | 離中心最近的透明氣泡 | `null` | `'press'` |
+| 2 `dye` | 那塊染色區中心 | `{ kind:'floor', x, y, r }`(同一塊) | `null` |
+| 3 `gate` | 亮著的光門判定帶內緣中點(`Art.geometry.gateInnerApothem` 沿該槽法向) | `{ kind:'gate', slot }` | `null` |
+| 4 `hold` | 剩餘壽命最短的氣泡 | `null` | `'press'` |
+| 5 `wrong` | 消失處 | `{ kind:'gate', slot: 亮著的槽 }` | `null` |
+| 6 `heal` | 血量環最上方 (640, 139) | `{ kind:'hpRing' }` | `null` |
+| 7 `beat` | 那顆氣泡(或捕捉處) | `null` | `null` |
+| 8 `shape` | 第 2 關方形狀區中心 | `{ kind:'floor', x, y, r }`(同一塊) | `null` |
+
+**視覺**
+
+- 泡泡: 一行字(20px 粗體, 該關深色)放在紙色底上(該關 `ink`: 林間 #f4fff0 / 舞廳 #fff6e6 / 魔龍 #f2eeff), 2.5 像素深色描邊, 尾巴從面向錨點的那一邊長出、尖端指向錨點。三關只換角與落影: 林間圓角 16 + 柔影; 舞廳像素直角(圓角 2)+ 往右下 4 像素的硬影; 魔龍切角 9 + 柔影。三關深色: 林間 #0f3326 / 舞廳 #1e0f3a / 魔龍 #14101e
+- 滑鼠圖示(`'press'`): 18 × 27 的滑鼠外形, 左鍵塗滿深色(= 按著), 左上三道短線隨 `time` 微閃
+- 擺位: 依序試「上(置中 → 往左偏 → 往右偏)→ 下(同)→ 右 → 左」, 壓到 HUD、暫停 / 靜音按鈕(各外擴 8)就沿該方向推開; 每個候選扣分(壓 UI、壓亮著的光門、壓被標示物件、蓋到錨點、尾巴過長、出畫布), 取最低; 最後一律夾回畫布內(離邊 8)。錨點在 HUD 裡或畫布角落時泡泡會被推到 HUD 外, 尾巴拉長指回去
+- 尾巴尖端離錨點: 錨點就是被標示的氣泡 / 地板 → 停在標示圈外(r + 14); `grab` `hold` `beat` → 28(停在氣泡外); `heal` → 12; 其他 → 20
+- 標示: 紙色實線(粗 3~5)+ 深色外描(再寬 4)+ 紙色外光, 以 0.9 秒週期原地呼吸(粗細與亮度; 不外擴、不旋轉、不對拍)。0.9 秒刻意不等於危險紅光的 1.3 秒, 也不跟拍子
+- 彈出(`appear` 0 → 1): 泡泡從尾巴尖端由 35% 放大到 100%(稍微回彈), 同時淡入; 標示跟著淡入
+- 完成(`done` 0 → 1, 0.8 秒): 前 0.3 秒泡泡與標示縮小 12% 並淡出; 在錨點(夾在離畫布邊 44 內)彈出紙色圓牌(半徑 17)+ 深色勾, 8 顆紙色小四角星(大小 6.5 / 4.5 交錯, 深色外描)從半徑 20 散到 62 並淡出, 圓牌在後 38% 淡出。`gate` 階段的完成與觸發同一刻發生: 觸發的白勾在碰網點往內 34, 教學勾在錨點, 兩者黑白相反
+- 不用危險紅、拍子色、4 色、血量色; 不壓暗畫面, 遊戲照常進行
 
 ## 6. 尺寸表
 
@@ -170,16 +220,18 @@
 | 血量環 | 中心半徑 221; 軌寬 14(214~228); 弧寬 10; 增減亮段最少 9 弧長 |
 | 危險紅光 | 半徑 174~211, 週期 1.3 秒 |
 | 拍子提示 | 從半徑 266 收到 234; 第 2 首方塊 8×8(黑底 10×10, 內緣 ≥ 229) |
-| 網牆 | 每邊長約 248.5。**亮邊色帶**: 法向從邊中線往內 12 到往外 10(三關相同; v18 第 2 首為往外 4); 內緣白芯寬 4(往內 12~8); 黑襯底往內 14 到往外 16; 外光: 第 1 首 22 / 第 2 首 16 / 第 3 首 12, 只在內緣以外 |
+| 網牆 | 每邊長約 248.5。**亮邊色帶**: 法向從邊中線往內 12 到往外 10(三關相同); 內緣白芯寬 4(往內 12~8); 黑襯底往內 14 到往外 16; 外光: 第 1 首 22 / 第 2 首 16 / 第 3 首 12, 只在內緣以外 |
 | 跳位預告「即將亮起」 | 與亮邊同一條帶位置; 虛線段 14 / 間 9 |
 | 光門條件形狀符號 | 中心在邊中線往外 14, 底圓半徑 16, 形狀半徑 9 |
 | 換位角框 | 中心在邊中線往外 6, 沿邊 ±134、法向 ±18, 角長 18 |
 | 觸發回饋 | 判定帶內緣白閃寬 10 → 2; 白環半徑 16 → 38; 勾 13 |
 | 氣泡 | 判定圓半徑 20。外緣軌半徑 19、寬 4(17~21); 本體圓半徑 16 |
-| 地板 | 半徑 24, 第 3 關後段起 20; 角框邊 地板半徑 + 9; **說明標示中光圈半徑 r + 9(線寬 4, 深色外描 9)** |
-| 形狀說明對話框 | 框 x 36~680、y 118~692(圓角 18、框線 3); 一句話 26px 於 y 160; 示意圖兩格各 297 × 404(x 54~351 / 365~662, y 194~598, 取景縮放 0.88); 「知道了」x 258~458、y 616~672(圓角 12, 字 24px); 指向尖角 底邊在框右緣 y 260~320、尖端 (725,290); 壓暗 50%, 挖洞以 (761,290) 為心半徑 42。框右緣離方形狀區邊緣 57; 離暫停 / 靜音按鈕 526 |
-| 說明第 5 頁 | 兩格各 560 × 488(x 70~630 / 650~1210, y 150~638), 取景縮放 1.16 |
-| 其他 | 同 v18(踩拍、整串、沾上、已鎖定、預備拍、換關提示、HUD、按鈕、背景裝飾) |
+| 地板 | 半徑 24, 第 3 關後段起 20; 角框邊 地板半徑 + 9 |
+| **教學泡泡** | 高 46; 寬 = 字寬 + 左右各 18(有滑鼠圖示再加 24 + 間距 10); 字 20px 粗體; 描邊 2.5; 尾巴長 14、底寬 22; 離畫布邊 ≥ 8; 離 HUD / 按鈕 ≥ 8。規格最長一句(14 字, 無圖示)約 290 寬 |
+| **教學滑鼠圖示** | 18 × 27, 圓角 9; 左鍵 9 × 11 |
+| **教學標示** | 線寬 3~5 + 深色外描再寬 4; 圓形物件: 判定半徑 + 8; 光門膠囊: 沿邊半長 = 邊長 / 2 + 8(約 132), 法向半寬 19(判定帶 -12 ~ +10 外再 8), 圓角 19; 血量環: 半徑 211 與 231 兩圈 |
+| **教學完成特效** | 圓牌半徑 17(深色外圈 19.5), 勾線寬 4; 8 顆四角星半徑 6.5 / 4.5, 從離中心 20 散到 62 |
+| 其他 | 同 v19(踩拍、整串、沾上、已鎖定、預備拍、換關提示、HUD、按鈕、背景裝飾) |
 | 左上 HUD | x 20~260, y 20~100 |
 | 右上 HUD、按鈕 | 右上 HUD x 960~1180、y 20~100; 暫停 (1206,26) 48×48; 靜音 (1206,86) 48×48 |
 
@@ -187,34 +239,36 @@
 
 ### 繪製層級(由下到上)
 
-1. drawBackground → 2. drawArena → 3. drawHpRing → 4. drawBeatCue → 5. drawDyeFloor / drawShapeFloor → 6. drawRotateCue → 7. drawBatchCue → 8. drawNetWall → 9. drawBubble → 10. drawStickFx → 11. drawMissFx → 12. drawBeatFx → 13. drawChainFx → 14. drawLevelIntro / drawCountIn → 15. drawHud → **15.5 drawShapeDialog** → 16. drawPauseButton / drawMuteButton → 17. drawPauseMenu(之後再畫一次兩顆按鈕)/ drawGameOver / drawGuidePage → 18. drawCredits(只在標題畫面與結束畫面)
+1. drawBackground → 2. drawArena → 3. drawHpRing → 4. drawBeatCue → 5. drawDyeFloor / drawShapeFloor → 6. drawRotateCue → 7. drawBatchCue → 8. drawNetWall → 9. drawBubble → 10. drawStickFx → 11. drawMissFx → 12. drawBeatFx → 13. drawChainFx → 14. drawLevelIntro / drawCountIn → **14.5 drawTutorial** → 15. drawHud → 16. drawPauseButton / drawMuteButton → 17. drawPauseMenu(之後再畫一次兩顆按鈕)/ drawGameOver → 18. drawCredits(只在開始畫面與結束畫面)
 
 ### 時長 `Art.timing`(秒)
 
-spawn 0.3 / batchCue 0.6 / stickFx 0.8 / unaskedFx 0.6 / missFx 0.6 / beatFx 0.55 / chainFx 0.9 / catchFx 0.45 / netHint 0.6 / floorIntro 2.0 / hpFx 0.6 / **shapeDialogIn 0.18 / shapeDialogLock 0.6**。
+spawn 0.3 / batchCue 0.6 / stickFx 0.8 / unaskedFx 0.6 / missFx 0.6 / beatFx 0.55 / chainFx 0.9 / catchFx 0.45 / netHint 0.6 / floorIntro 2.0 / hpFx 0.6 / **tutorialShow 0.25 / tutorialDone 0.8**。(v20 刪除 shapeDialogIn、shapeDialogLock)
 
 ### 一次事件要呼叫哪些(對照)
 
 | 事件 | 呼叫 |
 |---|---|
 | 每一幀 | `drawBackground({level, time, beat})`; `drawHpRing({hp, danger, time, hpFx})`; 每顆氣泡 `drawBubble({..., beatPhase})` |
-| 觸發、沾上、沾錯、過期、跳位、輪轉 | 同 v18 |
+| 觸發、沾上、沾錯、過期、跳位、輪轉 | 同 v19 |
 | 換關 | 所有函式的 `level` 換新關; 帶過的那一顆 `drawBubble({status:'carried', paletteLevel: 舊關})` 與 `drawNetWall` 的 `lit.paletteLevel: 舊關`; `drawHpRing({hp: 100})`; `drawLevelIntro` + `drawCountIn` |
-| **形狀說明對話框開著**(第 1 → 2 換關、首次) | `level: 2` 的背景(`time` / `beat` 固定)、內圈、`drawHpRing({hp:100})`、`drawBeatCue`(固定 `phase`)、染色地板與色 A~D `status:'standby', t:0`、方形狀區 `drawShapeFloor({status:'spotlight'})`、`drawNetWall({lit:null})`、`drawHud`(`songProgress: null`)→ `drawShapeDialog({t, hover, pressed, menu})` → 暫停 / 靜音按鈕。不畫氣泡、換關提示、預備拍 |
-| 點「知道了」 | 判定框 `Art.layout.shapeDialog.ok`; 可按條件由 RD 依規格判(出現 ≥ 0.6 秒、暫停選單沒開、按下在出現之後、按下與放開都在框內)。畫面只負責把同一個條件畫出來: 傳進來的 `t` 與 `menu` 決定外觀 |
-| 關掉對話框 | 方形狀區回 `'standby'`; 接著換關提示與預備拍照 v18 |
+| 教學提示顯示中 | 每幀 `drawTutorial({stage, text, icon, x, y, mark, appear, done: 0, level, time, litSlot})`, 錨點與 `mark` 每幀用當下位置 |
+| 教學階段完成 | 接著每幀 `drawTutorial({... 同上, done: 經過秒數 / 0.8})`, 到 1 停止; 錨點停在完成那一刻的位置即可 |
+| 第 8 階段蓋過其他提示 | 只畫第 8 階段那一個; 被蓋的那個不畫(進度由 RD 保留) |
+| 暫停 | `appear`、`done`、`time` 都凍結, 照常每幀畫(在暫停選單底下) |
 
 ### 按鈕判定框 `Art.layout`
 
-`hudLeft`、`hudRight`、`pauseBtn`、`muteBtn`; `title.start/guide`(**刪 device**); **`shapeDialog.panel / ok / target`**; `pauseMenu.panel/resume/restart/quit/guide`; `gameOver.panel/again/title`; `guide.close/prev/next`; `credits`(不可點)。皆為 `{ x, y, w, h }`(`target` 為 `{ x, y }`)。`Art.geometry = { gateInnerApothem: 288, hpRingRadius: 221, bubbleOuterRadius: 21 }`。`Art.guidePages = 5`。
+`hudLeft`、`hudRight`、`pauseBtn`、`muteBtn`; `title.start`(x 540, y 392, 200 × 60); `pauseMenu.panel`(x 470, y 215, 340 × 290)/ `resume`(520, 285)/ `restart`(520, 351)/ `quit`(520, 417)(三顆皆 240 × 52); `gameOver.panel/again/title`; `credits`(不可點)。皆為 `{ x, y, w, h }`。**v20 刪除**: `title.guide`、`pauseMenu.guide`、`shapeDialog`、`guide`。`Art.geometry = { gateInnerApothem: 288, hpRingRadius: 221, bubbleOuterRadius: 21 }`。
 
 ### 判定幾何自查
 
-**光門內緣對齊(規格要求誤差 ≤ 3 像素)**: 第 2 首色帶改寬後重驗。headless 截圖下三關 × 8 槽位(背景 + 內圈 + 亮著的光門), 沿法線從往內 30 掃到 0(取邊上離中點 75 像素處, 避開形狀符號), 找第一個亮度 > 200 的像素: 24 個全部落在往內 10.5~12.5 像素, 誤差 ≤ 1.5 像素。
+**光門內緣對齊(規格要求誤差 ≤ 3 像素)**: v20 未改光門畫法, 沿用 v19 重驗結果(24 個全部落在往內 10.5~12.5 像素)。
 
-**形狀說明對話框**: 框與被指著的方形狀區(半徑 24)最近距離 57; 與暫停 / 靜音按鈕不重疊(x 方向相隔 526); 框會蓋住內圈左半、第 2 關的染 B / 染 C / 染 D 與左側網牆(遊戲已停住, 規格容許, 以不蓋方形狀區優先)。
+**教學泡泡擺位**(假 ctx + 擺位函式, node 跑): 錨點以 40 像素格點掃全畫布(33 × 19 點 × 寬 180 / 330 兩種)共 1254 次: 出畫布 0、壓到 HUD / 暫停 / 靜音按鈕 0(含錨點本身在 HUD 裡的情況, 泡泡會被推出去); 方向分佈上 975 / 下 253 / 右 12 / 左 14。錨點在畫布四角、四邊中點、中心與離角 30 的點 × 三關 × 有無圖示 × 亮著的光門 5 種, 共 390 次, 泡泡含尾巴與落影的外框全部在畫布內。8 道光門各取錨點在光門旁(離中心 250 / 200)並傳 `litSlot` = 該槽: 16 次泡泡都沒壓到那道光門。
 
 ### 交付自查
 
-- `node --check` 通過; 假 ctx 把 25 個匯出函式 × 三關、說明頁 5 頁、對話框(t = 0 / 0.3 / 0.7 × menu 開關)全部呼叫過, 無拋錯
-- headless 截圖(加 --mute-audio, 每張跑完瀏覽器即結束, 已確認無殘留程序)看過: 三關滿場、第 2 關光門要 C 與要方 + B 兩張、B / C 新舊對照、對話框(鎖定中 / 可按 / 暫停選單疊上)、標題、說明頁 5 頁
+- `node --check` 通過; 假 ctx 把 24 個匯出函式 × 三關全部呼叫過(共 1438 次)無拋錯, 其中 `drawTutorial` 1296 次 = 8 階段 × 有無圖示 × appear 0 / 0.5 / 1 × done 0 / 0.5 / 1 × 三關 × `litSlot` 無 / 1 / 7, 另加空 state、null、不認得的 `mark`
+- 已確認匯出表、`Art.layout`、`Art.timing` 不再有任何說明頁 / 形狀說明對話框的項目
+- v20 沒有開瀏覽器截圖(任務限制); 泡泡、標示、完成特效的實際畫面待 RD 接上後由製作人目視驗收

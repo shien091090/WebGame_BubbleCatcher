@@ -1,9 +1,9 @@
-/* 捕泡手 art.js (spec v19)
+/* 捕泡手 art.js (spec v20)
  * 全域物件 window.Art, 不用 ES module。純 Canvas 2D 幾何繪製, 不引外部資源。
  * 一組函式畫三套風格: 每個 draw 函式的 state.level(1 / 2 / 3)決定用哪一套。
  * 三套皮: 第 1 首 林間(森林, 明亮) / 第 2 首 舞廳(8-bit 迪斯可 + 粉洋紅花) / 第 3 首 魔龍(黑暗奇幻)。骨不變。
- * v19: 刪輸入裝置選擇; 新增形狀說明對話框(drawShapeDialog)與說明第 5 頁(共用第 2 關風格的示意圖);
- *      第 2 首重定色(色 B 綠 / 色 C 藍拉開色相與明度), 光門色帶在第 2 首改回單層外光。
+ * v19: 刪輸入裝置選擇; 第 2 首重定色(色 B 綠 / 色 C 藍拉開色相與明度), 光門色帶在第 2 首改回單層外光。
+ * v20: 新增嵌入式新手教學(drawTutorial); 刪說明頁、形狀說明對話框與「說明」按鈕。
  * 只負責「給狀態就畫」, 不算規則、不管輸入。每個函式自己 save / restore。
  */
 (function () {
@@ -34,8 +34,8 @@
     netHint: 0.6,     // 光門剛亮起的換位提示
     floorIntro: 2.0,  // 地板出場提示(規格 2 秒)
     hpFx: 0.6,        // 血量環 / 血條上「加減了一段」的亮段
-    shapeDialogIn: 0.18, // 形狀說明對話框淡入
-    shapeDialogLock: 0.6 // 形狀說明對話框「知道了」不可按的時長(規格 0.6 秒)
+    tutorialShow: 0.25, // 教學提示彈出(state.appear 0→1 用的總長, 規格 0.25 秒)
+    tutorialDone: 0.8   // 教學完成特效(state.done 0→1 用的總長, 規格 0.8 秒)
   };
 
   // ---------------------------------------------------------------- 小工具
@@ -174,38 +174,26 @@
     pauseBtn: { x: 1206, y: 26, w: 48, h: 48 },
     muteBtn: { x: 1206, y: 86, w: 48, h: 48 },
     title: {
-      start: { x: 540, y: 392, w: 200, h: 60 },
-      guide: { x: 540, y: 470, w: 200, h: 52 }
+      start: { x: 540, y: 392, w: 200, h: 60 }
     },
-    // 形狀說明對話框: 放在畫面左半, 右緣 x 680 離被指著的方形狀區(761,290)左緣 737 還有 57; 不碰暫停 / 靜音按鈕
-    shapeDialog: {
-      panel: { x: 36, y: 118, w: 644, h: 574 },
-      ok: { x: 258, y: 616, w: 200, h: 56 },
-      target: { x: 761, y: 290 } // 被指著的地板中心(第 2 關 賦形 方, 330°)
-    },
+    // v20: 拿掉「說明」, 三顆按鈕, 面板上下置中
     pauseMenu: {
-      panel: { x: 470, y: 180, w: 340, h: 360 },
-      resume: { x: 520, y: 250, w: 240, h: 52 },
-      restart: { x: 520, y: 316, w: 240, h: 52 },
-      quit: { x: 520, y: 382, w: 240, h: 52 },
-      guide: { x: 520, y: 448, w: 240, h: 52 }
+      panel: { x: 470, y: 215, w: 340, h: 290 },
+      resume: { x: 520, y: 285, w: 240, h: 52 },
+      restart: { x: 520, y: 351, w: 240, h: 52 },
+      quit: { x: 520, y: 417, w: 240, h: 52 }
     },
     gameOver: {
       panel: { x: 400, y: 150, w: 480, h: 420 },
       again: { x: 450, y: 470, w: 180, h: 60 },
       title: { x: 650, y: 470, w: 180, h: 60 }
     },
-    credits: { x: 40, y: 604, w: 1200, h: 106 }, // 署名可佔範圍(不可點), 與所有按鈕判定框不重疊
-    guide: {
-      close: { x: 1150, y: 20, w: 110, h: 48 },
-      prev: { x: 20, y: 652, w: 140, h: 48 },
-      next: { x: 1120, y: 652, w: 140, h: 48 }
-    }
+    credits: { x: 40, y: 604, w: 1200, h: 106 } // 署名可佔範圍(不可點), 與所有按鈕判定框不重疊
   };
 
   // ---------------------------------------------------------------- 背景
   // state: { level, time?(秒, 暫停凍結), beat?(浮點拍數 = 關內拍序號 + 拍內進度, 預備拍可為負) }
-  // 不傳 time / beat 時畫靜止版(說明頁、標題)。
+  // 不傳 time / beat 時畫靜止版(標題)。
   // 背景輔助: 位置雜湊(固定的偽亂數, 讓每拍亮的磚、餘燼位置可重現)
   function hash01(n) { var x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
   // 離圓心的「八邊形距離」(= 該點投影到最近一邊法線上的長度); 背景裝飾只放在 ≥ 360 的地方, 不進光門外光範圍(≤ 344)
@@ -921,14 +909,6 @@
       ctx.setLineDash([6, 5]); ctx.lineWidth = 2.5; ctx.strokeStyle = edge; ctx.stroke(); ctx.setLineDash([]);
       if (kind === 'shape') { shapePath(ctx, shape, x, y, r * 0.5); ctx.fillStyle = rgba(t.shapeFloorGlyph, 0.45); ctx.fill(); }
     } else {
-      if (status === 'spotlight') {
-        // 說明標示中(形狀說明對話框指著這一塊; 已顯示、不生效): 畫成生效外觀(與對話框示意圖同一個長相),
-        //   外圍一圈白色實線光圈 + 深色外描。對話框的指向尖端落在這圈上。
-        circle(ctx, x, y, r + 9); ctx.lineWidth = 9; ctx.strokeStyle = 'rgba(0,0,0,0.55)'; ctx.stroke();
-        ctx.save(); ctx.shadowColor = '#ffffff'; ctx.shadowBlur = 16;
-        circle(ctx, x, y, r + 9); ctx.lineWidth = 4; ctx.strokeStyle = '#ffffff'; ctx.stroke();
-        ctx.restore();
-      }
       paintFloor(ctx, t, L, kind, color, shape, x, y, r);
       if (s.shrink) {
         var sp = clamp01(num(s.shrink.t, 0)), toR = num(s.shrink.toR, 20);
@@ -1438,7 +1418,6 @@
     drawButton(ctx, t, m.resume, '繼續', s.hover === 'resume', { primary: true });
     drawButton(ctx, t, m.restart, '重開', s.hover === 'restart');
     drawButton(ctx, t, m.quit, '放棄', s.hover === 'quit');
-    drawButton(ctx, t, m.guide, '說明', s.hover === 'guide');
     ctx.restore();
   }
   function drawTitle(ctx, state) {
@@ -1451,14 +1430,7 @@
     text(ctx, '捕泡手', CX, 230, 76, t.ink, 'center', { stroke: 'rgba(6,36,22,0.8)', strokeWidth: 9 });
     text(ctx, '把氣泡染色、送進光門、對上拍子', CX, 304, 20, t.ink, 'center', { stroke: 'rgba(6,36,22,0.7)', strokeWidth: 5 });
     drawButton(ctx, t, b.start, '開始', s.hover === 'start', { primary: true, px: 26 });
-    drawButton(ctx, t, b.guide, '說明', s.hover === 'guide');
     ctx.restore();
-  }
-  function endCard(ctx, t, x, y, w, survival) {
-    roundRect(ctx, x, y, w, 170, 18); ctx.fillStyle = t.panel; ctx.fill();
-    ctx.lineWidth = 2; ctx.strokeStyle = rgba(t.rim, 0.6); ctx.stroke();
-    text(ctx, '結束', x + w / 2, y + 50, 36, t.ink);
-    text(ctx, '存活 ' + num(survival, 0).toFixed(1) + ' 秒', x + w / 2, y + 115, 28, t.ink);
   }
   function drawGameOver(ctx, state) {
     var s = state || {}, t = THEMES[1], g = LAYOUT.gameOver;
@@ -1493,285 +1465,277 @@
     ctx.restore();
   }
 
-  // ---------------------------------------------------------------- 說明頁(第 1 關風格)
-  function inGame(ctx, ox, oy, sc, fn) {
-    ctx.save(); ctx.translate(ox, oy); ctx.scale(sc, sc); ctx.translate(-CX, -CY); fn(); ctx.restore();
-  }
-  function toScreen(ox, oy, sc, gx, gy) { return [ox + (gx - CX) * sc, oy + (gy - CY) * sc]; }
-  function gPanel(ctx, x, y, w, h) {
-    roundRect(ctx, x, y, w, h, 16); ctx.fillStyle = 'rgba(0,0,0,0.38)'; ctx.fill();
-    ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(255,255,255,0.16)'; ctx.stroke();
-  }
-  function drawCursor(ctx, x, y, s) {
-    s = s || 1;
-    ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
-    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(0, 22); ctx.lineTo(6, 16); ctx.lineTo(10, 25); ctx.lineTo(14, 23); ctx.lineTo(10, 15); ctx.lineTo(17, 15); ctx.closePath();
-    ctx.fillStyle = '#ffffff'; ctx.fill(); ctx.lineWidth = 1.8; ctx.strokeStyle = '#111111'; ctx.stroke();
-    ctx.restore();
-  }
-  function drawArrow(ctx, pts, opts) {
-    opts = opts || {};
-    var col = opts.color || '#ffffff', w = opts.width || 4;
-    ctx.save();
-    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    if (opts.outline !== false) {
-      ctx.strokeStyle = 'rgba(0,0,0,0.5)'; ctx.lineWidth = w + 3;
-      ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
-      for (var j = 1; j < pts.length; j++) ctx.lineTo(pts[j][0], pts[j][1]);
+  // ---------------------------------------------------------------- 新手教學提示(v20 新增, 取代說明頁與形狀說明對話框)
+  // 一個提示泡泡 + 一圈脈動標示 + 完成特效。遊戲不停, 畫在所有遊戲物件之上、HUD 與暫停 / 靜音按鈕之下。
+  // 長相跟遊戲裡所有既有提示反過來: 既有的面板 / 換關提示都是「深底淺字」, 換位與出場提示是白色角框;
+  //   教學泡泡是「淺紙色底 + 深色字 + 深色描邊」, 標示是紙色實線圈原地呼吸(不外擴、不是角框、不是虛線)。
+  //   紙色 = 該關的 ink(近白、帶該關色調), 深色 = 該關的教學深色; 不用危險紅、不用拍子色、不用 4 色。
+  // state: { stage, text, icon('press' | null), x, y(錨點), mark(見下), appear(0~1), done(0~1), level(1~3),
+  //          time?(秒, 任意遞增、暫停凍結; 標示呼吸用, 不傳 = 靜止), litSlot?(亮著的光門槽 1~8; 泡泡避開它, 不傳 = 不避) }
+  // mark: null | { kind: 'bubble', x, y, r?(預設 20) } | { kind: 'floor', x, y, r(24 / 20) }
+  //            | { kind: 'gate', slot(1~8) } | { kind: 'hpRing' }
+  var TUT = {
+    h: 46, px: 20, padX: 18, iconW: 24, iconGap: 10, tail: 14, tailW: 22,
+    margin: 8, uiPad: 8, pulse: 0.9, markGap: 8,
+    skin: {
+      1: { dark: '#0f3326', radius: 16 },
+      2: { dark: '#1e0f3a', radius: 2 },
+      3: { dark: '#14101e', radius: 0, cut: 9 }
     }
-    ctx.strokeStyle = col; ctx.lineWidth = w;
-    if (opts.dash) ctx.setLineDash(opts.dash);
-    ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
-    if (pts.length === 2) ctx.lineTo(pts[1][0], pts[1][1]);
-    else {
-      for (var i = 1; i < pts.length - 1; i++) {
-        var mx = (pts[i][0] + pts[i + 1][0]) / 2, my = (pts[i][1] + pts[i + 1][1]) / 2;
-        if (i === pts.length - 2) { mx = pts[i + 1][0]; my = pts[i + 1][1]; }
-        ctx.quadraticCurveTo(pts[i][0], pts[i][1], mx, my);
-      }
-    }
-    ctx.stroke(); ctx.setLineDash([]);
-    var a = pts[pts.length - 2], b = pts[pts.length - 1];
-    var ang = Math.atan2(b[1] - a[1], b[0] - a[0]), hs = w * 3.2;
-    ctx.fillStyle = col;
-    ctx.beginPath(); ctx.moveTo(b[0] + Math.cos(ang) * hs * 0.4, b[1] + Math.sin(ang) * hs * 0.4);
-    ctx.lineTo(b[0] + Math.cos(ang + 2.5) * hs, b[1] + Math.sin(ang + 2.5) * hs);
-    ctx.lineTo(b[0] + Math.cos(ang - 2.5) * hs, b[1] + Math.sin(ang - 2.5) * hs);
-    ctx.closePath(); ctx.fill();
-    ctx.restore();
-  }
-  // 步驟徽章: 白底大圓 + 深色數字 + 旁邊短詞(說明頁專用, 圖中最先被看到的東西)
-  function stepBadge(ctx, x, y, n, label, side) {
-    ctx.save();
-    circle(ctx, x, y, 25); ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fill();
-    circle(ctx, x, y, 21); ctx.fillStyle = '#ffffff'; ctx.fill();
-    text(ctx, String(n), x, y + 1, 28, '#14141c');
-    var lx = side === 'left' ? x - 32 : x + 32;
-    text(ctx, label, lx, y + 1, 24, '#ffffff', side === 'left' ? 'right' : 'left', { stroke: 'rgba(0,0,0,0.75)', strokeWidth: 6 });
-    ctx.restore();
-  }
-  var GUIDE = [
-    { title: '怎麼玩', text: '把氣泡染成正確的顏色後送進光門' },
-    { title: '染錯會消失', text: '染到光門不要的顏色, 氣泡會消失' },
-    { title: '抓著不會消失', text: '抓著氣泡時氣泡不會消失' },
-    { title: '血量', text: '送進光門和對上拍子能補回血量' },
-    { title: '形狀', text: '光門可能要形狀, 拖過形狀區就變形', level: 2 } // 第 5 頁: 第 2 關風格, 圖與形狀說明對話框共用
-  ];
-  var GUIDE_PAGES = GUIDE.length;
-
-  // 第 1 頁: 完整場面; 1 抓氣泡 → 2 拉去染色區(到達處已是色 A)→ 3 送進光門(碰到時指標仍按著, 打勾)
-  function guidePage1(ctx) {
-    var ox = 640, oy = 398, sc = 0.74;
-    var B1 = [552, 440], B2 = [744, 306], B3 = [908, 326];
-    inGame(ctx, ox, oy, sc, function () {
-      drawArena(ctx, { level: 1 });
-      drawDyeFloor(ctx, { level: 1, x: 761, y: 290, color: 'A' });
-      drawDyeFloor(ctx, { level: 1, x: 519, y: 290, color: 'B' });
-      drawNetWall(ctx, { level: 1, lit: { slot: 1, color: 'A' } });
-      drawArrow(ctx, [[578, 426], [650, 380], [718, 322]], { width: 5, color: 'rgba(255,255,255,0.9)' });
-      drawArrow(ctx, [[772, 304], [830, 300], [880, 318]], { width: 5, color: 'rgba(255,255,255,0.9)' });
-      drawBubble(ctx, { level: 1, x: B1[0], y: B1[1], color: null, status: 'held', noLife: true });
-      drawCursor(ctx, B1[0] + 3, B1[1] + 4, 1.35);
-      drawBubble(ctx, { level: 1, x: B2[0], y: B2[1], color: 'A', status: 'dragging', noLife: true });
-      drawCursor(ctx, B2[0] + 3, B2[1] + 4, 1.35);
-      drawBubble(ctx, { level: 1, x: B3[0], y: B3[1], color: 'A', status: 'dragging', noLife: true });
-      drawCursor(ctx, B3[0] + 3, B3[1] + 4, 1.35);
-      drawCheck(ctx, 902, 262, 26, '#ffffff', 1);
-    });
-    var p1 = toScreen(ox, oy, sc, B1[0], B1[1]), p2 = toScreen(ox, oy, sc, 761, 290), p3 = toScreen(ox, oy, sc, B3[0], B3[1]);
-    stepBadge(ctx, p1[0] - 6, p1[1] + 62, 1, '抓氣泡', 'right');
-    stepBadge(ctx, p2[0] - 70, p2[1] - 62, 2, '拉去染色區', 'left');
-    stepBadge(ctx, p3[0] + 6, p3[1] + 76, 3, '送進光門', 'right');
-  }
-  function wallScene(ctx, ox, oy, sc, litSlot, litColor, hp, fn) {
-    inGame(ctx, ox, oy, sc, function () {
-      drawArena(ctx, { level: 1 });
-      if (hp) drawHpRing(ctx, { level: 1, hp: hp.hp, hpFx: hp.fx });
-      drawNetWall(ctx, { level: 1, lit: litSlot ? { slot: litSlot, color: litColor } : null });
-      if (fn) fn();
-    });
-  }
-  // 第 2 頁: 同一道要色 A 的光門左右對照; 左: 擦過 A → 變 A, 血量環沒少; 右: 擦過 B → 原地消失, 血量環少一小段
-  function guidePage2(ctx) {
-    var cx = [330, 950];
-    for (var i = 0; i < 2; i++) {
-      var ok = i === 0;
-      gPanel(ctx, cx[i] - 280, 150, 560, 488);
-      (function (good) {
-        wallScene(ctx, cx[i], 400, 0.68, 1, 'A', { hp: good ? 64 : 61, fx: good ? null : [{ from: 64, to: 61, kind: 'miss', t: 0.12 }] }, function () {
-          drawDyeFloor(ctx, { level: 1, x: 619, y: 290, color: 'A' });
-          drawDyeFloor(ctx, { level: 1, x: 619, y: 430, color: 'B' });
-          if (good) {
-            drawBubble(ctx, { level: 1, x: 470, y: 290, color: null, status: 'dragging', noLife: true });
-            drawArrow(ctx, [[498, 290], [544, 290]], { width: 5, color: 'rgba(255,255,255,0.9)' });
-            drawBubble(ctx, { level: 1, x: 579, y: 290, color: 'A', status: 'dragging', noLife: true });
-            drawStickFx(ctx, { level: 1, x: 579, y: 290, kind: 'stick', attr: 'color', value: 'A', t: 0.16 });
-            drawCursor(ctx, 583, 294, 1.5);
-          } else {
-            drawBubble(ctx, { level: 1, x: 470, y: 430, color: null, status: 'dragging', noLife: true });
-            drawArrow(ctx, [[498, 430], [544, 430]], { width: 5, color: 'rgba(255,255,255,0.9)' });
-            drawMissFx(ctx, { level: 1, x: 577, y: 430, color: 'B', t: 0.22 });
-            drawCursor(ctx, 581, 434, 1.5);
-          }
-        });
-      })(ok);
-    }
-  }
-  // 第 3 頁: 三格時間序; 被按住的環一直滿(白), 另一顆 滿 → 少一大段 → 走完消失
-  function guidePage3(ctx) {
-    var t = THEMES[1], cx = [235, 640, 1045], other = [1, 0.4, 0];
-    for (var i = 0; i < 3; i++) {
-      gPanel(ctx, cx[i] - 175, 210, 350, 320);
-      roundRect(ctx, cx[i] - 155, 230, 310, 280, 20); ctx.fillStyle = t.ground; ctx.fill();
-      (function (k) {
-        ctx.save(); ctx.translate(cx[k], 370); ctx.scale(2.6, 2.6);
-        drawBubble(ctx, { level: 1, x: -28, y: 0, color: null, status: 'held', life: 1 });
-        if (other[k] > 0) drawBubble(ctx, { level: 1, x: 28, y: 0, color: null, status: 'idle', life: other[k] });
-        drawCursor(ctx, -26, 2, 0.5);
-        ctx.restore();
-      })(i);
-      if (i < 2) drawArrow(ctx, [[cx[i] + 182, 370], [cx[i] + 222, 370]], { width: 5 });
-    }
-  }
-  // 第 4 頁: 四格, 每格主角是血量環。1 自己往下掉(同一圈兩個時刻) 2 送進光門 → 變長 3 光門要色 A, 對上拍子染上 A(沒碰光門)→ 變長 4 縮到空 → 結束畫面
-  function guidePage4(ctx) {
-    var t = THEMES[1], px = [40, 342, 644, 946], pw = 292;
-    for (var i = 0; i < 4; i++) gPanel(ctx, px[i], 140, pw, 500);
-    var c0 = px[0] + pw / 2;
-    inGame(ctx, c0, 262, 0.42, function () { drawArena(ctx, { level: 1 }); drawHpRing(ctx, { level: 1, hp: 72 }); });
-    drawArrow(ctx, [[c0, 370], [c0, 404]], { width: 5 });
-    inGame(ctx, c0, 518, 0.42, function () { drawArena(ctx, { level: 1 }); drawHpRing(ctx, { level: 1, hp: 58 }); });
-    var c1 = px[1] + pw / 2;
-    ctx.save(); roundRect(ctx, px[1] + 2, 142, pw - 4, 496, 15); ctx.clip();
-    inGame(ctx, c1 - 16, 390, 0.47, function () {
-      drawArena(ctx, { level: 1 });
-      drawHpRing(ctx, { level: 1, hp: 62, hpFx: [{ from: 56, to: 62, kind: 'catch', t: 0.1 }] });
-      drawNetWall(ctx, { level: 1, lit: { slot: 1, color: 'A' } });
-      drawArrow(ctx, [[800, 372], [872, 362]], { width: 8 });
-      drawBubble(ctx, { level: 1, x: 908, y: 360, color: 'A', status: 'dragging', noLife: true });
-      drawCursor(ctx, 912, 364, 2.2);
-      drawCheck(ctx, 880, 280, 34, '#ffffff', 1);
-    });
-    ctx.restore();
-    var c2 = px[2] + pw / 2;
-    ctx.save(); roundRect(ctx, px[2] + 2, 142, pw - 4, 496, 15); ctx.clip();
-    inGame(ctx, c2, 390, 0.62, function () {
-      drawArena(ctx, { level: 1 });
-      drawHpRing(ctx, { level: 1, hp: 60, hpFx: [{ from: 56, to: 60, kind: 'beat', t: 0.1 }] });
-      drawBeatCue(ctx, { level: 1, phase: 0.02, beat: 0 });
-      // v17: 亮著、要色 A 的光門(上方槽 7), 氣泡沒碰到它 = 染上的是光門要的顏色
-      drawNetWall(ctx, { level: 1, lit: { slot: 7, color: 'A' } });
-      drawDyeFloor(ctx, { level: 1, x: 700, y: 360, color: 'A' });
-      drawArrow(ctx, [[500, 384], [580, 372], [622, 364]], { width: 7, color: 'rgba(255,255,255,0.85)' });
-      drawBubble(ctx, { level: 1, x: 658, y: 360, color: 'A', status: 'dragging', noLife: true });
-      drawBeatFx(ctx, { level: 1, x: 658, y: 360, tier: 1, t: 0.08, onBubble: true });
-      drawCursor(ctx, 662, 364, 1.7);
-    });
-    ctx.restore();
-    var c3 = px[3] + pw / 2;
-    inGame(ctx, c3, 262, 0.42, function () { drawArena(ctx, { level: 1 }); drawHpRing(ctx, { level: 1, hp: 0, danger: true, time: 0.33 }); });
-    drawArrow(ctx, [[c3, 370], [c3, 404]], { width: 5 });
-    endCard(ctx, t, c3 - 125, 430, 250, 87.3);
-  }
-  // ---------------------------------------------------------------- 形狀示意圖(說明第 5 頁與形狀說明對話框共用; 第 2 關風格)
-  // 兩格並排, 每格都是第 2 關場上的真實位置: 色 A 染色區(30°, 761,430)、方形狀區(330°, 761,290)= 對話框指著的那一塊,
-  //   亮著的光門在槽 8(315°)。左格光門要「方 + 色 A」, 右格只要色 A; 兩格同一條路線: 透明 → 擦過 A 變色 A → 擦過方變方形色 A →
-  //   碰到光門(指標仍按著)→ 打勾。兩格只差光門上有沒有形狀(P21: 只差分界那一項)。
-  var SHAPE_CROP = { cx: 770, cy: 266, w: 336, h: 420 }; // 每格取景(遊戲座標): x 602~938, y 56~476(含整條槽 8 光門)
-  var SHAPE_PATH = [[672, 438], [738, 434], [772, 404], [766, 340], [772, 276], [834, 212]];
-  var SHAPE_SNAP = [[650, 440, null, 'circle'], [776, 372, 'A', 'circle'], [853, 194, 'A', 'square']];
-  function shapeCell(ctx, x, y, w, h, wantShape) {
-    var sc = Math.min(w / SHAPE_CROP.w, h / SHAPE_CROP.h);
-    var ox = x + w / 2 - (SHAPE_CROP.cx - CX) * sc, oy = y + h / 2 - (SHAPE_CROP.cy - CY) * sc;
-    ctx.save();
-    roundRect(ctx, x, y, w, h, 16); ctx.clip();
-    inGame(ctx, ox, oy, sc, function () {
-      drawBackground(ctx, { level: 2 });
-      drawArena(ctx, { level: 2 });
-      drawDyeFloor(ctx, { level: 2, x: 761, y: 430, color: 'A' });
-      drawShapeFloor(ctx, { level: 2, x: 761, y: 290, shape: 'square' });
-      drawNetWall(ctx, { level: 2, lit: { slot: 8, color: 'A', shape: wantShape ? 'square' : null } });
-      drawArrow(ctx, SHAPE_PATH, { width: 5, color: 'rgba(255,255,255,0.9)' });
-      for (var i = 0; i < SHAPE_SNAP.length; i++) {
-        var b = SHAPE_SNAP[i];
-        drawBubble(ctx, { level: 2, x: b[0], y: b[1], color: b[2], shape: b[3], status: 'dragging', noLife: true });
-        drawCursor(ctx, b[0] + 3, b[1] + 4, 1.3);
-      }
-      drawCheck(ctx, 808, 156, 22, '#ffffff', 1);
-    });
-    ctx.restore();
-    roundRect(ctx, x, y, w, h, 16); ctx.lineWidth = 2; ctx.strokeStyle = rgba(THEMES[2].rim, 0.45); ctx.stroke();
-  }
-  function shapeIllustration(ctx, x, y, w, h, gap) {
-    var cw = (w - gap) / 2;
-    shapeCell(ctx, x, y, cw, h, true);
-    shapeCell(ctx, x + cw + gap, y, cw, h, false);
-  }
-  function guidePage5(ctx) { shapeIllustration(ctx, 70, 150, 1140, 488, 20); }
-
-  // ---------------------------------------------------------------- 形狀說明對話框(第 2 關開始前, 遊戲停住)
-  // state: { t(秒, 對話框出現後經過; 暫停時凍結), hover?('ok'), pressed?(bool, 左鍵在「知道了」上按著), menu?(bool, 暫停選單疊在上面) }
-  // 畫面: 全畫面壓暗(被指著的方形狀區挖洞不壓)+ 左半邊對話框(一句話 + 共用示意圖 + 「知道了」)+ 從框右緣伸到那塊地板光圈的指向尖角。
-  // 「知道了」: t < 0.6 或暫停選單開著 = 不能按(深底 + 虛線框 + 淡字, 底下一條由中間往兩端長的進度, 長滿 = 能按;
-  //   字典「虛線 + 由中心長大 = 還沒生效」); 能按 = 實心金色主按鈕(與其他畫面的主按鈕同一個長相)。
-  // 被指著的那塊地板請 RD 同時用 drawShapeFloor({ status: 'spotlight' }) 畫(光圈在那裡)。
-  function drawShapeDialog(ctx, state) {
-    var s = state || {}, t = THEMES[2], d = LAYOUT.shapeDialog, P = d.panel, B = d.ok, T = d.target;
-    var tt = Math.max(0, num(s.t, 0)), lock = TIMING.shapeDialogLock;
-    var ready = tt >= lock && !s.menu;
-    ctx.save();
-    ctx.globalAlpha = clamp01(tt / TIMING.shapeDialogIn);
-    // 壓暗(挖洞: 被指著的地板保持原亮度 = 「亮起」)
-    ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.arc(T.x, T.y, 42, 0, TAU, true);
-    ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill('evenodd');
-    // 指向尖角: 框右緣 → 光圈外緣(尖端碰到光圈, 不停在空白)
-    var tipX = T.x - FLOOR_R - 12;
-    ctx.beginPath(); ctx.moveTo(P.x + P.w - 2, T.y - 30); ctx.lineTo(tipX, T.y); ctx.lineTo(P.x + P.w - 2, T.y + 30); ctx.closePath();
-    ctx.fillStyle = t.panel; ctx.fill();
-    ctx.lineJoin = 'round'; ctx.lineWidth = 3; ctx.strokeStyle = t.rim; ctx.stroke();
-    // 框
-    roundRect(ctx, P.x, P.y, P.w, P.h, 18); ctx.fillStyle = t.panel; ctx.fill();
-    ctx.lineWidth = 3; ctx.strokeStyle = t.rim; ctx.stroke();
-    // 尖角與框接縫處補一段底色, 讓尖角看起來從框長出來
-    ctx.fillStyle = t.panel; ctx.fillRect(P.x + P.w - 3, T.y - 27, 6, 54);
-    text(ctx, '光門可能要形狀, 拖過形狀區就變形', P.x + P.w / 2, P.y + 42, 26, t.ink, 'center', { stroke: 'rgba(0,0,0,0.6)', strokeWidth: 5 });
-    shapeIllustration(ctx, P.x + 18, P.y + 76, P.w - 36, 404, 14);
-    // 「知道了」
-    if (ready) {
-      var col = s.pressed ? darken(t.rim, 0.18) : (s.hover === 'ok' ? lighten(t.rim, 0.2) : t.rim);
-      roundRect(ctx, B.x, B.y, B.w, B.h, 12); ctx.fillStyle = col; ctx.fill();
-      ctx.lineWidth = s.hover === 'ok' ? 3 : 2; ctx.strokeStyle = s.hover === 'ok' ? '#ffffff' : rgba(t.ink, 0.6); ctx.stroke();
-      text(ctx, '知道了', B.x + B.w / 2, B.y + B.h / 2 + 1, 24, '#14141c');
+  };
+  function tutRect(ctx, L, r) {
+    var K = TUT.skin[L];
+    ctx.beginPath();
+    if (K.cut) {
+      var c = K.cut, x0 = r.x, y0 = r.y, x1 = r.x + r.w, y1 = r.y + r.h;
+      ctx.moveTo(x0 + c, y0); ctx.lineTo(x1 - c, y0); ctx.lineTo(x1, y0 + c); ctx.lineTo(x1, y1 - c);
+      ctx.lineTo(x1 - c, y1); ctx.lineTo(x0 + c, y1); ctx.lineTo(x0, y1 - c); ctx.lineTo(x0, y0 + c); ctx.closePath();
     } else {
-      var p = s.menu ? 0 : clamp01(tt / lock);
-      roundRect(ctx, B.x, B.y, B.w, B.h, 12); ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fill();
-      if (p > 0.01) {
-        ctx.save(); roundRect(ctx, B.x, B.y, B.w, B.h, 12); ctx.clip();
-        ctx.fillStyle = rgba(t.rim, 0.28); ctx.fillRect(B.x + B.w / 2 * (1 - p), B.y, B.w * p, B.h);
-        ctx.restore();
+      roundRectPath(ctx, r.x, r.y, r.w, r.h, K.radius);
+    }
+  }
+  function rectHit(a, b) { return a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y; }
+  function inflate(r, d) { return { x: r.x - d, y: r.y - d, w: r.w + 2 * d, h: r.h + 2 * d }; }
+  function rectCircle(r, cx, cy, rad) {
+    var nx = Math.max(r.x, Math.min(cx, r.x + r.w)), ny = Math.max(r.y, Math.min(cy, r.y + r.h));
+    return (nx - cx) * (nx - cx) + (ny - cy) * (ny - cy) < rad * rad;
+  }
+  // 泡泡矩形是否壓到某一道光門(亮邊帶 + 外光: 法向 -14 ~ +18)
+  function rectGate(r, slot) {
+    var e = edgeOf(slot), rr = inflate(r, 4);
+    for (var k = 0; k <= 24; k++) {
+      for (var d = -14; d <= 18; d += 16) {
+        var p = edgePt(e, k / 24, d);
+        if (p[0] > rr.x && p[0] < rr.x + rr.w && p[1] > rr.y && p[1] < rr.y + rr.h) return true;
       }
-      roundRect(ctx, B.x, B.y, B.w, B.h, 12);
-      ctx.setLineDash([8, 6]); ctx.lineWidth = 2; ctx.strokeStyle = rgba(t.rim, 0.7); ctx.stroke(); ctx.setLineDash([]);
-      text(ctx, '知道了', B.x + B.w / 2, B.y + B.h / 2 + 1, 24, rgba(t.ink, 0.4));
+    }
+    return false;
+  }
+  function tutUiRects() {
+    var P = TUT.uiPad;
+    return [inflate(LAYOUT.hudLeft, P), inflate(LAYOUT.hudRight, P), inflate(LAYOUT.pauseBtn, P), inflate(LAYOUT.muteBtn, P)];
+  }
+  // 擺位: 依序試 上(置中 / 左偏 / 右偏)→ 下(同)→ 右 → 左; 壓到 HUD 或按鈕就沿該方向推開;
+  //   每個候選算扣分(壓 UI、壓亮著的光門、壓被標示物件、尾巴過長、出畫布), 取最低; 最後一律夾回畫布內。
+  // 回傳 { r: 泡泡矩形, dir }。
+  function tutPlace(ax, ay, w, h, clear, avoid) {
+    var T = TUT.tail, M = TUT.margin, ui = tutUiRects();
+    var cand = [['up', 0], ['up', -0.32], ['up', 0.32], ['down', 0], ['down', -0.32], ['down', 0.32], ['right', 0], ['left', 0]];
+    var best = null, bestPen = Infinity;
+    for (var i = 0; i < cand.length; i++) {
+      var dir = cand[i][0], sh = cand[i][1], r = { x: 0, y: 0, w: w, h: h };
+      if (dir === 'up') { r.x = ax - w / 2 + sh * w; r.y = ay - clear - T - h; }
+      else if (dir === 'down') { r.x = ax - w / 2 + sh * w; r.y = ay + clear + T; }
+      else if (dir === 'right') { r.x = ax + clear + T; r.y = ay - h / 2; }
+      else { r.x = ax - clear - T - w; r.y = ay - h / 2; }
+      if (dir === 'up' || dir === 'down') r.x = Math.max(M, Math.min(W - M - w, r.x));
+      else r.y = Math.max(M, Math.min(H - M - h, r.y));
+      for (var k = 0; k < 5; k++) {
+        var hit = null;
+        for (var j = 0; j < ui.length; j++) if (rectHit(r, ui[j])) { hit = ui[j]; break; }
+        if (!hit) break;
+        if (dir === 'up') r.y = hit.y - h; else if (dir === 'down') r.y = hit.y + hit.h;
+        else if (dir === 'right') r.x = hit.x + hit.w; else r.x = hit.x - w;
+      }
+      var pen = i;
+      if (r.x < M - 0.5 || r.y < M - 0.5 || r.x + w > W - M + 0.5 || r.y + h > H - M + 0.5) pen += 5000;
+      for (j = 0; j < ui.length; j++) if (rectHit(r, ui[j])) { pen += 1000; break; }
+      if (avoid.gate && rectGate(r, avoid.gate)) pen += avoid.gateIsAnchor ? 40 : 400;
+      if (avoid.circle && rectCircle(r, avoid.circle[0], avoid.circle[1], avoid.circle[2])) pen += 150;
+      if (rectCircle(r, ax, ay, Math.max(6, clear * 0.6))) pen += 600;
+      var nx = Math.max(r.x, Math.min(ax, r.x + w)), ny = Math.max(r.y, Math.min(ay, r.y + h));
+      var dist = Math.sqrt((nx - ax) * (nx - ax) + (ny - ay) * (ny - ay));
+      pen += Math.max(0, dist - clear - T) * 0.6;
+      if (pen < bestPen) { bestPen = pen; best = { r: r, dir: dir }; }
+    }
+    best.r.x = Math.max(M, Math.min(W - M - w, best.r.x));
+    best.r.y = Math.max(M, Math.min(H - M - h, best.r.y));
+    return best;
+  }
+  // 尾巴: 從泡泡面向錨點的那一邊長出, 尖端停在錨點前 clear 像素(不蓋被指的東西)
+  function tutTail(r, ax, ay, clear, rad) {
+    var tw = TUT.tailW / 2, side, bx, by, nx, ny, ins = 3;
+    if (ay >= r.y + r.h) side = 'b'; else if (ay <= r.y) side = 't';
+    else if (ax >= r.x + r.w) side = 'r'; else if (ax <= r.x) side = 'l'; else return null;
+    var lo, hi;
+    if (side === 'b' || side === 't') {
+      lo = r.x + rad + tw + 2; hi = r.x + r.w - rad - tw - 2;
+      bx = lo > hi ? r.x + r.w / 2 : Math.max(lo, Math.min(hi, ax));
+      by = side === 'b' ? r.y + r.h : r.y; nx = 1; ny = 0;
+    } else {
+      lo = r.y + rad + tw + 2; hi = r.y + r.h - rad - tw - 2;
+      by = lo > hi ? r.y + r.h / 2 : Math.max(lo, Math.min(hi, ay));
+      bx = side === 'r' ? r.x + r.w : r.x; nx = 0; ny = 1;
+    }
+    var dx = ax - bx, dy = ay - by, len = Math.sqrt(dx * dx + dy * dy);
+    if (len < 1) return null;
+    var reach = Math.max(6, len - clear), ux = dx / len, uy = dy / len;
+    var ox = side === 'b' ? 0 : (side === 't' ? 0 : (side === 'r' ? -ins : ins));
+    var oy = side === 'b' ? -ins : (side === 't' ? ins : 0);
+    return {
+      a: [bx - nx * tw + ox, by - ny * tw + oy], b: [bx + nx * tw + ox, by + ny * tw + oy],
+      tip: [bx + ux * reach, by + uy * reach]
+    };
+  }
+  // 滑鼠按住圖示: 滑鼠外形 + 左鍵塗滿(= 按著)+ 左上三道「壓下」短線(隨 pulse 微微閃)
+  function tutMouse(ctx, x, y, dark, paper, pulse) {
+    ctx.save();
+    roundRect(ctx, x - 9, y - 13, 18, 27, 9);
+    ctx.fillStyle = paper; ctx.fill();
+    ctx.save(); roundRect(ctx, x - 9, y - 13, 18, 27, 9); ctx.clip();
+    ctx.fillStyle = dark; ctx.fillRect(x - 9, y - 13, 9, 11);
+    ctx.restore();
+    roundRect(ctx, x - 9, y - 13, 18, 27, 9);
+    ctx.lineWidth = 2.2; ctx.strokeStyle = dark; ctx.stroke();
+    ctx.lineWidth = 1.6;
+    line(ctx, x, y - 13, x, y - 2); line(ctx, x - 9, y - 2, x + 9, y - 2);
+    ctx.lineCap = 'round'; ctx.lineWidth = 2; ctx.strokeStyle = rgba(dark, 0.55 + 0.45 * pulse);
+    line(ctx, x - 12, y - 15, x - 15, y - 18); line(ctx, x - 6, y - 17, x - 6, y - 21); line(ctx, x - 14, y - 9, x - 18, y - 9);
+    ctx.restore();
+  }
+  function normMark(m) {
+    if (!m || typeof m !== 'object') return null;
+    var k = m.kind;
+    if (k === 'bubble') return { kind: 'bubble', x: num(m.x, CX), y: num(m.y, CY), r: num(m.r, BUBBLE_R) };
+    if (k === 'floor' || k === 'dyeFloor' || k === 'shapeFloor') return { kind: 'floor', x: num(m.x, CX), y: num(m.y, CY), r: num(m.r, FLOOR_R) };
+    if (k === 'gate') { var sl = Math.round(num(m.slot, 0)); return sl >= 1 && sl <= 8 ? { kind: 'gate', slot: sl } : null; }
+    if (k === 'hpRing') return { kind: 'hpRing' };
+    return null;
+  }
+  // 標示: 沿被標示物件的判定幾何, 往外留 8 像素, 畫一圈紙色實線(深色外描)原地呼吸(粗細 3 ~ 5、亮度); 不外擴、不旋轉
+  function tutMarkStroke(ctx, pathFn, paper, pulse, a) {
+    var lw = 3 + 2 * pulse;
+    pathFn(); ctx.lineWidth = lw + 4; ctx.strokeStyle = 'rgba(0,0,0,' + (0.55 * a) + ')'; ctx.stroke();
+    ctx.save();
+    ctx.shadowColor = paper; ctx.shadowBlur = 4 + 8 * pulse;
+    pathFn(); ctx.lineWidth = lw; ctx.strokeStyle = rgba(paper, a * (0.72 + 0.28 * pulse)); ctx.stroke();
+    ctx.restore();
+  }
+  function tutMark(ctx, mk, paper, pulse, a) {
+    var g = TUT.markGap;
+    ctx.save();
+    ctx.lineJoin = 'round';
+    if (mk.kind === 'bubble' || mk.kind === 'floor') {
+      tutMarkStroke(ctx, function () { circle(ctx, mk.x, mk.y, mk.r + g); }, paper, pulse, a);
+    } else if (mk.kind === 'gate') {
+      // 光門: 圈住整條判定帶(法向 -12 ~ +10)外再留 8, 兩端各多 8, 圓角膠囊
+      var e = edgeOf(mk.slot), c = edgePt(e, 0.5, -1), len = Math.sqrt((e.x2 - e.x1) * (e.x2 - e.x1) + (e.y2 - e.y1) * (e.y2 - e.y1));
+      var hw = len / 2 + g, hh = 11 + g, ang = Math.atan2(e.y2 - e.y1, e.x2 - e.x1);
+      tutMarkStroke(ctx, function () {
+        ctx.save(); ctx.translate(c[0], c[1]); ctx.rotate(ang);
+        ctx.beginPath(); roundRectPath(ctx, -hw, -hh, 2 * hw, 2 * hh, hh);
+        ctx.restore();
+      }, paper, pulse, a);
+    } else if (mk.kind === 'hpRing') {
+      // 血量環: 軌 214 ~ 228 的內外兩側各一圈(211 / 231), 不蓋環本身
+      tutMarkStroke(ctx, function () { circle(ctx, CX, CY, HP_R - HP_TRACK / 2 - 3); }, paper, pulse, a * 0.85);
+      tutMarkStroke(ctx, function () { circle(ctx, CX, CY, HP_R + HP_TRACK / 2 + 3); }, paper, pulse, a);
     }
     ctx.restore();
   }
-
-  var GUIDE_FNS = [guidePage1, guidePage2, guidePage3, guidePage4, guidePage5];
-  function drawGuidePage(ctx, state) {
-    var s = state || {}, g = LAYOUT.guide;
-    var page = Math.max(1, Math.min(GUIDE_PAGES, Math.round(num(s.page, 1))));
-    var info = GUIDE[page - 1], t = THEMES[info.level || 1];
+  // 完成特效: 紙色圓牌 + 深色勾(與觸發的「深底白勾」相反)彈出, 8 顆紙色小四角星往外散開後淡出; 全長 0.8 秒(done 0~1)
+  function tutStar(ctx, x, y, s) {
+    ctx.beginPath();
+    ctx.moveTo(x, y - s);
+    ctx.quadraticCurveTo(x + s * 0.18, y - s * 0.18, x + s, y);
+    ctx.quadraticCurveTo(x + s * 0.18, y + s * 0.18, x, y + s);
+    ctx.quadraticCurveTo(x - s * 0.18, y + s * 0.18, x - s, y);
+    ctx.quadraticCurveTo(x - s * 0.18, y - s * 0.18, x, y - s);
+    ctx.closePath();
+  }
+  function tutDone(ctx, x, y, p, paper, dark) {
+    x = Math.max(44, Math.min(W - 44, x)); y = Math.max(44, Math.min(H - 44, y));
+    var pop = easeOutBack(clamp01(p / 0.3)), a = p < 0.62 ? 1 : clamp01(1 - (p - 0.62) / 0.38);
+    var sa = p < 0.12 ? p / 0.12 : clamp01(1 - (p - 0.12) / 0.88), e = easeOut(p);
     ctx.save();
-    drawBackground(ctx, { level: info.level || 1 });
-    overlay(ctx, 0.45);
-    text(ctx, info.title, 40, 46, 20, t.inkDim, 'left');
-    text(ctx, page + ' / ' + GUIDE_PAGES, 40, 80, 16, t.inkDim, 'left');
-    text(ctx, info.text, CX, 92, 34, t.ink, 'center', { stroke: 'rgba(0,0,0,0.6)', strokeWidth: 6 });
-    GUIDE_FNS[page - 1](ctx);
-    drawButton(ctx, t, g.close, '關閉', s.hover === 'close');
-    if (page > 1) drawButton(ctx, t, g.prev, '上一頁', s.hover === 'prev');
-    if (page < GUIDE_PAGES) drawButton(ctx, t, g.next, '下一頁', s.hover === 'next', { primary: true });
+    for (var i = 0; i < 8; i++) {
+      var ang = -Math.PI / 2 + i * TAU / 8 + 0.2, d = 20 + 42 * e, sz = (i % 2 ? 4.5 : 6.5) * (1 - 0.45 * p);
+      var sx = x + d * Math.cos(ang), sy = y + d * Math.sin(ang);
+      tutStar(ctx, sx, sy, sz + 1.4); ctx.fillStyle = 'rgba(0,0,0,' + (0.5 * sa) + ')'; ctx.fill();
+      tutStar(ctx, sx, sy, sz); ctx.fillStyle = rgba(paper, sa); ctx.fill();
+    }
+    if (pop > 0.01) {
+      var R = 17 * pop;
+      ctx.globalAlpha = a;
+      circle(ctx, x, y, R + 2.5); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill();
+      circle(ctx, x, y, R); ctx.fillStyle = paper; ctx.fill();
+      ctx.lineWidth = 2; ctx.strokeStyle = dark; ctx.stroke();
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(1.5, 4 * pop); ctx.strokeStyle = dark;
+      ctx.beginPath(); ctx.moveTo(x - R * 0.48, y + R * 0.02); ctx.lineTo(x - R * 0.12, y + R * 0.38); ctx.lineTo(x + R * 0.5, y - R * 0.36); ctx.stroke();
+    }
+    ctx.restore();
+  }
+  var TUT_BUBBLE_STAGES = { grab: 1, hold: 1, beat: 1 };
+  function drawTutorial(ctx, state) {
+    var s = state || {}, L = lv(s.level), t = THEMES[L], K = TUT.skin[L];
+    var paper = t.ink, dark = K.dark;
+    var ax = num(s.x, CX), ay = num(s.y, CY);
+    var ap = s.appear == null ? 1 : clamp01(num(s.appear, 1));
+    var dn = clamp01(num(s.done, 0));
+    var time = num(s.time, NaN), pulse = isFinite(time) ? 0.5 + 0.5 * Math.sin(time * TAU / TUT.pulse) : 0.6;
+    var mk = normMark(s.mark);
+    var vis = ap * (dn > 0 ? 1 - clamp01(dn / 0.3) : 1);
+    var str = s.text == null ? '' : String(s.text), icon = s.icon === 'press';
+    ctx.save();
+    if (mk && vis > 0.01) tutMark(ctx, mk, paper, pulse, vis);
+    if (vis > 0.01 && (str || icon)) {
+      // 尺寸
+      ctx.font = font(TUT.px);
+      var mt = str ? ctx.measureText(str) : null, tw = mt && isFinite(mt.width) && mt.width > 0 ? mt.width : str.length * TUT.px;
+      var w = Math.ceil(TUT.padX * 2 + tw + (icon ? TUT.iconW + (str ? TUT.iconGap : 0) : 0)), h = TUT.h;
+      // 尾巴尖端離錨點多遠: 錨點就是被標示的圓形物件 → 停在標示圈外; 錨點是氣泡 → 停在氣泡外; 其他 → 小距離
+      var clear;
+      if (mk && (mk.kind === 'bubble' || mk.kind === 'floor') && Math.abs(mk.x - ax) < 6 && Math.abs(mk.y - ay) < 6) clear = mk.r + TUT.markGap + 6;
+      else if (TUT_BUBBLE_STAGES[s.stage]) clear = BUBBLE_R + 8;
+      else if (s.stage === 'heal') clear = 12;
+      else clear = 20;
+      var litSlot = Math.round(num(s.litSlot, 0)), avoid = {};
+      if (litSlot >= 1 && litSlot <= 8) avoid.gate = litSlot;
+      else if (mk && mk.kind === 'gate') avoid.gate = mk.slot;
+      avoid.gateIsAnchor = s.stage === 'gate';
+      if (mk && (mk.kind === 'bubble' || mk.kind === 'floor')) avoid.circle = [mk.x, mk.y, mk.r + TUT.markGap + 4];
+      var pl = tutPlace(ax, ay, w, h, clear, avoid), r = pl.r;
+      var tail = tutTail(r, ax, ay, clear, K.radius || K.cut || 0);
+      // 彈出: 從尾巴尖端(沒有尾巴時從錨點)放大
+      var ox = tail ? tail.tip[0] : ax, oy = tail ? tail.tip[1] : ay;
+      var sc = ap < 1 ? 0.35 + 0.65 * easeOutBack(ap) : 1;
+      if (dn > 0) sc *= 1 - 0.12 * clamp01(dn / 0.3);
+      ctx.save();
+      ctx.globalAlpha = clamp01(vis * (ap < 1 ? Math.min(1, ap * 2.2) : 1));
+      ctx.translate(ox, oy); ctx.scale(sc, sc); ctx.translate(-ox, -oy);
+      // 落影: 林間 / 魔龍柔影, 舞廳 8-bit 硬影
+      if (L === 2) {
+        ctx.fillStyle = 'rgba(0,0,0,0.55)';
+        tutRect(ctx, L, { x: r.x + 4, y: r.y + 4, w: r.w, h: r.h }); ctx.fill();
+      } else {
+        ctx.save(); ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 3;
+        tutRect(ctx, L, r); ctx.fillStyle = paper; ctx.fill();
+        ctx.restore();
+      }
+      // 描邊(先畫粗深色, 再填紙色蓋掉內側半邊與接縫)
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 5; ctx.strokeStyle = dark;
+      tutRect(ctx, L, r); ctx.stroke();
+      if (tail) {
+        ctx.beginPath(); ctx.moveTo(tail.a[0], tail.a[1]); ctx.lineTo(tail.tip[0], tail.tip[1]); ctx.lineTo(tail.b[0], tail.b[1]); ctx.closePath();
+        ctx.stroke();
+      }
+      ctx.fillStyle = paper;
+      tutRect(ctx, L, r); ctx.fill();
+      if (tail) {
+        ctx.beginPath(); ctx.moveTo(tail.a[0], tail.a[1]); ctx.lineTo(tail.tip[0], tail.tip[1]); ctx.lineTo(tail.b[0], tail.b[1]); ctx.closePath();
+        ctx.fill();
+      }
+      // 內容
+      var cy = r.y + h / 2, cx0 = r.x + TUT.padX;
+      if (icon) { tutMouse(ctx, cx0 + TUT.iconW / 2, cy + 2, dark, paper, pulse); cx0 += TUT.iconW + TUT.iconGap; }
+      if (str) {
+        if (icon) text(ctx, str, cx0, cy + 1, TUT.px, dark, 'left');
+        else text(ctx, str, r.x + r.w / 2, cy + 1, TUT.px, dark, 'center');
+      }
+      ctx.restore();
+    }
+    if (dn > 0 && dn < 1) tutDone(ctx, ax, ay, dn, paper, dark);
     ctx.restore();
   }
 
@@ -1793,7 +1757,6 @@
     palette: palette,
     timing: TIMING,
     layout: LAYOUT,
-    guidePages: GUIDE_PAGES,
     geometry: { gateInnerApothem: WALL_APO - GATE_WIDEN, hpRingRadius: HP_R, bubbleOuterRadius: RING_C + RING_TRACK / 2 },
     drawBackground: drawBackground,
     drawArena: drawArena,
@@ -1816,9 +1779,8 @@
     drawMuteButton: drawMuteButton,
     drawPauseMenu: drawPauseMenu,
     drawTitle: drawTitle,
-    drawShapeDialog: drawShapeDialog,
     drawGameOver: drawGameOver,
     drawCredits: drawCredits,
-    drawGuidePage: drawGuidePage
+    drawTutorial: drawTutorial
   };
 })();
