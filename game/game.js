@@ -28,7 +28,14 @@
   var L = Art.layout;
   var W = Art.canvas.width, H = Art.canvas.height;
   var TAU = Math.PI * 2;
-  var BUILD_VERSION = 'demo-v20-0.1.0';
+  var BUILD_VERSION = 'demo-v21-0.1.0';
+  // 接住的例外一律印出(同一種訊息只印前 3 次, 避免每幀重複洗版)
+  var ERR_SEEN = {};
+  function logErr(e, where) {
+    var msg = (where ? where + ': ' : '') + String(e && e.message ? e.message : e);
+    ERR_SEEN[msg] = (ERR_SEEN[msg] || 0) + 1;
+    if (ERR_SEEN[msg] <= 3 && window.console) console.error(msg, e);
+  }
 
   var CX = 640, CY = 360;
   var INNER_R = 210;
@@ -93,7 +100,7 @@
   var EMERGENCY_MUSIC = [null, { bpm: 120, levelBars: 36, loop: false }, { bpm: 120, levelBars: 40, loop: false }, { bpm: 120, levelBars: 48, loop: true, loopBeats: 192 }];
   function readMusicInfo(name, lvl) {
     var mi = null;
-    try { mi = Sound.getMusicInfo(name); } catch (e) {}
+    try { mi = Sound.getMusicInfo(name); } catch (e) { logErr(e); }
     if (!mi || !(mi.bpm > 0) || !(mi.levelBars > 0)) {
       if (window.console) console.error('Sound.getMusicInfo 讀不到曲子設定, 改用緊急預設: ' + name);
       return { info: null, use: EMERGENCY_MUSIC[lvl] };
@@ -170,8 +177,8 @@
   var FIRST_REACH_KEY = 'bcv19_firstReach';
   var LAST_END_KEY = 'bcv19_lastEndWall';
 
-  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
-  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { logErr(e, 'localStorage 讀取'); return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) { logErr(e); } }
   var LS_OLD_PREFIXES = ['bcv18_', 'bcv17_', 'bcv16_', 'bcv15_', 'bcv14_'];
   // 讀不到 v19 的值就沿用舊版同名鍵(只用在玩家 ID、局數、靜音、已看過說明、最高關、首次到達關; 後備累積與形狀說明標記不沿用)
   function lsGetCompat(k) {
@@ -203,42 +210,50 @@
       if ((m = /Chrome\/([0-9.]+)/.exec(ua))) return 'Chrome ' + m[1];
       if ((m = /Version\/([0-9.]+).*Safari/.exec(ua))) return 'Safari ' + m[1];
       return ua.slice(0, 60) || null;
-    } catch (e) { return null; }
+    } catch (e) { logErr(e, '瀏覽器辨識'); return null; }
   })();
 
   // ---------- 聲音(全部包 try, 沒載入也不當掉) ----------
   var muted = loadMuted();
-  try { if (window.Sound && Sound.setMuted) Sound.setMuted(muted); } catch (e) {}
+  try { if (window.Sound && Sound.setMuted) Sound.setMuted(muted); } catch (e) { logErr(e); }
   var soundInited = false;
   function ensureSoundInit() {
-    if (!soundInited) { soundInited = true; try { Sound.init(); } catch (e) {} }
+    if (!soundInited) { soundInited = true; try { Sound.init(); } catch (e) { logErr(e); } }
   }
-  function snd(name, opts) { try { Sound.play(name, opts); } catch (e) {} }
+  function snd(name, opts) { try { Sound.play(name, opts); } catch (e) { logErr(e); } }
   function toggleMute() {
     muted = !muted;
-    try { Sound.setMuted(muted); } catch (e) {}
+    try { Sound.setMuted(muted); } catch (e) { logErr(e); }
     saveMuted(muted);
   }
 
   // ---------- 畫布 DPI ----------
+  // 依容器(#stage, 即瀏覽器視窗或網站 iframe)算最大等比尺寸, 置中、多的留黑邊、不裁切不拉伸; 實際像素 = CSS 尺寸 × devicePixelRatio
   function fitCanvas() {
     var dpr = window.devicePixelRatio || 1;
-    canvas.width = Math.round(W * dpr);
-    canvas.height = Math.round(H * dpr);
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.scale(dpr, dpr);
+    var box = canvas.parentNode;
+    var cw = (box && box.clientWidth) || window.innerWidth || W;
+    var ch = (box && box.clientHeight) || window.innerHeight || H;
+    var scale = Math.min(cw / W, ch / H);
+    if (!(scale > 0)) scale = 1;
+    var cssW = W * scale, cssH = H * scale;
+    canvas.style.width = cssW + 'px';
+    canvas.style.height = cssH + 'px';
+    canvas.width = Math.max(1, Math.round(cssW * dpr));
+    canvas.height = Math.max(1, Math.round(cssH * dpr));
+    ctx.setTransform(canvas.width / W, 0, 0, canvas.height / H, 0, 0);
   }
   fitCanvas();
   window.addEventListener('resize', fitCanvas);
+  window.addEventListener('orientationchange', function () { fitCanvas(); setTimeout(fitCanvas, 200); });
 
   // ---------- 畫面狀態機 ----------
   var SCREEN = { TITLE: 'title', PLAYING: 'playing', PAUSED: 'paused', END: 'end' };
   var screen = SCREEN.TITLE;
   var endInfo = null;
   var lastGameEndWall = null;
-  var hov = { title: null, pauseBtn: false, muteBtn: false, pauseMenu: null, end: null };
+  var hov = { title: null, pauseBtn: false, muteBtn: false, pauseMenu: null, confirm: null, end: null };
+  var confirmKind = null;          // 暫停選單上的確認面板: null / 'restart' / 'quit'(只在 PAUSED 畫面有意義)
   var game = null;
   var animT = 0;                   // 背景 / HUD 動態用的遞增秒數(暫停凍結)
   // 署名: credits.md 的新署名(三首新曲; 前兩首已調速、第 3 首已截取並循環)。標題與結束畫面的署名區只有約 106 像素高, 所以把每首的「曲名 / 作者 / 授權 / 修改說明」併成一行, 授權網址放最後一行
@@ -604,7 +619,7 @@
       nodeDiffs: {}
     };
     enterLevelStats(g, 1);
-    try { g.audioOutputLatencySec = Sound.getOutputLatency() || 0; } catch (e) {}
+    try { g.audioOutputLatencySec = Sound.getOutputLatency() || 0; } catch (e) { logErr(e); }
     return g;
   }
   function enterLevelStats(g, lvl) {
@@ -2145,14 +2160,14 @@
     if (isCarried) clearCarried(g, b, category === '內圈內' ? '放開清掉(內圈內)' : '放開清掉', lt);
   }
 
-  // 系統事件強制結果(視窗外放開 / 失焦): 一律「內圈外」彈回, 走獨立路徑, 不看座標
+  // 系統事件強制結果(視窗外放開 / 失焦 / Esc 暫停): 一律「內圈外」彈回, 走獨立路徑, 不看座標
   function forceBounce(g, b, reason, lt) {
     b.dragPathTotal += b.dragPathLen;
     dragEndEvent(g, b, reason, lt);
     var px = b.x, py = b.y;
     if (!b.carried) g.totals.bounceOuter++;
-    if (reason === '視窗外放開') checkSuspect(g, b, px, py, { x: mouse.x, y: mouse.y }, lt);   // 失焦不在嫌疑定義內
-    emitDrop(g, b, lt, { category: reason === '失焦' ? '失焦' : '視窗外', outcome: b.carried ? '帶過的那一顆清掉' : '彈回內圈', px: px, py: py, onUi: false, pointerSource: '系統事件' });
+    if (reason === '視窗外放開') checkSuspect(g, b, px, py, { x: mouse.x, y: mouse.y }, lt);   // 失焦與 Esc 暫停不在嫌疑定義內
+    emitDrop(g, b, lt, { category: reason === '失焦' ? '失焦' : (reason === 'Esc 暫停' ? 'Esc 暫停' : '視窗外'), outcome: b.carried ? '帶過的那一顆清掉' : '彈回內圈', px: px, py: py, onUi: false, pointerSource: '系統事件' });
     if (b.carried) clearCarried(g, b, '視窗外或失焦清掉', lt);
     else startReturn(g, b, px, py);
     mouse.press = null;
@@ -2387,11 +2402,12 @@
     if (g.paused) return;
     g.paused = true;
     g.pauseCount++;
-    var rec = emit(g, 'pause', { startRealMs: Date.now() - g.startWall, endRealMs: null, reason: reason === 'blur' ? '失焦' : '按鈕', atSeg: segLabel(g) });
+    var rec = emit(g, 'pause', { startRealMs: Date.now() - g.startWall, endRealMs: null, reason: reason === 'blur' ? '失焦' : (reason === 'esc' ? 'Esc' : '按鈕'), atSeg: segLabel(g) });
     g.openPauseRecord = rec;
     screen = SCREEN.PAUSED;
+    confirmKind = null;
     mouse.btn = false;
-    try { Sound.pauseMusic(); } catch (e) {}
+    try { Sound.pauseMusic(); } catch (e) { logErr(e); }
   }
   function endPauseRecord(g) {
     var rec = g.openPauseRecord;
@@ -2405,8 +2421,9 @@
     if (!g.paused) return;
     g.paused = false;
     endPauseRecord(g);
+    confirmKind = null;
     screen = SCREEN.PLAYING;
-    try { Sound.resumeMusic(g.lt / g.bs); } catch (e) {}
+    try { Sound.resumeMusic(g.lt / g.bs); } catch (e) { logErr(e); }
   }
 
   // ==================================================================
@@ -2769,7 +2786,7 @@
     if (newLvl > prevMax) { lsSet(MAXLEVEL_KEY, String(newLvl)); lsSet(FIRST_REACH_KEY + newLvl, String(g.gameIndex)); }
     // 5. 音樂與提示音(順序: 換關 → 新歌 → 預備拍第 −4 拍)
     snd('stageChange');
-    try { Sound.playMusic(LEVELS[newLvl].music, { beat: g.lt / g.bs }); } catch (e) {}
+    try { Sound.playMusic(LEVELS[newLvl].music, { beat: g.lt / g.bs }); } catch (e) { logErr(e); }
     snd('countIn', { left: 4 });
   }
 
@@ -2839,7 +2856,7 @@
         if (ad > g.driftMaxAbs[g.lvl]) g.driftMaxAbs[g.lvl] = ad;
         if (ad > 0.04) g.resync[g.lvl]++;      // sound.js 的容許值 0.04 秒: 超過就對回時鐘(對回次數)
       }
-    } catch (e) {}
+    } catch (e) { logErr(e); }
   }
 
   // ==================================================================
@@ -3634,7 +3651,7 @@
     return Math.sqrt(ss / (arr.length - 1));
   }
   function loadHistory() {
-    try { var h = JSON.parse(lsGet(HISTORY_KEY) || '[]'); return Array.isArray(h) ? h : []; } catch (e) { return []; }
+    try { var h = JSON.parse(lsGet(HISTORY_KEY) || '[]'); return Array.isArray(h) ? h : []; } catch (e) { logErr(e, '讀取跨局紀錄'); return []; }
   }
   function saveHistory(h) { lsSet(HISTORY_KEY, JSON.stringify(h.slice(-300))); }
   function normRate(rate, base) { return rate == null ? null : r3((rate - base) / (1 - base)); }
@@ -4572,7 +4589,7 @@
             level: l, music: lv.music, title: lv.title, bpmActual: lv.bpm, beatSec: lv.beatSec, bars: lv.bars, endBeat: lv.endBeat, loopBeats: lv.loopBeats, levelSec: r3(lv.levelSec),
             songSettingsFromSound: !!lv.info,
             songSettings: lv.info ? { file: lv.info.file, bpm: lv.info.bpm, levelBars: lv.info.levelBars, firstBeatInFileSec: lv.info.firstBeatInFileSec, levelStartInFileSec: lv.info.levelStartInFileSec, loop: lv.info.loop, loopStartBeat: lv.info.loopStartBeat, loopBeats: lv.info.loopBeats, loopStartInFileSec: lv.info.loopStartInFileSec, loopEndInFileSec: lv.info.loopEndInFileSec } : null, segSwitchBeat: PARAMS.segSwitchBeat, previewBeats: PARAMS.previewBeats, batchN: lv.N, drain: lv.drain,
-            musicInfo: (function () { try { return Sound.getMusicInfo(lv.music); } catch (e) { return null; } })()
+            musicInfo: (function () { try { return Sound.getMusicInfo(lv.music); } catch (e) { logErr(e, "曲子資訊"); return null; } })()
           };
         }),
         floorTransforms: { level1: '原樣', level2: '轉 180°', level3: '左右鏡射' },
@@ -4643,13 +4660,14 @@
       document.body.removeChild(a);
       setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
       return true;
-    } catch (e) { return false; }
+    } catch (e) { logErr(e, '試玩紀錄下載失敗'); return false; }
   }
 
   function endGame(reason) {
     var g = game;
     if (!g || g.done) return;
     g.done = true;
+    confirmKind = null;
     if (reason === 'hpZero') {
       var uq = uniqArr(g.pendingDeathReasons);
       if (uq.length === 0) uq = ['持續扣血'];
@@ -4657,7 +4675,7 @@
     } else if (reason === 'restart') g.deathReasons = ['重開'];
     else if (reason === 'quit') g.deathReasons = ['放棄'];
     else g.deathReasons = [reason];
-    try { Sound.stopMusic(); } catch (e) {}
+    try { Sound.stopMusic(); } catch (e) { logErr(e); }
     var ok = false;
     try { ok = finalizeAndDownload(g, reason); } catch (e) { ok = false; if (window.console) console.error(e); }
     endInfo = { time: g.surv, score: g.score, note: ok ? '紀錄已下載' : '紀錄下載失敗' };
@@ -4669,12 +4687,13 @@
   function startNewGame() {
     var idx = nextGameIndex();
     mouse.press = null; mouse.lastDropPos = null; mouse.netSeqAtLastDrop = null; mouse.pathSinceDrop = 0; mouse.btn = false;
+    confirmKind = null;
     inputQueue = [];
     game = createGame(idx);
     tutNewRun(game);
     endInfo = null;
     screen = SCREEN.PLAYING;
-    try { Sound.playMusic(LEVELS[1].music, { beat: game.lt / game.bs }); } catch (e) {}
+    try { Sound.playMusic(LEVELS[1].music, { beat: game.lt / game.bs }); } catch (e) { logErr(e); }
   }
 
   // ==================================================================
@@ -4871,16 +4890,30 @@
     return null;
   }
   function pauseBtnLocate(p) { return inRect(p.x, p.y, L.pauseBtn); }
-  function muteBtnLocate(p) { return inRect(p.x, p.y, L.muteBtn); }
+  // 靜音按鈕: 開始與結束畫面在最角落(muteBtnCorner), 遊戲中 / 暫停 / 確認面板在暫停按鈕正下方(muteBtn)
+  function muteBtnLocate(p) { return inRect(p.x, p.y, (screen === SCREEN.TITLE || screen === SCREEN.END) ? L.muteBtnCorner : L.muteBtn); }
+  function confirmLocate(p) {
+    if (inRect(p.x, p.y, L.confirm.yes)) return 'yes';
+    if (inRect(p.x, p.y, L.confirm.no)) return 'no';
+    return null;
+  }
+  function pausedLocate(p) { return confirmKind ? confirmLocate(p) : pauseMenuLocate(p); }
 
   function doTitleAction(key) {
     if (key === 'start') startNewGame();
   }
+  // 暫停畫面上的按鈕: 暫停選單(繼續 / 重開 / 放棄)或確認面板(確定 / 取消)。重開與放棄的紀錄與死因都在「確定」那一刻才發生
   function doPauseMenuAction(key) {
     var g = game;
+    if (confirmKind) {
+      var kind = confirmKind;
+      confirmKind = null;
+      if (key === 'yes') endGame(kind);
+      else hov.pauseMenu = pauseMenuLocate(mouse);
+      return;
+    }
     if (key === 'resume') resumePause(g);
-    else if (key === 'restart') endGame('restart');
-    else if (key === 'quit') endGame('quit');
+    else if (key === 'restart' || key === 'quit') { confirmKind = key; hov.confirm = confirmLocate(mouse); }
   }
   function doEndAction(key) {
     if (key === 'again') startNewGame();
@@ -4888,7 +4921,7 @@
   }
 
   // ==================================================================
-  // 滑鼠事件(唯一輸入; 不掛鍵盤 / 觸控事件)
+  // 滑鼠事件(遊戲動作唯一輸入); 鍵盤只掛 Esc(暫停 / 繼續 / 取消確認), 不掛其他鍵與觸控事件
   // ==================================================================
   function logicalPos(e) {
     var rect = canvas.getBoundingClientRect();
@@ -4909,10 +4942,10 @@
       else inputQueue.push({ k: 'down', x: p.x, y: p.y, ts: e.timeStamp });
     } else if (screen === SCREEN.PAUSED) {
       if (muteBtnLocate(p)) mouse.uiDownKey = 'mute';
-      else mouse.uiDownKey = pauseMenuLocate(p);
+      else mouse.uiDownKey = pausedLocate(p);
     } else if (screen === SCREEN.TITLE) {
-      mouse.uiDownKey = titleLocate(p);
-    } else if (screen === SCREEN.END) mouse.uiDownKey = endLocate(p);
+      mouse.uiDownKey = muteBtnLocate(p) ? 'mute' : titleLocate(p);
+    } else if (screen === SCREEN.END) mouse.uiDownKey = muteBtnLocate(p) ? 'mute' : endLocate(p);
   });
   canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
@@ -4931,8 +4964,12 @@
         var gm = game;
         if (gm.net && !gm.netFirstPressDone && gm.phase === 'playing' && dist(p.x, p.y, CX, CY) > INNER_R && sectorOf(p.x, p.y) === gm.net.slot) gm.netApproached = true;
       }
-    } else if (screen === SCREEN.PAUSED) { hov.pauseMenu = inside ? pauseMenuLocate(p) : null; hov.muteBtn = inside && muteBtnLocate(p); }
+    } else if (screen === SCREEN.PAUSED) {
+      hov.pauseMenu = (inside && !confirmKind) ? pauseMenuLocate(p) : null;
+      hov.confirm = (inside && confirmKind) ? confirmLocate(p) : null;
+    }
     else if (screen === SCREEN.END) hov.end = inside ? endLocate(p) : null;
+    if (screen !== SCREEN.PLAYING) hov.muteBtn = inside && muteBtnLocate(p);
   });
 
   window.addEventListener('mouseup', function (e) {
@@ -4952,9 +4989,9 @@
       return;
     }
     if (!inside || !key) return;
+    if (key === 'mute') { if (muteBtnLocate(p)) toggleMute(); return; }
     if (screen === SCREEN.PAUSED) {
-      if (key === 'mute') { if (muteBtnLocate(p)) toggleMute(); }
-      else if (pauseMenuLocate(p) === key) doPauseMenuAction(key);
+      if (pausedLocate(p) === key) doPauseMenuAction(key);
     } else if (screen === SCREEN.TITLE) {
       if (titleLocate(p) === key) doTitleAction(key);
     } else if (screen === SCREEN.END) {
@@ -4963,20 +5000,36 @@
   });
 
   // 視窗失去焦點: 拖曳中立刻視為在內圈外放開彈回(獨立路徑, 不看座標); 按住未拖比照放開; 接著自動暫停
-  window.addEventListener('blur', function () {
-    if (screen !== SCREEN.PLAYING || !game || game.paused) return;
+  // 失焦與 Esc 共用: 拖曳中 → 獨立路徑彈回(結束方式與放下記該原因); 按住未拖 → 比照放開; 然後開暫停選單
+  function interruptToPause(why) {
     var g = game;
     drainInputsNow(g);
     if (mouse.press) {
       var hb = mouse.press.bubble;
       if (hb && !hb.dead) {
-        if (mouse.press.dragging) forceBounce(g, hb, '失焦', g.lt);
+        if (mouse.press.dragging) forceBounce(g, hb, why === 'esc' ? 'Esc 暫停' : '失焦', g.lt);
         else releaseHoldNoDrag(g, hb, '放開', g.lt);
       }
       mouse.press = null;
     }
     mouse.btn = false; mouse.uiDownKey = null;
-    openPause(g, 'blur');
+    openPause(g, why);
+  }
+  window.addEventListener('blur', function () {
+    if (screen !== SCREEN.PLAYING || !game || game.paused || game.done) return;
+    interruptToPause('blur');
+  });
+
+  // 通用鍵 Esc(只處理 Esc, 其他鍵一律不理也不 preventDefault): 遊戲中 → 暫停; 暫停選單 → 繼續; 確認面板 → 取消; 開始 / 結束畫面無作用
+  window.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' && e.keyCode !== 27) return;
+    e.preventDefault();
+    if (e.repeat) return;
+    if (screen === SCREEN.PLAYING && game && !game.paused && !game.done) interruptToPause('esc');
+    else if (screen === SCREEN.PAUSED && game) {
+      if (confirmKind) { confirmKind = null; hov.pauseMenu = pauseMenuLocate(mouse); }
+      else resumePause(game);
+    }
   });
 
   // ==================================================================
@@ -4994,7 +5047,7 @@
     if (hoverId != null && b.id === hoverId && b.mode === 'idle') st.hover = true;
     return st;
   }
-  function renderGame(g, paused) {
+  function renderGame(g, paused, noButtons) {
     var lvl = g.lvl, bs = g.bs;
     var beat = g.lt / bs;
     var fl = Math.floor(beat);
@@ -5076,6 +5129,7 @@
     Art.drawHud(ctx, {
       level: lvl, hp: g.hp, danger: g.danger, hpFx: g.hpFx, time: animT, survival: g.surv, songProgress: songProgress, score: g.score, combo: g.combo
     });
+    if (noButtons) return;
     Art.drawPauseButton(ctx, { level: lvl, hover: hov.pauseBtn && !paused });
     Art.drawMuteButton(ctx, { level: lvl, hover: hov.muteBtn, muted: muted });
   }
@@ -5083,17 +5137,20 @@
     if (screen === SCREEN.TITLE) {
       Art.drawTitle(ctx, { hover: hov.title });
       Art.drawCredits(ctx, { lines: CREDITS_LINES });
+      Art.drawMuteButton(ctx, { level: 1, corner: true, hover: hov.muteBtn, muted: muted });
     } else if (screen === SCREEN.PLAYING) {
       renderGame(game, false);
     } else if (screen === SCREEN.PAUSED) {
       renderGame(game, true);
-      Art.drawPauseMenu(ctx, { level: game.lvl, hover: hov.pauseMenu });
+      Art.drawPauseMenu(ctx, { level: game.lvl, hover: confirmKind ? null : hov.pauseMenu });
+      if (confirmKind) Art.drawConfirm(ctx, { kind: confirmKind, hover: hov.confirm, level: game.lvl });
       Art.drawPauseButton(ctx, { level: game.lvl, hover: false });
       Art.drawMuteButton(ctx, { level: game.lvl, hover: hov.muteBtn, muted: muted });
     } else if (screen === SCREEN.END) {
-      if (game) renderGame(game, true);
+      if (game) renderGame(game, true, true);
       Art.drawGameOver(ctx, { survival: endInfo ? endInfo.time : 0, score: endInfo ? endInfo.score : 0, hover: hov.end });
       Art.drawCredits(ctx, { lines: CREDITS_LINES });
+      Art.drawMuteButton(ctx, { level: 1, corner: true, hover: hov.muteBtn, muted: muted });
     }
   }
 

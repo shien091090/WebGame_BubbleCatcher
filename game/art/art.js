@@ -1,9 +1,11 @@
-/* 捕泡手 art.js (spec v20)
+/* 捕泡手 art.js (spec v21)
  * 全域物件 window.Art, 不用 ES module。純 Canvas 2D 幾何繪製, 不引外部資源。
  * 一組函式畫三套風格: 每個 draw 函式的 state.level(1 / 2 / 3)決定用哪一套。
  * 三套皮: 第 1 首 林間(森林, 明亮) / 第 2 首 舞廳(8-bit 迪斯可 + 粉洋紅花) / 第 3 首 魔龍(黑暗奇幻)。骨不變。
  * v19: 刪輸入裝置選擇; 第 2 首重定色(色 B 綠 / 色 C 藍拉開色相與明度), 光門色帶在第 2 首改回單層外光。
  * v20: 新增嵌入式新手教學(drawTutorial); 刪說明頁、形狀說明對話框與「說明」按鈕。
+ * v21: 靜音中不用危險紅; 第 1、3 關四色重定(色名中心、離危險紅 ≥ 48°); HUD 與按鈕 8 級距; 教學淡出 0.5 秒;
+ *      新增確認面板 drawConfirm 與靜音按鈕角落位置(layout.muteBtnCorner)。
  * 只負責「給狀態就畫」, 不算規則、不管輸入。每個函式自己 save / restore。
  */
 (function () {
@@ -35,7 +37,8 @@
     floorIntro: 2.0,  // 地板出場提示(規格 2 秒)
     hpFx: 0.6,        // 血量環 / 血條上「加減了一段」的亮段
     tutorialShow: 0.25, // 教學提示彈出(state.appear 0→1 用的總長, 規格 0.25 秒)
-    tutorialDone: 0.8   // 教學完成特效(state.done 0→1 用的總長, 規格 0.8 秒)
+    tutorialDone: 0.8,  // 教學完成特效(state.done 0→1 用的總長, 規格 0.8 秒)
+    tutorialFade: 0.5   // v21: 完成後泡泡與標示縮小淡出的時長(包含在 tutorialDone 的 0.8 秒內, RD 不必另外計時)
   };
 
   // ---------------------------------------------------------------- 小工具
@@ -118,7 +121,8 @@
   // 骨(三關都一樣, 辨識靠它): 氣泡 = 立體漸層 + 高光 + 落影 + 外緣壽命環; 地板 = 平塗無影;
   //   無色 = 空心玻璃; 有色 = 實心; 亮邊 = 粗 + 條件色 + 內緣白芯 + 黑襯底; 拍子 = 該關專屬色(只給拍子用);
   //   血量 = 該關血量色(不與 4 色同色相、不用危險紅), 環與左上血條同色。
-  //   4 色 = 4 個明度階(暗 / 中暗 / 中亮 / 亮), 色相兩兩至少差 62°(三關最小 80° / 62° / 66°)。
+  //   4 色 = 4 個明度階(暗 / 中暗 / 中亮 / 亮), 色相兩兩至少差 60°(v21 三關最小 63° / 64° / 63°);
+  //   每色落在自己色名的中心, 4 色全部離危險紅 ≥ 48°(v21: 第 1 關色 A 莓洋紅 → 葡萄紫, 第 3 關色 C 冰藍 → 寶石藍)。
   // 皮(每關換): 明暗(明亮 / 暗 + 點狀光 / 近黑)、質感(柔圓藤葉 / 8-bit 像素方塊 / 鐵甲尖刺)、
   //   背景動態(草葉隨拍輕彈 / 舞池磚隨拍亮 / 餘燼上升 + 魔龍眼光緩慢呼吸)、網牆造型(藤蔓 / 像素磚鍊 / 鐵甲龍脊)。
   // 危險紅三關同一色(規格: 危險紅光三關一致)。
@@ -129,7 +133,9 @@
       bgTop: '#d9f7c8', bgMid: '#8fd88a', bgBottom: '#2f7a4c',
       ground: '#163d36', groundLine: '#1f5047', rim: '#eaffd2',
       wallDim: '#2f6b3a', wallJoint: '#6b4a2a',
-      colors: { A: '#e2459a', B: '#ffd83a', C: '#1f58d8', D: '#4fdc68' },
+      // v21: A 莓洋紅 #e2459a(328°, 離危險紅 27°)→ 葡萄紫 #c446e4(288°, 67°); B / C / D 往色名中心微調。
+      //   色相 A 288 / B 51 / C 225 / D 125(兩兩最小 63°); 灰階 A 126 / B 216 / C 90 / D 163。
+      colors: { A: '#c446e4', B: '#ffe23a', C: '#2a58e0', D: '#4edc5a' },
       beat: '#3ff0d8', danger: DANGER, hp: '#96e04c',
       ink: '#f4fff0', inkDim: '#bfe3c4', hudPlate: 'rgba(12,44,30,0.88)',
       glass: '#f6fff2', lifeRing: '#f4ffe0',
@@ -155,8 +161,11 @@
       bgTop: '#06040c', bgMid: '#0d0818', bgBottom: '#160c22',
       ground: '#1a1622', groundLine: '#2c2638', rim: '#cfc6e0',
       wallDim: '#4a4258', wallJoint: '#8a80a0',
-      colors: { A: '#ffc03a', B: '#5ad636', C: '#1a8ec8', D: '#7a18b8' },
-      beat: '#80ffd4', danger: DANGER, hp: '#7682ff',
+      // v21: C 冰藍 #1a8ec8(200°, 偏青)→ 寶石藍 #4a74f0(225°); D 魔紫 277° → 288°(與 C 保持 ≥ 60°);
+      //   A 41° → 44°(離危險紅 ≥ 48°); B 107° → 118°(綠的中心)。血量色從星輝藍紫(235°, 會與新 C 撞)改幽光黃綠 #c4f25a(78°)。
+      //   色相 A 44 / B 118 / C 225 / D 288(兩兩最小 63°); 灰階 A 201 / B 156 / C 118 / D 75。
+      colors: { A: '#ffca3a', B: '#4ad646', C: '#4a74f0', D: '#9014b0' },
+      beat: '#80ffd4', danger: DANGER, hp: '#c4f25a',
       dragon: '#1c1430', dragonEdge: '#3a2a56', ember: '#ffd27a', eye: '#e8f0b0',
       ink: '#f2eeff', inkDim: '#a49cbc', hudPlate: 'rgba(4,2,10,0.9)',
       glass: '#f0ecff', lifeRing: '#d8d0e8',
@@ -173,20 +182,28 @@
     hudRight: { x: 960, y: 20, w: 220, h: 80 },
     pauseBtn: { x: 1206, y: 26, w: 48, h: 48 },
     muteBtn: { x: 1206, y: 86, w: 48, h: 48 },
+    // v21: 開始與結束畫面的靜音按鈕放在右上角最角落(= 暫停按鈕的位置, 中心 (1230,50))
+    muteBtnCorner: { x: 1206, y: 26, w: 48, h: 48 },
+    // v21: 按鈕與面板的內距 / 間距改 8 的倍數級距(8 / 16 / 24 / 32 / 40 / 48 / 56)
     title: {
-      start: { x: 540, y: 392, w: 200, h: 60 }
+      start: { x: 536, y: 392, w: 208, h: 56 }
     },
-    // v20: 拿掉「說明」, 三顆按鈕, 面板上下置中
     pauseMenu: {
-      panel: { x: 470, y: 215, w: 340, h: 290 },
-      resume: { x: 520, y: 285, w: 240, h: 52 },
-      restart: { x: 520, y: 351, w: 240, h: 52 },
-      quit: { x: 520, y: 417, w: 240, h: 52 }
+      panel: { x: 464, y: 208, w: 352, h: 304 },
+      resume: { x: 520, y: 288, w: 240, h: 56 },
+      restart: { x: 520, y: 360, w: 240, h: 56 },
+      quit: { x: 520, y: 432, w: 240, h: 56 }
+    },
+    // v21 新增: 確認面板(重開 / 放棄)。與暫停選單同一個中心; 不碰右上暫停 / 靜音按鈕
+    confirm: {
+      panel: { x: 464, y: 232, w: 352, h: 256 },
+      yes: { x: 488, y: 400, w: 144, h: 56 },
+      no: { x: 648, y: 400, w: 144, h: 56 }
     },
     gameOver: {
-      panel: { x: 400, y: 150, w: 480, h: 420 },
-      again: { x: 450, y: 470, w: 180, h: 60 },
-      title: { x: 650, y: 470, w: 180, h: 60 }
+      panel: { x: 400, y: 152, w: 480, h: 416 },
+      again: { x: 448, y: 472, w: 184, h: 56 },
+      title: { x: 648, y: 472, w: 184, h: 56 }
     },
     credits: { x: 40, y: 604, w: 1200, h: 106 } // 署名可佔範圍(不可點), 與所有按鈕判定框不重疊
   };
@@ -1336,77 +1353,103 @@
     var s = state || {};
     var L = lv(s.level), t = THEMES[L];
     ctx.save();
-    var hl = LAYOUT.hudLeft, hr = LAYOUT.hudRight;
-    roundRect(ctx, hl.x, hl.y, hl.w, hl.h, L === 1 ? 12 : 3); ctx.fillStyle = t.hudPlate; ctx.fill();
-    text(ctx, '血量', hl.x + 12, hl.y + 24, 16, s.danger ? t.danger : t.ink, 'left');
-    drawHpBar(ctx, t, hl.x + 52, hl.y + 14, 176, 20, s.hp, !!s.danger, s.hpFx, s.time);
-    text(ctx, '存活', hl.x + 12, hl.y + 60, 13, t.inkDim, 'left');
-    text(ctx, num(s.survival, 0).toFixed(1) + ' 秒', hl.x + 48, hl.y + 60, 18, t.ink, 'left');
+    // v21: 內距 / 間距一律 8 的倍數: 左右內距 16、上下內距 16、標籤與內容間距 8、兩列之間 8
+    var hl = LAYOUT.hudLeft, hr = LAYOUT.hudRight, P = 16;
+    roundRect(ctx, hl.x, hl.y, hl.w, hl.h, L === 1 ? 8 : 3); ctx.fillStyle = t.hudPlate; ctx.fill();
+    // 第一列(y +16 ~ +32): 「血量」標籤(寬 32)+ 間距 8 + 血條
+    text(ctx, '血量', hl.x + P, hl.y + 24, 16, s.danger ? t.danger : t.ink, 'left');
+    drawHpBar(ctx, t, hl.x + 56, hl.y + 16, hl.w - 56 - P, 16, s.hp, !!s.danger, s.hpFx, s.time);
+    // 第二列(y +48 ~ +64): 「存活」+ 秒數; 歌曲進度在右段(x +152 ~ +224)
+    text(ctx, '存活', hl.x + P, hl.y + 56, 13, t.inkDim, 'left');
+    text(ctx, num(s.survival, 0).toFixed(1) + ' 秒', hl.x + 56, hl.y + 56, 18, t.ink, 'left');
     if (s.songProgress != null) {
       // 歌曲進度: 細譜線 + 沿線滑動的音符(播放頭), 不是填滿長條, 不會讀成血量
-      var sp = clamp01(num(s.songProgress, 0)), x0 = hl.x + 150, x1 = hl.x + 226, ly = hl.y + 64;
+      var sp = clamp01(num(s.songProgress, 0)), x0 = hl.x + 152, x1 = hl.x + hl.w - P, ly = hl.y + 64;
       ctx.lineCap = 'round';
       ctx.lineWidth = 1.5; ctx.strokeStyle = rgba(t.inkDim, 0.45); line(ctx, x0, ly, x1, ly);
       ctx.lineWidth = 1; line(ctx, x1, ly - 5, x1, ly + 5);
       if (sp > 0) { ctx.lineWidth = 2.5; ctx.strokeStyle = rgba(t.rim, 0.9); line(ctx, x0, ly, x0 + (x1 - x0) * sp, ly); }
-      drawNote(ctx, x0 + (x1 - x0) * sp - 2, ly - 7, t.ink);
+      drawNote(ctx, x0 + (x1 - x0) * sp - 2, ly - 8, t.ink);
     }
-    roundRect(ctx, hr.x, hr.y, hr.w, hr.h, L === 1 ? 12 : 3); ctx.fillStyle = t.hudPlate; ctx.fill();
-    text(ctx, '分數', hr.x + 14, hr.y + 24, 13, t.inkDim, 'left');
-    text(ctx, String(Math.round(num(s.score, 0))), hr.x + hr.w - 14, hr.y + 28, 30, t.ink, 'right');
+    roundRect(ctx, hr.x, hr.y, hr.w, hr.h, L === 1 ? 8 : 3); ctx.fillStyle = t.hudPlate; ctx.fill();
+    // 第一列(y +16 ~ +40): 分數; 第二列(y +48 ~ +64): 連續
+    text(ctx, '分數', hr.x + P, hr.y + 28, 13, t.inkDim, 'left');
+    text(ctx, String(Math.round(num(s.score, 0))), hr.x + hr.w - P, hr.y + 28, 30, t.ink, 'right');
     var combo = Math.round(num(s.combo, 0));
     if (combo > 0) {
-      text(ctx, '連續', hr.x + 14, hr.y + 62, 13, t.inkDim, 'left');
-      text(ctx, '×' + combo, hr.x + hr.w - 14, hr.y + 62, 22, t.ink, 'right');
+      text(ctx, '連續', hr.x + P, hr.y + 56, 13, t.inkDim, 'left');
+      text(ctx, '×' + combo, hr.x + hr.w - P, hr.y + 56, 22, t.ink, 'right');
     }
     ctx.restore();
   }
 
   // ---------------------------------------------------------------- 按鈕
+  // 三種按鈕外觀(v21):
+  //   一般 = 半透明深底 + 細 ink 框 + ink 字;
+  //   主按鈕(primary, 安全的那個選項: 開始 / 繼續 / 再玩一次 / 取消)= 該關 rim 色實心 + 深字;
+  //   確定(會結束本局的那一下)= 深底 + 粗 rim 色框 + 斜紋 + rim 色大字。不用危險紅(危險紅只代表血量危險)。
   function drawButton(ctx, t, r, label, hover, opts) {
     opts = opts || {};
-    roundRect(ctx, r.x, r.y, r.w, r.h, 12);
+    roundRect(ctx, r.x, r.y, r.w, r.h, 8);
     ctx.fillStyle = opts.primary ? (hover ? lighten(t.rim, 0.2) : t.rim) : (hover ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.35)');
     ctx.fill();
     ctx.lineWidth = hover ? 3 : 2; ctx.strokeStyle = hover ? '#ffffff' : rgba(t.ink, 0.5); ctx.stroke();
     text(ctx, label, r.x + r.w / 2, r.y + r.h / 2 + 1, opts.px || 22, opts.primary ? '#14141c' : t.ink);
   }
+  function drawConfirmButton(ctx, t, r, label, hover) {
+    roundRect(ctx, r.x, r.y, r.w, r.h, 8);
+    ctx.fillStyle = hover ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.62)'; ctx.fill();
+    // 斜紋(間距 16): 只有這種按鈕有, 一眼和一般 / 主按鈕分開
+    ctx.save();
+    roundRect(ctx, r.x, r.y, r.w, r.h, 8); ctx.clip();
+    ctx.lineWidth = 6; ctx.strokeStyle = rgba(t.rim, hover ? 0.34 : 0.2);
+    for (var k = -r.h; k < r.w + r.h; k += 16) line(ctx, r.x + k, r.y + r.h, r.x + k + r.h, r.y);
+    ctx.restore();
+    roundRect(ctx, r.x + 2, r.y + 2, r.w - 4, r.h - 4, 7);
+    ctx.lineWidth = 4; ctx.strokeStyle = hover ? '#ffffff' : t.rim; ctx.stroke();
+    text(ctx, label, r.x + r.w / 2, r.y + r.h / 2 + 1, 24, hover ? '#ffffff' : t.rim, 'center', { stroke: 'rgba(0,0,0,0.75)', strokeWidth: 5 });
+  }
+  // 48×48 小方鈕的版面(v21, 8 級距): 上內距 8、圖示 8~20、間距 8、字 28~40(12px)、下內距 8
   function drawPauseButton(ctx, state) {
     var s = state || {}, t = theme(s.level), r = LAYOUT.pauseBtn;
     ctx.save();
-    roundRect(ctx, r.x, r.y, r.w, r.h, 10); ctx.fillStyle = s.hover ? 'rgba(255,255,255,0.22)' : t.hudPlate; ctx.fill();
+    roundRect(ctx, r.x, r.y, r.w, r.h, 8); ctx.fillStyle = s.hover ? 'rgba(255,255,255,0.22)' : t.hudPlate; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = s.hover ? '#ffffff' : rgba(t.ink, 0.45); ctx.stroke();
     ctx.fillStyle = t.ink;
-    ctx.fillRect(r.x + 18, r.y + 9, 4, 13); ctx.fillRect(r.x + 26, r.y + 9, 4, 13);
-    text(ctx, '暫停', r.x + r.w / 2, r.y + 36, 13, t.ink);
+    ctx.fillRect(r.x + 16, r.y + 8, 4, 12); ctx.fillRect(r.x + 28, r.y + 8, 4, 12);
+    text(ctx, '暫停', r.x + r.w / 2, r.y + 34, 12, t.ink);
     ctx.restore();
   }
+  // 靜音按鈕(v21): 「靜音中」不用危險紅。有聲 / 靜音中走三條通道:
+  //   圖示形狀(喇叭 + 聲波 / 喇叭 + 叉)、明暗(靜音中整顆壓暗: 底更深、框與喇叭改 inkDim)、字(「靜音」/「靜音中」)。
+  //   state.corner = true → 畫在右上角最角落(Art.layout.muteBtnCorner, 開始與結束畫面用); 否則在暫停按鈕正下方(Art.layout.muteBtn)
   function drawMuteButton(ctx, state) {
-    var s = state || {}, t = theme(s.level), r = LAYOUT.muteBtn, muted = !!s.muted;
+    var s = state || {}, t = theme(s.level), muted = !!s.muted;
+    var r = s.corner ? LAYOUT.muteBtnCorner : LAYOUT.muteBtn;
     ctx.save();
-    roundRect(ctx, r.x, r.y, r.w, r.h, 10);
-    ctx.fillStyle = muted ? rgba(t.danger, 0.4) : (s.hover ? 'rgba(255,255,255,0.22)' : t.hudPlate); ctx.fill();
-    ctx.lineWidth = 2; ctx.strokeStyle = s.hover ? '#ffffff' : (muted ? t.danger : rgba(t.ink, 0.45)); ctx.stroke();
-    var ix = r.x + 17, iy = r.y + 15;
-    ctx.fillStyle = t.ink;
-    ctx.beginPath(); ctx.moveTo(ix - 4, iy - 3); ctx.lineTo(ix, iy - 3); ctx.lineTo(ix + 5, iy - 8); ctx.lineTo(ix + 5, iy + 8); ctx.lineTo(ix, iy + 3); ctx.lineTo(ix - 4, iy + 3); ctx.closePath(); ctx.fill();
-    ctx.lineWidth = 2; ctx.lineCap = 'round';
+    roundRect(ctx, r.x, r.y, r.w, r.h, 8);
+    ctx.fillStyle = s.hover ? 'rgba(255,255,255,0.22)' : (muted ? 'rgba(0,0,0,0.78)' : t.hudPlate); ctx.fill();
+    ctx.lineWidth = 2; ctx.strokeStyle = s.hover ? '#ffffff' : (muted ? rgba(t.inkDim, 0.55) : rgba(t.ink, 0.45)); ctx.stroke();
+    var ix = r.x + 18, iy = r.y + 14;
+    ctx.fillStyle = muted ? t.inkDim : t.ink;
+    ctx.beginPath(); ctx.moveTo(ix - 4, iy - 3); ctx.lineTo(ix, iy - 3); ctx.lineTo(ix + 5, iy - 6); ctx.lineTo(ix + 5, iy + 6); ctx.lineTo(ix, iy + 3); ctx.lineTo(ix - 4, iy + 3); ctx.closePath(); ctx.fill();
+    ctx.lineCap = 'round';
     if (muted) {
-      ctx.strokeStyle = '#ffffff';
-      line(ctx, ix + 9, iy - 5, ix + 17, iy + 5); line(ctx, ix + 17, iy - 5, ix + 9, iy + 5);
+      ctx.lineWidth = 2.5; ctx.strokeStyle = t.ink;
+      line(ctx, ix + 9, iy - 4, ix + 16, iy + 4); line(ctx, ix + 16, iy - 4, ix + 9, iy + 4);
     } else {
-      ctx.strokeStyle = t.ink;
-      ctx.beginPath(); ctx.arc(ix + 6, iy, 5, -0.9, 0.9); ctx.stroke();
-      ctx.beginPath(); ctx.arc(ix + 6, iy, 9, -0.9, 0.9); ctx.stroke();
+      ctx.lineWidth = 2; ctx.strokeStyle = t.ink;
+      ctx.beginPath(); ctx.arc(ix + 6, iy, 4, -0.9, 0.9); ctx.stroke();
+      ctx.beginPath(); ctx.arc(ix + 6, iy, 8, -0.9, 0.9); ctx.stroke();
     }
-    text(ctx, '靜音', r.x + r.w / 2, r.y + 36, 13, t.ink);
+    text(ctx, muted ? '靜音中' : '靜音', r.x + r.w / 2, r.y + 34, 12, muted ? t.inkDim : t.ink);
     ctx.restore();
   }
 
   // ---------------------------------------------------------------- 選單類畫面
   function overlay(ctx, a) { ctx.fillStyle = 'rgba(0,0,0,' + a + ')'; ctx.fillRect(0, 0, W, H); }
   function panelBox(ctx, t, r) {
-    roundRect(ctx, r.x, r.y, r.w, r.h, 18); ctx.fillStyle = t.panel; ctx.fill();
+    roundRect(ctx, r.x, r.y, r.w, r.h, 16); ctx.fillStyle = t.panel; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = rgba(t.rim, 0.6); ctx.stroke();
   }
   function drawPauseMenu(ctx, state) {
@@ -1414,10 +1457,23 @@
     ctx.save();
     overlay(ctx, 0.55);
     panelBox(ctx, t, m.panel);
-    text(ctx, '暫停中', CX, m.panel.y + 38, 26, t.ink);
+    text(ctx, '暫停中', CX, m.panel.y + 40, 26, t.ink);
     drawButton(ctx, t, m.resume, '繼續', s.hover === 'resume', { primary: true });
     drawButton(ctx, t, m.restart, '重開', s.hover === 'restart');
     drawButton(ctx, t, m.quit, '放棄', s.hover === 'quit');
+    ctx.restore();
+  }
+  // 確認面板(v21 新增): 疊在暫停選單之上(自己再壓暗一層), 畫面板、問句、一行後果說明與兩顆按鈕。
+  // state: { kind: 'restart' | 'quit', hover: 'yes' | 'no' | null, level }
+  function drawConfirm(ctx, state) {
+    var s = state || {}, t = theme(s.level), c = LAYOUT.confirm, quit = s.kind === 'quit';
+    ctx.save();
+    overlay(ctx, 0.4);
+    panelBox(ctx, t, c.panel);
+    text(ctx, quit ? '確定放棄?' : '確定重開?', CX, c.panel.y + 64, 30, t.ink);
+    text(ctx, quit ? '這一局會結束, 直接看成績' : '這一局會結束, 從第 1 關重新開始', CX, c.panel.y + 112, 16, t.inkDim);
+    drawConfirmButton(ctx, t, c.yes, '確定', s.hover === 'yes');
+    drawButton(ctx, t, c.no, '取消', s.hover === 'no', { primary: true });
     ctx.restore();
   }
   function drawTitle(ctx, state) {
@@ -1425,9 +1481,9 @@
     ctx.save();
     drawBackground(ctx, { level: 1 });
     overlay(ctx, 0.2);
-    var deco = [[420, 230, 'A', 'circle'], [860, 210, 'C', 'circle'], [330, 470, null, 'circle'], [950, 480, 'B', 'circle']];
+    var deco = [[420, 232, 'A', 'circle'], [860, 208, 'C', 'circle'], [328, 472, null, 'circle'], [952, 480, 'B', 'circle']];
     for (var i = 0; i < deco.length; i++) drawBubble(ctx, { level: 1, x: deco[i][0], y: deco[i][1], color: deco[i][2], shape: deco[i][3], life: 1 });
-    text(ctx, '捕泡手', CX, 230, 76, t.ink, 'center', { stroke: 'rgba(6,36,22,0.8)', strokeWidth: 9 });
+    text(ctx, '捕泡手', CX, 232, 76, t.ink, 'center', { stroke: 'rgba(6,36,22,0.8)', strokeWidth: 9 });
     text(ctx, '把氣泡染色、送進光門、對上拍子', CX, 304, 20, t.ink, 'center', { stroke: 'rgba(6,36,22,0.7)', strokeWidth: 5 });
     drawButton(ctx, t, b.start, '開始', s.hover === 'start', { primary: true, px: 26 });
     ctx.restore();
@@ -1437,9 +1493,9 @@
     ctx.save();
     overlay(ctx, 0.62);
     panelBox(ctx, t, g.panel);
-    text(ctx, '結束', CX, g.panel.y + 60, 44, t.ink);
-    text(ctx, '存活 ' + num(s.survival, 0).toFixed(1) + ' 秒', CX, g.panel.y + 150, 36, t.ink);
-    text(ctx, '分數 ' + Math.round(num(s.score, 0)), CX, g.panel.y + 210, 26, t.inkDim);
+    text(ctx, '結束', CX, g.panel.y + 64, 44, t.ink);
+    text(ctx, '存活 ' + num(s.survival, 0).toFixed(1) + ' 秒', CX, g.panel.y + 152, 36, t.ink);
+    text(ctx, '分數 ' + Math.round(num(s.score, 0)), CX, g.panel.y + 208, 26, t.inkDim);
     drawButton(ctx, t, g.again, '再玩一次', s.hover === 'again', { primary: true });
     drawButton(ctx, t, g.title, '回標題', s.hover === 'title');
     ctx.restore();
@@ -1674,7 +1730,8 @@
     var dn = clamp01(num(s.done, 0));
     var time = num(s.time, NaN), pulse = isFinite(time) ? 0.5 + 0.5 * Math.sin(time * TAU / TUT.pulse) : 0.6;
     var mk = normMark(s.mark);
-    var vis = ap * (dn > 0 ? 1 - clamp01(dn / 0.3) : 1);
+    var fadeP = TIMING.tutorialFade / TIMING.tutorialDone; // v21: 淡出 0.5 秒 = done 的前 62.5%
+    var vis = ap * (dn > 0 ? 1 - clamp01(dn / fadeP) : 1);
     var str = s.text == null ? '' : String(s.text), icon = s.icon === 'press';
     ctx.save();
     if (mk && vis > 0.01) tutMark(ctx, mk, paper, pulse, vis);
@@ -1699,7 +1756,7 @@
       // 彈出: 從尾巴尖端(沒有尾巴時從錨點)放大
       var ox = tail ? tail.tip[0] : ax, oy = tail ? tail.tip[1] : ay;
       var sc = ap < 1 ? 0.35 + 0.65 * easeOutBack(ap) : 1;
-      if (dn > 0) sc *= 1 - 0.12 * clamp01(dn / 0.3);
+      if (dn > 0) sc *= 1 - 0.12 * clamp01(dn / fadeP);
       ctx.save();
       ctx.globalAlpha = clamp01(vis * (ap < 1 ? Math.min(1, ap * 2.2) : 1));
       ctx.translate(ox, oy); ctx.scale(sc, sc); ctx.translate(-ox, -oy);
@@ -1778,6 +1835,7 @@
     drawPauseButton: drawPauseButton,
     drawMuteButton: drawMuteButton,
     drawPauseMenu: drawPauseMenu,
+    drawConfirm: drawConfirm,
     drawTitle: drawTitle,
     drawGameOver: drawGameOver,
     drawCredits: drawCredits,
