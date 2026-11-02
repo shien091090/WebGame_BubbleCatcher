@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Bubble Tempo 圖示 B — 舞池三形泡泡</title>
+<style>body{margin:0;overflow:hidden;background:#000}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="512" height="512"></canvas>
+<script src="../game/art/art.js"></script>
+<script>
+// 圖示 B: 第 2 首舞廳。8-bit 棋盤舞池(金邊圓)上站著三顆不同形狀的泡泡: 金方、綠圓、藍三角。無字。
+(function () {
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  var S = 512, C = S / 2, P = Art.palette[2];
+  // 背景: 暗紫天鵝絨漸層 + 淡像素格(四角只有背景)
+  ctx.save();
+  var bg = ctx.createLinearGradient(0, 0, 0, S);
+  bg.addColorStop(0, P.bgTop); bg.addColorStop(1, P.bgBottom);
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, S, S);
+  ctx.strokeStyle = 'rgba(200,180,255,0.07)'; ctx.lineWidth = 1;
+  for (var v = 0; v <= S; v += 32) {
+    ctx.beginPath(); ctx.moveTo(v + 0.5, 0); ctx.lineTo(v + 0.5, S); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0, v + 0.5); ctx.lineTo(S, v + 0.5); ctx.stroke();
+  }
+  // 舞池後方一圈金色柔光
+  var halo = ctx.createRadialGradient(C, C, 150, C, C, 250);
+  halo.addColorStop(0, 'rgba(255,215,122,0.28)'); halo.addColorStop(1, 'rgba(255,215,122,0)');
+  ctx.fillStyle = halo; ctx.fillRect(0, 0, S, S);
+  ctx.restore();
+  // 舞池: 遊戲內圈(半徑 210)縮到半徑約 196
+  ctx.save();
+  var k = 196 / 210;
+  ctx.translate(C, C); ctx.scale(k, k); ctx.translate(-640, -360);
+  Art.drawArena(ctx, { level: 2 });
+  ctx.restore();
+  // 三顆泡泡: 每顆外緣半徑約 62
+  var bs = 2.95;
+  var list = [
+    { x: C, y: C - 74, color: 'A', shape: 'square' },
+    { x: C - 86, y: C + 70, color: 'C', shape: 'triangle' },
+    { x: C + 86, y: C + 70, color: 'B', shape: 'circle' }
+  ];
+  for (var i = 0; i < list.length; i++) {
+    var b = list[i];
+    ctx.save();
+    ctx.translate(b.x, b.y); ctx.scale(bs, bs);
+    Art.drawBubble(ctx, { level: 2, x: 0, y: 0, color: b.color, shape: b.shape, status: 'idle', life: 1 });
+    ctx.restore();
+  }
+})();
+</script>
+</body>
+</html>

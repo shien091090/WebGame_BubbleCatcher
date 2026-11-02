@@ -1,0 +1,32 @@
+{
+  "canvas": { "width": 1280, "height": 720, "maxWidth": 1680 },
+  "draw": [
+    { "name": "drawBackground", "state": ["level", "time", "beat"] },
+    { "name": "drawArena", "state": ["level"] },
+    { "name": "drawHpRing", "state": ["level", "hp", "danger", "time", "hpFx"] },
+    { "name": "drawBeatCue", "state": ["level", "phase", "beat"] },
+    { "name": "drawDyeFloor", "state": ["level", "x", "y", "r", "status", "t", "shrink", "color"] },
+    { "name": "drawShapeFloor", "state": ["level", "x", "y", "r", "status", "t", "shrink", "shape"] },
+    { "name": "drawRotateCue", "state": ["level", "p", "r", "floors"] },
+    { "name": "drawBatchCue", "state": ["level", "x", "y", "t"] },
+    { "name": "drawNetWall", "state": ["level", "lit", "catchFx"] },
+    { "name": "drawBubble", "state": ["level", "x", "y", "color", "shape", "status", "life", "beatPhase", "paletteLevel", "spawnT", "hover"] },
+    { "name": "drawStickFx", "state": ["level", "x", "y", "kind", "attr", "value", "t", "stack", "paletteLevel"] },
+    { "name": "drawMissFx", "state": ["level", "x", "y", "t", "color", "paletteLevel"] },
+    { "name": "drawBeatFx", "state": ["level", "x", "y", "tier", "t", "onBubble"] },
+    { "name": "drawChainFx", "state": ["level", "x", "y", "t"] },
+    { "name": "drawCountIn", "state": ["level", "beatsLeft", "phase"] },
+    { "name": "drawLevelIntro", "state": ["level", "t", "dur"] },
+    { "name": "drawTutorial", "state": ["stage", "text", "icon", "x", "y", "mark", "appear", "done", "level", "time", "litSlot"] },
+    { "name": "drawHud", "state": ["level", "hp", "danger", "hpFx", "time", "survival", "songProgress", "score", "combo"] },
+    { "name": "drawPauseButton", "state": ["level", "hover"] },
+    { "name": "drawMuteButton", "state": ["level", "corner", "hover", "muted"] },
+    { "name": "drawPauseMenu", "state": ["level", "hover"] },
+    { "name": "drawConfirm", "state": ["kind", "hover", "level"] },
+    { "name": "drawTitle", "state": ["hover"] },
+    { "name": "drawGameOver", "state": ["survival", "score", "hover"] },
+    { "name": "drawCredits", "state": ["lines"] }
+  ],
+  "sounds": ["countIn", "onBeat", "beatChain", "catch", "netSwap", "expire", "danger", "stageChange", "floorRotate", "wrongDye", "tutorialShow", "tutorialDone"],
+  "music": ["stage1", "stage2", "stage3"]
+}

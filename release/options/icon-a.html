@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Bubble Tempo 圖示 A — 林間大泡泡</title>
+<style>body{margin:0;overflow:hidden;background:#000}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="512" height="512"></canvas>
+<script src="../game/art/art.js"></script>
+<script>
+// 圖示 A: 第 1 首林間。一顆放大的葡萄紫圓泡泡佔滿中央, 外圍兩圈踩拍共鳴輪廓(拍子青)。無字。
+(function () {
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  var S = 512, C = S / 2, P = Art.palette[1];
+  // 背景: 林間背景中央一塊放大(樹冠與晨光), 再加中央柔光, 讓泡泡從亮綠上浮出
+  ctx.save();
+  ctx.fillStyle = P.bgMid; ctx.fillRect(0, 0, S, S);
+  var k = S / 560;
+  ctx.translate(C, C); ctx.scale(k, k); ctx.translate(-640, -360);
+  Art.drawBackground(ctx, { level: 1 });
+  ctx.restore();
+  ctx.save();
+  var g = ctx.createRadialGradient(C, C, 40, C, C, 300);
+  g.addColorStop(0, 'rgba(10,50,32,0.55)'); g.addColorStop(0.6, 'rgba(10,50,32,0.35)'); g.addColorStop(1, 'rgba(10,50,32,0.05)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, S, S);
+  ctx.restore();
+  // 主角: 葡萄紫圓泡泡 + 踩拍 2 級共鳴輪廓(長在泡泡本身)
+  ctx.save();
+  ctx.translate(C, C + 6); ctx.scale(5.4, 5.4);
+  Art.drawBeatFx(ctx, { level: 1, x: 0, y: 0, tier: 2, t: 0.06, onBubble: true });
+  Art.drawBubble(ctx, { level: 1, x: 0, y: 0, color: 'A', shape: 'circle', status: 'idle', life: 1, spawnT: 1 });
+  ctx.restore();
+})();
+</script>
+</body>
+</html>

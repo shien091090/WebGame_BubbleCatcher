@@ -1,0 +1,25 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  height: 100%;
+  overflow: hidden;
+}
+/* 容器 = 整個視窗(或網站 iframe); 畫布 CSS 尺寸由 game.js 的 fitCanvas 依容器算最大等比尺寸, 這裡只負責置中與黑邊 */
+#stage {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+#game {
+  display: block;
+  flex: none;
+  cursor: default;
+  image-rendering: -webkit-optimize-contrast;
+}

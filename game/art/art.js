@@ -1,4 +1,4 @@
-/* 捕泡手 art.js (spec v21)
+/* Bubble Tempo(捕泡手) art.js (spec v21)
  * 全域物件 window.Art, 不用 ES module。純 Canvas 2D 幾何繪製, 不引外部資源。
  * 一組函式畫三套風格: 每個 draw 函式的 state.level(1 / 2 / 3)決定用哪一套。
  * 三套皮: 第 1 首 林間(森林, 明亮) / 第 2 首 舞廳(8-bit 迪斯可 + 粉洋紅花) / 第 3 首 魔龍(黑暗奇幻)。骨不變。
@@ -22,6 +22,29 @@
   var BODY = { circle: 16, square: 14.4, triangle: 12.8 }; // 氣泡本體(形狀路徑參數), 收在壽命環內
   var TAU = Math.PI * 2, OCT = Math.PI / 4, DEG = Math.PI / 180;
   var FONT = '"Microsoft JhengHei", "PingFang TC", "Noto Sans TC", "Heiti TC", sans-serif';
+
+  // 畫布寬度依裝置(PVD計畫網站): 電腦 1280; 觸控裝置照可視區長寬比, 夾在 1280~1680。設計區固定 1280×720, 本檔所有座標都在設計區裡;
+  // 多出來的兩側由 game.js 把設計區置中、touch.js 塗黑放按鈕。TOUCH 與 touch.js 的判斷一致。
+  var TOUCH = false;
+  function pickWidth() {
+    var w = 1280;
+    try {
+      var q = /[?&]w=([0-9]+)/.exec(location.search);
+      var mm = function (m) { return !!(window.matchMedia && matchMedia(m).matches); };
+      TOUCH = /[?&]touch=1(&|$)/.test(location.search) || mm('(pointer: coarse)') ||
+        (((navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window) && !mm('(hover: hover)'));
+      if (q) w = +q[1];
+      else if (TOUCH) {
+        var a = window.screen || {}, sw = a.width || 0, sh = a.height || 0, iw = window.innerWidth || 0, ih = window.innerHeight || 0;
+        var r = sw > 0 && sh > 0 ? Math.max(sw, sh) / Math.min(sw, sh) : 0;
+        if (iw > ih && ih > 0) r = iw / ih;
+        if (r > 0) w = 720 * r;
+      }
+    } catch (e) { /* 取不到就用 1280 */ }
+    return Math.round(Math.max(1280, Math.min(1680, w || 1280)) / 2) * 2;
+  }
+  var VW = pickWidth();
+  var TOUCH_MIN_PX = 21;   // 觸控模式的字級下限(畫布高 1/35); 電腦版不動
 
   // 各演出時長(秒)。RD 依這張表決定何時停止呼叫對應函式, t 從 0 走到時長
   var TIMING = {
@@ -104,6 +127,7 @@
   }
   function text(ctx, str, x, y, px, color, align, opts) {
     opts = opts || {};
+    if (TOUCH && !opts.noFloor && px < TOUCH_MIN_PX) px = TOUCH_MIN_PX;
     ctx.font = font(px, opts.weight);
     ctx.textAlign = align || 'center';
     ctx.textBaseline = opts.baseline || 'middle';
@@ -1354,17 +1378,17 @@
     var L = lv(s.level), t = THEMES[L];
     ctx.save();
     // v21: 內距 / 間距一律 8 的倍數: 左右內距 16、上下內距 16、標籤與內容間距 8、兩列之間 8
-    var hl = LAYOUT.hudLeft, hr = LAYOUT.hudRight, P = 16;
+    var hl = LAYOUT.hudLeft, hr = LAYOUT.hudRight, P = 16, LB = TOUCH ? 64 : 56;   // LB: 標籤放大後內容右移
     roundRect(ctx, hl.x, hl.y, hl.w, hl.h, L === 1 ? 8 : 3); ctx.fillStyle = t.hudPlate; ctx.fill();
     // 第一列(y +16 ~ +32): 「血量」標籤(寬 32)+ 間距 8 + 血條
     text(ctx, '血量', hl.x + P, hl.y + 24, 16, s.danger ? t.danger : t.ink, 'left');
-    drawHpBar(ctx, t, hl.x + 56, hl.y + 16, hl.w - 56 - P, 16, s.hp, !!s.danger, s.hpFx, s.time);
+    drawHpBar(ctx, t, hl.x + LB, hl.y + 16, hl.w - LB - P, 16, s.hp, !!s.danger, s.hpFx, s.time);
     // 第二列(y +48 ~ +64): 「存活」+ 秒數; 歌曲進度在右段(x +152 ~ +224)
     text(ctx, '存活', hl.x + P, hl.y + 56, 13, t.inkDim, 'left');
-    text(ctx, num(s.survival, 0).toFixed(1) + ' 秒', hl.x + 56, hl.y + 56, 18, t.ink, 'left');
+    text(ctx, num(s.survival, 0).toFixed(1) + ' 秒', hl.x + LB, hl.y + 56, 18, t.ink, 'left');
     if (s.songProgress != null) {
       // 歌曲進度: 細譜線 + 沿線滑動的音符(播放頭), 不是填滿長條, 不會讀成血量
-      var sp = clamp01(num(s.songProgress, 0)), x0 = hl.x + 152, x1 = hl.x + hl.w - P, ly = hl.y + 64;
+      var sp = clamp01(num(s.songProgress, 0)), x0 = hl.x + (TOUCH ? 168 : 152), x1 = hl.x + hl.w - P, ly = hl.y + 64;
       ctx.lineCap = 'round';
       ctx.lineWidth = 1.5; ctx.strokeStyle = rgba(t.inkDim, 0.45); line(ctx, x0, ly, x1, ly);
       ctx.lineWidth = 1; line(ctx, x1, ly - 5, x1, ly + 5);
@@ -1471,7 +1495,10 @@
     overlay(ctx, 0.4);
     panelBox(ctx, t, c.panel);
     text(ctx, quit ? '確定放棄?' : '確定重開?', CX, c.panel.y + 64, 30, t.ink);
-    text(ctx, quit ? '這一局會結束, 直接看成績' : '這一局會結束, 從第 1 關重新開始', CX, c.panel.y + 112, 16, t.inkDim);
+    if (TOUCH) {
+      text(ctx, '這一局會結束,', CX, c.panel.y + 100, 16, t.inkDim);
+      text(ctx, quit ? '直接看成績' : '從第 1 關重新開始', CX, c.panel.y + 132, 16, t.inkDim);
+    } else text(ctx, quit ? '這一局會結束, 直接看成績' : '這一局會結束, 從第 1 關重新開始', CX, c.panel.y + 112, 16, t.inkDim);
     drawConfirmButton(ctx, t, c.yes, '確定', s.hover === 'yes');
     drawButton(ctx, t, c.no, '取消', s.hover === 'no', { primary: true });
     ctx.restore();
@@ -1483,7 +1510,7 @@
     overlay(ctx, 0.2);
     var deco = [[420, 232, 'A', 'circle'], [860, 208, 'C', 'circle'], [328, 472, null, 'circle'], [952, 480, 'B', 'circle']];
     for (var i = 0; i < deco.length; i++) drawBubble(ctx, { level: 1, x: deco[i][0], y: deco[i][1], color: deco[i][2], shape: deco[i][3], life: 1 });
-    text(ctx, '捕泡手', CX, 232, 76, t.ink, 'center', { stroke: 'rgba(6,36,22,0.8)', strokeWidth: 9 });
+    text(ctx, 'Bubble Tempo', CX, 140, 68, t.ink, 'center', { stroke: 'rgba(6,36,22,0.8)', strokeWidth: 9 });
     text(ctx, '把氣泡染色、送進光門、對上拍子', CX, 304, 20, t.ink, 'center', { stroke: 'rgba(6,36,22,0.7)', strokeWidth: 5 });
     drawButton(ctx, t, b.start, '開始', s.hover === 'start', { primary: true, px: 26 });
     ctx.restore();
@@ -1516,7 +1543,7 @@
     var top = yLast - (lines.length - 1) * lh - lh / 2 - 3, h = (lines.length - 1) * lh + lh + 6;
     roundRect(ctx, CX - wMax / 2 - 12, top, wMax + 24, h, 8); ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fill();
     for (i = 0; i < lines.length; i++) {
-      text(ctx, String(lines[i]), CX, yLast - (lines.length - 1 - i) * lh, px, t.inkDim, 'center', { weight: 'normal' });
+      text(ctx, String(lines[i]), CX, yLast - (lines.length - 1 - i) * lh, px, t.inkDim, 'center', { weight: 'normal', noFloor: true });
     }
     ctx.restore();
   }
@@ -1531,7 +1558,7 @@
   // mark: null | { kind: 'bubble', x, y, r?(預設 20) } | { kind: 'floor', x, y, r(24 / 20) }
   //            | { kind: 'gate', slot(1~8) } | { kind: 'hpRing' }
   var TUT = {
-    h: 46, px: 20, padX: 18, iconW: 24, iconGap: 10, tail: 14, tailW: 22,
+    h: 46, px: TOUCH ? 21 : 20, padX: 18, iconW: TOUCH ? 30 : 24, iconGap: 10, tail: 14, tailW: 22,
     margin: 8, uiPad: 8, pulse: 0.9, markGap: 8,
     skin: {
       1: { dark: '#0f3326', radius: 16 },
@@ -1636,6 +1663,7 @@
   // 滑鼠按住圖示: 滑鼠外形 + 左鍵塗滿(= 按著)+ 左上三道「壓下」短線(隨 pulse 微微閃)
   function tutMouse(ctx, x, y, dark, paper, pulse) {
     ctx.save();
+    if (TOUCH) { ctx.translate(x, y); ctx.scale(1.25, 1.25); ctx.translate(-x, -y); }   // 觸控: 小圖示放大到約 30px
     roundRect(ctx, x - 9, y - 13, 18, 27, 9);
     ctx.fillStyle = paper; ctx.fill();
     ctx.save(); roundRect(ctx, x - 9, y - 13, 18, 27, 9); ctx.clip();
@@ -1810,7 +1838,7 @@
   });
 
   window.Art = {
-    canvas: { width: W, height: H },
+    canvas: { width: VW, height: H },
     palette: palette,
     timing: TIMING,
     layout: LAYOUT,

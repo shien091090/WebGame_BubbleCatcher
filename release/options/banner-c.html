@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Bubble Tempo 橫幅 C — 魔龍封印陣</title>
+<style>body{margin:0;overflow:hidden;background:#000}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="1680" height="720"></canvas>
+<script src="../game/art/art.js"></script>
+<script>
+// 橫幅 C: 第 3 首魔龍。龍翼張滿兩側、右下龍頭眼光發亮; 下方封印法陣當舞台, 三顆泡泡(藍方、綠圓、金三角)站在陣上,
+// 中間那顆身後整串爆開拍子青光芒。上方大標題。左下角只有尖塔剪影與龍尾。
+(function () {
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  var W = 1680, H = 720, P = Art.palette[3];
+  var FONT = '"Arial Rounded MT Bold", "Arial Black", "Segoe UI", "Microsoft JhengHei", sans-serif';
+
+  function title(str, x, y, maxW, px, fill, stroke, glow) {
+    ctx.save();
+    ctx.font = '900 ' + px + 'px ' + FONT;
+    var w = ctx.measureText(str).width;
+    if (w > maxW) { px = Math.floor(px * maxW / w); ctx.font = '900 ' + px + 'px ' + FONT; }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+    ctx.shadowColor = glow; ctx.shadowBlur = 30;
+    ctx.lineWidth = Math.round(px * 0.15); ctx.strokeStyle = stroke; ctx.strokeText(str, x, y);
+    ctx.shadowBlur = 0;
+    var g = ctx.createLinearGradient(0, y - px / 2, 0, y + px / 2);
+    g.addColorStop(0, '#ffffff'); g.addColorStop(1, fill);
+    ctx.fillStyle = g; ctx.fillText(str, x, y);
+    ctx.restore();
+  }
+
+  // 背景: 魔龍背景等比放大到 1680 寬, 貼齊底邊(龍頭與龍尾留在畫面裡)
+  ctx.save();
+  ctx.fillStyle = P.bgTop; ctx.fillRect(0, 0, W, H);
+  var k = W / 1280;
+  ctx.translate(0, H - 720 * k); ctx.scale(k, k);
+  Art.drawBackground(ctx, { level: 3, time: 3.2, beat: 7.1 });
+  ctx.restore();
+
+  // 舞台: 封印法陣(遊戲內圈)放在畫面中下, 下緣被裁
+  ctx.save();
+  ctx.translate(860, 600); ctx.scale(1.15, 0.62); ctx.translate(-640, -360);
+  Art.drawArena(ctx, { level: 3 });
+  ctx.restore();
+  var mist = ctx.createRadialGradient(860, 420, 30, 860, 420, 420);
+  mist.addColorStop(0, 'rgba(110,60,170,0.40)'); mist.addColorStop(1, 'rgba(110,60,170,0)');
+  ctx.save(); ctx.fillStyle = mist; ctx.fillRect(440, 0, 840, H); ctx.restore();
+
+  // 中間泡泡身後的整串光芒
+  ctx.save();
+  ctx.translate(860, 400); ctx.scale(1.6, 1.6);
+  Art.drawChainFx(ctx, { level: 3, x: 0, y: 0, t: 0.2 });
+  ctx.restore();
+
+  // 三顆泡泡
+  var trio = [
+    { x: 640, y: 440, s: 3.1, color: 'C', shape: 'square' },
+    { x: 860, y: 400, s: 3.7, color: 'B', shape: 'circle' },
+    { x: 1080, y: 440, s: 3.1, color: 'A', shape: 'triangle' }
+  ];
+  for (var i = 0; i < trio.length; i++) {
+    var b = trio[i];
+    ctx.save();
+    ctx.translate(b.x, b.y); ctx.scale(b.s, b.s);
+    Art.drawBubble(ctx, { level: 3, x: 0, y: 0, color: b.color, shape: b.shape, status: 'idle', life: 1 });
+    ctx.restore();
+  }
+
+  // 標題: 限寬 820(約 450 ~ 1270), 落在兩側龍翼肩部之間, 不壓翼膜
+  title('Bubble Tempo', 860, 128, 820, 144, '#c8f5ff', '#140a24', 'rgba(128,255,212,0.8)');
+})();
+</script>
+</body>
+</html>

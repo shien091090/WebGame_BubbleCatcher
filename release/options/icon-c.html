@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Bubble Tempo 圖示 C — 魔龍夜的三角泡泡</title>
+<style>body{margin:0;overflow:hidden;background:#000}canvas{display:block}</style>
+</head>
+<body>
+<canvas id="c" width="512" height="512"></canvas>
+<script src="../game/art/art.js"></script>
+<script>
+// 圖示 C: 第 3 首魔龍。近黑夜空、兩側龍翼剪影, 中央一顆金色三角泡泡, 身後整串爆開的拍子青光芒。無字。
+(function () {
+  var cv = document.getElementById('c'), ctx = cv.getContext('2d');
+  var S = 512, C = S / 2, P = Art.palette[3];
+  // 背景: 魔龍背景整張縮進來(龍翼在兩側), 中央壓一層紫霧
+  ctx.save();
+  ctx.fillStyle = P.bgMid; ctx.fillRect(0, 0, S, S);
+  var k = S / 900;
+  ctx.translate(C, C); ctx.scale(k, k); ctx.translate(-640, -330);
+  ctx.beginPath(); ctx.rect(190, -120, 900, 900); ctx.clip();
+  ctx.fillStyle = P.bgTop; ctx.fillRect(190, -120, 900, 900);
+  Art.drawBackground(ctx, { level: 3 });
+  ctx.restore();
+  ctx.save();
+  var mist = ctx.createRadialGradient(C, C, 20, C, C, 260);
+  mist.addColorStop(0, 'rgba(90,50,140,0.55)'); mist.addColorStop(1, 'rgba(90,50,140,0)');
+  ctx.fillStyle = mist; ctx.fillRect(0, 0, S, S);
+  ctx.restore();
+  // 整串光芒(拍子青 + 白), 放大到外圈約 190
+  ctx.save();
+  ctx.translate(C, C); ctx.scale(1.45, 1.45);
+  Art.drawChainFx(ctx, { level: 3, x: 0, y: 0, t: 0.3 });
+  ctx.restore();
+  // 主角: 金色三角泡泡, 外緣半徑約 110
+  ctx.save();
+  ctx.translate(C, C + 4); ctx.scale(5.2, 5.2);
+  Art.drawBubble(ctx, { level: 3, x: 0, y: 0, color: 'A', shape: 'triangle', status: 'idle', life: 1 });
+  ctx.restore();
+})();
+</script>
+</body>
+</html>
