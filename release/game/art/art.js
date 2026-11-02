@@ -1,4 +1,4 @@
-/* Bubble Tempo(捕泡手) art.js (spec v21)
+/* Bubble Tempo(捕泡手) art.js (spec v22)
  * 全域物件 window.Art, 不用 ES module。純 Canvas 2D 幾何繪製, 不引外部資源。
  * 一組函式畫三套風格: 每個 draw 函式的 state.level(1 / 2 / 3)決定用哪一套。
  * 三套皮: 第 1 首 林間(森林, 明亮) / 第 2 首 舞廳(8-bit 迪斯可 + 粉洋紅花) / 第 3 首 魔龍(黑暗奇幻)。骨不變。
@@ -6,6 +6,8 @@
  * v20: 新增嵌入式新手教學(drawTutorial); 刪說明頁、形狀說明對話框與「說明」按鈕。
  * v21: 靜音中不用危險紅; 第 1、3 關四色重定(色名中心、離危險紅 ≥ 48°); HUD 與按鈕 8 級距; 教學淡出 0.5 秒;
  *      新增確認面板 drawConfirm 與靜音按鈕角落位置(layout.muteBtnCorner)。
+ * v22: 手機版放大(只在觸控模式; 電腦版畫面與數值完全不變): 內圈 240、網牆邊中點 285、地板環 170、地板 32 / 27、氣泡 28(含回饋整組 ×1.4)、
+ *      光門條件標示 ×1.5、HUD ×1.35(寬畫面移到兩側)、寬畫面時背景與壓暗畫滿整個畫布。新增匯出 Art.geom、Art.layout.slots / arena / hpTop。
  * 只負責「給狀態就畫」, 不算規則、不管輸入。每個函式自己 save / restore。
  */
 (function () {
@@ -24,7 +26,7 @@
   var FONT = '"Microsoft JhengHei", "PingFang TC", "Noto Sans TC", "Heiti TC", sans-serif';
 
   // 畫布寬度依裝置(PVD計畫網站): 電腦 1280; 觸控裝置照可視區長寬比, 夾在 1280~1680。設計區固定 1280×720, 本檔所有座標都在設計區裡;
-  // 多出來的兩側由 game.js 把設計區置中、touch.js 塗黑放按鈕。TOUCH 與 touch.js 的判斷一致。
+  // 多出來的兩側由 game.js 把設計區置中; v22 起觸控模式兩側不塗黑, 由背景(與壓暗)往外延伸畫滿(本作沒有虛擬按鈕)。TOUCH 與 touch.js 的判斷一致。
   var TOUCH = false;
   function pickWidth() {
     var w = 1280;
@@ -45,6 +47,27 @@
   }
   var VW = pickWidth();
   var TOUCH_MIN_PX = 21;   // 觸控模式的字級下限(畫布高 1/35); 電腦版不動
+  var TEXT_SCALE = 1;      // 目前文字外層的放大倍率(觸控 HUD 整塊放大時 > 1), 字級下限依它換算回本地座標
+
+  // v22 手機版放大(只在觸控模式; 電腦版所有數值維持上面的原值, 畫面一個像素都不變)
+  //   內圈 210 → 240、網牆邊中點 300 → 285、地板環 140 → 170、地板 24 → 32(小地板 20 → 27)、氣泡 20 → 28;
+  //   血量環 / 拍子提示跟著內圈外移(與內圈間距不變)。氣泡與它身上的回饋整組用座標放大 1.4 倍畫(BS), 光門條件標示 1.5 倍(GS)。
+  var BASE_BUBBLE_R = 20;                 // 氣泡類函式內部(已套 BS 放大)用的基準半徑
+  var FLOOR_R_SMALL = 20, GRAB_R = 20;    // 第 3 關後段小地板 / 抓取半徑
+  var BS = 1, GS = 1, AS = 1, FS = 1;     // 氣泡 / 光門條件 / 內圈裝飾 / 地板附屬線 的放大倍率
+  var HUD_S = 1;                          // HUD 放大倍率
+  var WIDE = false, EX0 = 0, EXW = W;     // 全畫面類(背景、壓暗)實際要畫的橫向範圍(設計座標)
+  if (TOUCH) {
+    ARENA_R = 240; BUBBLE_R = 28; FLOOR_R = 32; FLOOR_R_SMALL = 27; FLOOR_RING = 170; GRAB_R = 40;
+    WALL_APO = 285; WALL_R = WALL_APO / Math.cos(Math.PI / 8);      // 頂點約 308.5
+    HP_R = ARENA_R + 11;                                             // 251(軌 244~258)
+    BEAT_IN = HP_R + 13; BEAT_OUT = 292;                             // 從 292 收到 264; 被八邊形(邊中點 271)裁切, 不進光門帶
+    BS = 28 / 20; GS = 1.5; AS = 240 / 210; FS = 32 / 24; HUD_S = 1.35;
+    WIDE = VW > W; EX0 = -(VW - W) / 2; EXW = VW;
+  }
+  var EXR = EX0 + EXW;                    // 全畫面類的右緣(設計座標)
+  // 氣泡類回饋: 觸控模式以 (x, y) 為中心整組放大 BS 倍(電腦版不呼叫任何變換)
+  function bubbleSpace(ctx, x, y) { if (TOUCH) { ctx.translate(x, y); ctx.scale(BS, BS); ctx.translate(-x, -y); } }
 
   // 各演出時長(秒)。RD 依這張表決定何時停止呼叫對應函式, t 從 0 走到時長
   var TIMING = {
@@ -127,7 +150,7 @@
   }
   function text(ctx, str, x, y, px, color, align, opts) {
     opts = opts || {};
-    if (TOUCH && !opts.noFloor && px < TOUCH_MIN_PX) px = TOUCH_MIN_PX;
+    if (TOUCH && !opts.noFloor && px * TEXT_SCALE < TOUCH_MIN_PX) px = Math.ceil(TOUCH_MIN_PX / TEXT_SCALE);
     ctx.font = font(px, opts.weight);
     ctx.textAlign = align || 'center';
     ctx.textBaseline = opts.baseline || 'middle';
@@ -231,6 +254,37 @@
     },
     credits: { x: 40, y: 604, w: 1200, h: 106 } // 署名可佔範圍(不可點), 與所有按鈕判定框不重疊
   };
+  // v22: HUD 版位依模式。電腦版 = 上面原值。觸控: 整塊放大 1.35 倍(左 324 × 108、右 297 × 108);
+  //   畫布 = 1280 → 留原位(左上角 (20,20) 不動; 右塊頂端 20 不動、右緣改貼暫停按鈕左側 8 = 1198, 離右上光門條件標示 ≥ 24), 不碰網牆;
+  //   畫布 > 1280 → 左塊貼左緣(x = VX + 16), 右塊貼右緣(右緣 = 1280 − VX − 16)且放在暫停 / 靜音按鈕下方(y = 靜音按鈕底 + 8 = 142)
+  var HUD_BASE = { left: { w: 240, h: 80 }, right: { w: 220, h: 80 } };
+  if (TOUCH) {
+    var hlw = Math.round(HUD_BASE.left.w * HUD_S), hlh = Math.round(HUD_BASE.left.h * HUD_S);
+    var hrw = Math.round(HUD_BASE.right.w * HUD_S), hrh = Math.round(HUD_BASE.right.h * HUD_S);
+    if (WIDE) {
+      LAYOUT.hudLeft = { x: EX0 + 16, y: 20, w: hlw, h: hlh };
+      LAYOUT.hudRight = { x: EXR - 16 - hrw, y: LAYOUT.muteBtn.y + LAYOUT.muteBtn.h + 8, w: hrw, h: hrh };
+    } else {
+      LAYOUT.hudLeft = { x: 20, y: 20, w: hlw, h: hlh };
+      LAYOUT.hudRight = { x: LAYOUT.pauseBtn.x - 8 - hrw, y: 20, w: hrw, h: hrh };   // 右緣貼暫停按鈕左側 8(1198), 讓出右上光門的條件標示
+    }
+  }
+  // v22: 8 道光門(槽位)的幾何, 依模式。slot 1~8, 中線角度 = (slot − 1) × 45°(正右 0°、順時針); 扇區 = 中線 ±22.5°(兩模式相同)
+  //   mid = 邊中點(距圓心 wallMid); inner = 判定帶內緣中點(邊中線往內 12, 距圓心 wallMid − 12; 教學 gate 階段的錨點);
+  //   a / b = 該邊兩端頂點(距圓心 wallVertex, a 在逆時針側)
+  LAYOUT.slots = [];
+  for (var si = 1; si <= 8; si++) {
+    var sm = (si - 1) * Math.PI / 4, sa = sm - Math.PI / 8, sb = sm + Math.PI / 8, gin = WALL_APO - GATE_WIDEN;
+    LAYOUT.slots.push({
+      slot: si, angle: (si - 1) * 45,
+      mid: { x: CX + WALL_APO * Math.cos(sm), y: CY + WALL_APO * Math.sin(sm) },
+      inner: { x: CX + gin * Math.cos(sm), y: CY + gin * Math.sin(sm) },
+      a: { x: CX + WALL_R * Math.cos(sa), y: CY + WALL_R * Math.sin(sa) },
+      b: { x: CX + WALL_R * Math.cos(sb), y: CY + WALL_R * Math.sin(sb) }
+    });
+  }
+  LAYOUT.arena = { cx: CX, cy: CY, r: ARENA_R };
+  LAYOUT.hpTop = { x: CX, y: CY - HP_R };   // 血量環最上方(教學 heal 階段錨點): 電腦 (640,139) / 觸控 (640,109)
 
   // ---------------------------------------------------------------- 背景
   // state: { level, time?(秒, 暫停凍結), beat?(浮點拍數 = 關內拍序號 + 拍內進度, 預備拍可為負) }
@@ -252,6 +306,33 @@
   var TREES = [[70, 330, 96], [200, 240, 70], [120, 540, 104], [262, 640, 62], [1210, 330, 96], [1080, 240, 70], [1160, 540, 104], [1018, 640, 62]];
   // 第 1 首: 漂落葉片 [x0, y0, 落速, 相位]
   var LEAVES = [[90, 40, 22, 0.3], [250, 300, 16, 1.7], [1150, 120, 20, 2.4], [1010, 420, 18, 0.9], [60, 560, 14, 3.1], [1230, 600, 24, 4.2], [330, 120, 19, 5.0], [930, 80, 15, 2.0]];
+  // v22 兩側延伸(觸控且畫布比 1280 寬才畫): 左右各自配置, 不是鏡射。座標為設計座標(左側 x < 0, 右側 x > 1280)
+  //   第 1 首: 側邊樹冠 [x, y, 半徑, 遠近(0 近 / 1 遠)] 與漂落葉片
+  var TREES_SIDE = [[-150, 250, 72, 1], [-40, 170, 54, 1], [-70, 430, 92, 0], [-140, 612, 100, 0],
+                    [1322, 196, 58, 1], [1442, 286, 68, 1], [1352, 404, 96, 0], [1418, 596, 106, 0]];
+  var LEAVES_SIDE = [[-120, 100, 18, 1.1], [-60, 380, 21, 2.9], [-170, 560, 16, 4.4], [1330, 60, 20, 0.6], [1420, 330, 17, 3.6], [1372, 520, 23, 5.3]];
+  //   第 2 首: 兩側下角補的玫瑰 [x, y, 格大小]
+  var ROSES_SIDE = [[-188, 532, 4], [-176, 612, 5], [-112, 648, 6], [-52, 598, 4], [-150, 684, 4], [-74, 690, 5],
+                    [1294, 566, 4], [1288, 640, 5], [1352, 604, 6], [1418, 656, 5], [1446, 588, 4], [1384, 692, 4]];
+  //   第 3 首: 兩側遠方尖塔剪影的折線點(接在原本剪影的左右兩端)
+  var SKY_LEFT = [[-200, 592], [-176, 560], [-156, 498], [-134, 566], [-96, 604], [-52, 584], [-26, 536], [-10, 578]];
+  var SKY_RIGHT = [[1296, 574], [1318, 540], [1344, 468], [1366, 550], [1408, 598], [1438, 566], [1458, 508], [1480, 584]];
+  //   第 3 首: 兩側從頂端垂下的鐵鍊 [x, 長度, 相位]
+  var CHAINS_SIDE = [[-128, 250, 0.3], [-48, 150, 1.9], [-176, 96, 3.1], [1334, 196, 2.4], [1416, 296, 0.8], [1466, 120, 4.0]];
+  function ironChain(ctx, t, x, len, ph, time) {
+    var sway = 3 * Math.sin(time * 0.7 + ph);
+    ctx.lineWidth = 2.5;
+    for (var y = 0, k = 0; y < len; y += 12, k++) {
+      var cx = x + sway * (y / len);
+      ctx.beginPath();
+      if (k % 2) ctx.ellipse(cx, y + 6, 1.6, 6.5, 0, 0, TAU); else ctx.ellipse(cx, y + 6, 4.5, 7, 0, 0, TAU);
+      ctx.strokeStyle = k % 2 ? t.dragonEdge : '#2a2040'; ctx.stroke();
+    }
+    // 末端一枚倒鉤
+    var ex = x + sway, ey = len + 6;
+    ctx.beginPath(); ctx.moveTo(ex - 6, ey); ctx.lineTo(ex + 6, ey); ctx.lineTo(ex, ey + 16); ctx.closePath();
+    ctx.fillStyle = t.dragonEdge; ctx.fill();
+  }
   // 第 2 首: 8-bit 玫瑰圖樣(D 深 / P 花瓣 / L 亮), 每格 4~6 像素
   var ROSE = ['..DDD..', '.DPLPD.', 'DPLPLPD', 'DPPDPPD', 'DLPPPLD', '.DPPPD.', '..DDD..'];
   // 第 2 首: 花的位置 [x, y, 格大小] — 只在畫面左右下角, 八邊形距離都 ≥ 400, 離內圈紅光與血量環很遠
@@ -314,7 +395,12 @@
     ctx.quadraticCurveTo(1090, 640, 1130, 628);  // 鼻樑
     ctx.quadraticCurveTo(1170, 598, 1214, 600);  // 眉骨
     ctx.lineTo(1250, 560); ctx.lineTo(1282, 470); // 角往右上
-    ctx.lineTo(1282, 722); ctx.lineTo(1080, 722);
+    if (WIDE) {
+      // v22 兩側延伸: 角後面接一段往右延伸到畫布邊的頸(原本角後是畫布邊, 寬畫面會露出一條直切邊)
+      ctx.lineTo(1274, 548); ctx.quadraticCurveTo(1330, 520, 1392, 546); ctx.quadraticCurveTo(1440, 566, EXR + 4, 540);
+      ctx.lineTo(EXR + 4, 722);
+    } else ctx.lineTo(1282, 722);
+    ctx.lineTo(1080, 722);
     ctx.quadraticCurveTo(1078, 690, 1060, 662);
     ctx.closePath();
     ctx.fillStyle = t.dragon; ctx.fill();
@@ -325,6 +411,15 @@
     // 口縫與牙
     ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0,0,0,0.6)';
     ctx.beginPath(); ctx.moveTo(1064, 668); ctx.quadraticCurveTo(1120, 676, 1176, 664); ctx.stroke();
+    if (WIDE) {
+      // 頸背的三根背刺
+      ctx.fillStyle = t.dragonEdge;
+      var NS = [[1336, 528], [1392, 544], [1446, 556]];
+      for (var n = 0; n < NS.length; n++) {
+        if (NS[n][0] > EXR) continue;
+        ctx.beginPath(); ctx.moveTo(NS[n][0] - 10, NS[n][1] + 3); ctx.lineTo(NS[n][0] + 2, NS[n][1] - 20); ctx.lineTo(NS[n][0] + 9, NS[n][1] + 1); ctx.closePath(); ctx.fill();
+      }
+    }
     ctx.fillStyle = 'rgba(220,210,235,0.35)';
     for (var k = 0; k < 4; k++) { var fx = 1080 + k * 22; ctx.beginPath(); ctx.moveTo(fx, 671); ctx.lineTo(fx + 5, 684); ctx.lineTo(fx + 10, 672); ctx.closePath(); ctx.fill(); }
     // 眼: 光暈 + 縱瞳
@@ -360,10 +455,10 @@
     ctx.save();
     var g = ctx.createLinearGradient(0, 0, 0, H);
     g.addColorStop(0, t.bgTop); g.addColorStop(0.55, t.bgMid); g.addColorStop(1, t.bgBottom);
-    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = g; ctx.fillRect(EX0, 0, EXW, H);
     if (L === 1) {
       // 林間: 斜射的晨光 + 兩側樹冠 + 內圈周圍一圈林蔭(壓暗光門與拍子提示所在的帶)+ 漂落葉片 + 底部草叢隨拍輕彈
-      for (k = 0; k < 5; k++) {
+      for (k = WIDE ? -1 : 0; k < (WIDE ? 6 : 5); k++) {
         var bx0 = -60 + k * 250;
         ctx.beginPath(); ctx.moveTo(bx0, -10); ctx.lineTo(bx0 + 70, -10); ctx.lineTo(bx0 + 420, H + 10); ctx.lineTo(bx0 + 260, H + 10); ctx.closePath();
         ctx.fillStyle = 'rgba(255,255,225,' + (k % 2 ? 0.10 : 0.14) + ')'; ctx.fill();
@@ -376,18 +471,29 @@
         circle(ctx, tr[0] - tr[2] * 0.55, tr[1] + tr[2] * 0.25, tr[2] * 0.62); ctx.fill();
         circle(ctx, tr[0] + tr[2] * 0.55, tr[1] + tr[2] * 0.3, tr[2] * 0.6); ctx.fill();
       }
+      if (WIDE) {
+        for (i = 0; i < TREES_SIDE.length; i++) {
+          var ts = TREES_SIDE[i];
+          ctx.fillStyle = ts[3] ? 'rgba(40,100,60,0.55)' : 'rgba(70,150,85,0.5)';
+          ctx.fillRect(ts[0] - ts[2] * 0.09, ts[1], ts[2] * 0.18, H - ts[1]);
+          circle(ctx, ts[0], ts[1], ts[2]); ctx.fill();
+          circle(ctx, ts[0] - ts[2] * 0.55, ts[1] + ts[2] * 0.25, ts[2] * 0.62); ctx.fill();
+          circle(ctx, ts[0] + ts[2] * 0.55, ts[1] + ts[2] * 0.3, ts[2] * 0.6); ctx.fill();
+        }
+      }
       var sg = ctx.createRadialGradient(CX, CY, 200, CX, CY, 420);
       sg.addColorStop(0, 'rgba(8,46,30,0.62)'); sg.addColorStop(0.42, 'rgba(8,46,30,0.42)'); sg.addColorStop(1, 'rgba(8,46,30,0)');
-      ctx.fillStyle = sg; ctx.fillRect(0, 0, W, H);
-      for (i = 0; i < LEAVES.length; i++) {
-        var lf = LEAVES[i], span = H + 60;
+      ctx.fillStyle = sg; ctx.fillRect(EX0, 0, EXW, H);
+      var leaves = WIDE ? LEAVES.concat(LEAVES_SIDE) : LEAVES;
+      for (i = 0; i < leaves.length; i++) {
+        var lf = leaves[i], span = H + 60;
         var ly = ((lf[1] + time * lf[2]) % span + span) % span - 30;
         var lx = lf[0] + 22 * Math.sin(time * 0.6 + lf[3]);
         if (octDist(lx, ly) < 360) continue;
         leafShape(ctx, lx, ly, 18, 7, time * 0.8 + lf[3]);
         ctx.fillStyle = i % 2 ? 'rgba(120,200,90,0.55)' : 'rgba(200,230,110,0.5)'; ctx.fill();
       }
-      for (var gx = 8; gx < W; gx += 36) {
+      for (var gx = WIDE ? 8 - 36 * Math.ceil(-EX0 / 36) : 8; gx < (WIDE ? EXR : W); gx += 36) {
         if (octDist(gx, H - 10) < 360) continue;
         var hgt = 16 + 6 * hash01(gx) + 10 * pulse;
         ctx.fillStyle = (gx / 36) % 2 ? 'rgba(40,110,55,0.85)' : 'rgba(60,140,70,0.85)';
@@ -397,19 +503,20 @@
       // 舞廳: 像素磚牆(每拍亮幾塊, 只在光門外光範圍外)+ 兩側天鵝絨帷幕 + 兩顆像素鏡球 + 掃動聚光 + 左右下角粉洋紅玫瑰(靜止、不發光)
       var cell = 40;
       ctx.strokeStyle = 'rgba(200,180,255,0.05)'; ctx.lineWidth = 1;
-      for (var vx = 0; vx <= W; vx += cell) line(ctx, vx, 0, vx, H);
-      for (var vy = 0; vy <= H; vy += cell) line(ctx, 0, vy, W, vy);
+      for (var vx = WIDE ? -Math.ceil(-EX0 / cell) * cell : 0; vx <= (WIDE ? EXR : W); vx += cell) line(ctx, vx, 0, vx, H);
+      for (var vy = 0; vy <= H; vy += cell) line(ctx, EX0, vy, EXR, vy);
       if (hasBeat) {
         var bi = Math.floor(beat);
-        for (k = 0; k < 26; k++) {
-          var cxl = Math.floor(hash01(bi * 37 + k) * (W / cell)), cyl = Math.floor(hash01(bi * 53 + k * 7) * (H / cell));
+        var tcols = WIDE ? EXW / cell : W / cell, toff = WIDE ? Math.floor(EX0 / cell) : 0;
+        for (k = 0; k < (WIDE ? 34 : 26); k++) {
+          var cxl = Math.floor(hash01(bi * 37 + k) * tcols) + toff, cyl = Math.floor(hash01(bi * 53 + k * 7) * (H / cell));
           var tx = cxl * cell, ty = cyl * cell;
           if (octDist(tx + cell / 2, ty + cell / 2) < 380) continue;
           ctx.fillStyle = (k % 2 ? 'rgba(255,240,200,' : 'rgba(200,170,255,') + (0.05 + 0.16 * pulse) + ')';
           ctx.fillRect(tx + 2, ty + 2, cell - 4, cell - 4);
         }
       }
-      var sw = Math.sin(time * 0.7) * 0.35, beams = [[0, 1], [W, -1]];
+      var sw = Math.sin(time * 0.7) * 0.35, beams = [[EX0, 1], [EXR, -1]];
       for (k = 0; k < 2; k++) {
         var bxx = beams[k][0], dir = beams[k][1], ang = Math.PI / 2 - dir * (0.55 + sw * dir);
         ctx.beginPath(); ctx.moveTo(bxx, 0);
@@ -418,7 +525,7 @@
         ctx.fillStyle = 'rgba(255,230,180,0.05)'; ctx.fill();
       }
       for (var sd = 0; sd < 2; sd++) {
-        var x0 = sd ? W - 104 : 0;
+        var x0 = sd ? EXR - 104 : EX0;   // v22: 寬畫面時帷幕移到畫布兩緣, 框住整個舞台
         for (k = 0; k < 4; k++) {
           var fx = x0 + k * 26;
           var cg = ctx.createLinearGradient(fx, 0, fx + 26, 0);
@@ -436,27 +543,43 @@
       for (k = 0; k < 28; k++) {
         var fa = hash01(k * 3.3) * TAU + time * 0.25, fr = 380 + hash01(k * 9.1) * 300;
         var fxx = CX + fr * Math.cos(fa) * 1.1, fyy = CY + fr * Math.sin(fa) * 0.75;
-        if (octDist(fxx, fyy) < 370 || fxx < 0 || fxx > W || fyy < 0 || fyy > H) continue;
+        if (octDist(fxx, fyy) < 370 || fxx < EX0 || fxx > EXR || fyy < 0 || fyy > H) continue;
         ctx.fillStyle = 'rgba(255,248,230,' + (0.12 + 0.12 * hash01(k)) + ')';
         ctx.fillRect(Math.round(fxx / 4) * 4, Math.round(fyy / 4) * 4, 4, 4);
       }
       for (i = 0; i < ROSES.length; i++) pixelRose(ctx, t, ROSES[i][0], ROSES[i][1], ROSES[i][2]);
+      if (WIDE) for (i = 0; i < ROSES_SIDE.length; i++) {
+        var rs = ROSES_SIDE[i];
+        if (rs[0] > EX0 - 8 && rs[0] < EXR) pixelRose(ctx, t, rs[0], rs[1], rs[2]);
+      }
     } else {
       // 魔龍: 遠方尖塔剪影 + 兩側龍翼 + 右下龍頭(眼光隨 2 小節週期緩慢變亮, 對應第 3 關輪轉週期)+ 左下龍尾 + 上升餘燼(只在光門外光範圍外)
       ctx.fillStyle = '#0f0a1a';
-      ctx.beginPath(); ctx.moveTo(0, H);
+      ctx.beginPath(); ctx.moveTo(WIDE ? EX0 : 0, H);
+      if (WIDE) for (k = 0; k < SKY_LEFT.length; k++) if (SKY_LEFT[k][0] >= EX0) ctx.lineTo(SKY_LEFT[k][0], SKY_LEFT[k][1]);
       var sp = [[0, 600], [60, 560], [90, 520], [120, 580], [200, 590], [240, 540], [262, 470], [284, 545], [340, 600], [420, 640], [860, 640], [940, 600], [990, 548], [1012, 480], [1036, 552], [1100, 590], [1180, 560], [1220, 520], [1250, 580], [1280, 600], [1280, 720]];
-      for (k = 0; k < sp.length; k++) ctx.lineTo(sp[k][0], sp[k][1]);
+      for (k = 0; k < sp.length; k++) {
+        if (WIDE && k === sp.length - 1) {   // 右端 (1280,600) 之後先接右側剪影, 再收到畫布右下
+          for (var kr = 0; kr < SKY_RIGHT.length; kr++) if (SKY_RIGHT[kr][0] <= EXR) ctx.lineTo(SKY_RIGHT[kr][0], SKY_RIGHT[kr][1]);
+          ctx.lineTo(EXR, 588); ctx.lineTo(EXR, H);
+          break;
+        }
+        ctx.lineTo(sp[k][0], sp[k][1]);
+      }
       ctx.closePath(); ctx.fill();
       var mist = ctx.createRadialGradient(CX, CY, 280, CX, CY, 700);
       mist.addColorStop(0, 'rgba(70,40,110,0.0)'); mist.addColorStop(0.5, 'rgba(70,40,110,0.16)'); mist.addColorStop(1, 'rgba(70,40,110,0)');
-      ctx.fillStyle = mist; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = mist; ctx.fillRect(EX0, 0, EXW, H);
+      if (WIDE) for (k = 0; k < CHAINS_SIDE.length; k++) {
+        var ch = CHAINS_SIDE[k];
+        if (ch[0] > EX0 + 8 && ch[0] < EXR - 8) ironChain(ctx, t, ch[0], ch[1], ch[2], time);
+      }
       dragonWing(ctx, t, -1); dragonWing(ctx, t, 1);
       dragonTail(ctx, t);
       var cyc = hasBeat ? (((beat % 8) + 8) % 8) / 8 : 0.4;
       dragonHead(ctx, t, 0.45 + 0.55 * cyc * cyc);
-      for (k = 0; k < 44; k++) {
-        var ex0 = hash01(k * 1.7) * W, spd = 18 + 26 * hash01(k * 4.1), span2 = H + 40;
+      for (k = 0; k < (WIDE ? 60 : 44); k++) {
+        var ex0 = k < 44 ? hash01(k * 1.7) * W : (k % 2 ? EX0 + hash01(k * 1.7) * (-EX0) : W + hash01(k * 1.7) * (-EX0)), spd = 18 + 26 * hash01(k * 4.1), span2 = H + 40;
         var ey = H + 20 - (((hash01(k * 2.9) * span2 + time * spd) % span2) + span2) % span2;
         var exx = ex0 + 14 * Math.sin(time * 0.9 + k);
         if (octDist(exx, ey) < 360) continue;
@@ -477,6 +600,7 @@
     circle(ctx, CX, CY, ARENA_R); ctx.fillStyle = t.ground; ctx.fill();
     ctx.save();
     circle(ctx, CX, CY, ARENA_R); ctx.clip();
+    if (TOUCH) { ctx.save(); ctx.translate(CX, CY); ctx.scale(AS, AS); ctx.translate(-CX, -CY); }   // v22: 內圈裝飾跟內圈等比放大
     if (L === 1) {
       // 林間空地: 葉縫灑下的光斑(靜止、極淡)+ 兩圈淡淡的苔紋
       var DAP = [[-120, -80, 46], [90, -130, 38], [140, 60, 52], [-60, 120, 40], [10, -10, 60], [-170, 40, 30], [60, 160, 28]];
@@ -524,6 +648,7 @@
         ctx.restore();
       }
     }
+    if (TOUCH) ctx.restore();
     var vg = ctx.createRadialGradient(CX, CY, ARENA_R * 0.5, CX, CY, ARENA_R);
     vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,0.32)');
     ctx.fillStyle = vg; ctx.fillRect(CX - ARENA_R, CY - ARENA_R, ARENA_R * 2, ARENA_R * 2);
@@ -628,6 +753,13 @@
     var a = 0.2 + 0.5 * p;
     var i;
     ctx.save();
+    if (TOUCH) {
+      // v22: 觸控的網牆離內圈較近, 收攏元素先被裁在光門判定帶內緣(邊中點 273)往內 2 的八邊形裡: 從 8 個角先冒出、往內收成整圈
+      var ap = WALL_APO - GATE_WIDEN - 2;
+      ctx.beginPath();
+      for (i = 0; i < 8; i++) { var va = Math.PI / 8 + i * OCT, vr = ap / Math.cos(Math.PI / 8); if (i) ctx.lineTo(CX + vr * Math.cos(va), CY + vr * Math.sin(va)); else ctx.moveTo(CX + vr * Math.cos(va), CY + vr * Math.sin(va)); }
+      ctx.closePath(); ctx.clip();
+    }
     ctx.strokeStyle = rgba(t.beat, a); ctx.fillStyle = rgba(t.beat, a);
     if (L === 1) {
       // 林間: 24 顆露珠(深色外描, 亮背景上也讀得到)往內收
@@ -768,11 +900,11 @@
   }
   function drawCondShape(ctx, e, col, shape, pending) {
     if (shape !== 'square' && shape !== 'triangle') return;
-    var c = edgePt(e, 0.5, 14);
-    circle(ctx, c[0], c[1], 16); ctx.fillStyle = pending ? 'rgba(16,16,24,0.85)' : '#101018'; ctx.fill();
-    if (pending) ctx.setLineDash([4, 3]);
-    ctx.lineWidth = pending ? 2 : 3; ctx.strokeStyle = col; ctx.stroke(); ctx.setLineDash([]);
-    shapePath(ctx, shape, c[0], c[1], 9); ctx.fillStyle = pending ? 'rgba(255,255,255,0.5)' : '#ffffff'; ctx.fill();
+    var c = edgePt(e, 0.5, 14 * GS);   // v22: 觸控放大 1.5 倍(中心往外 21、底圓 24、形狀 13.5)
+    circle(ctx, c[0], c[1], 16 * GS); ctx.fillStyle = pending ? 'rgba(16,16,24,0.85)' : '#101018'; ctx.fill();
+    if (pending) ctx.setLineDash(TOUCH ? [6, 4.5] : [4, 3]);
+    ctx.lineWidth = (pending ? 2 : 3) * GS; ctx.strokeStyle = col; ctx.stroke(); ctx.setLineDash([]);
+    shapePath(ctx, shape, c[0], c[1], 9 * GS); ctx.fillStyle = pending ? 'rgba(255,255,255,0.5)' : '#ffffff'; ctx.fill();
   }
   // 亮邊: 條件色帶的內緣 = 邊中線往內 12(= 判定加寬後的位置), 內緣是一條白芯; 外光只往外放
   // core: 白芯保留的長度比例(1 = 全長; 跳位預告中「即將熄滅」由兩端往中間縮)
@@ -869,7 +1001,7 @@
         var ba = hintT > TIMING.netHint - 0.2 ? (TIMING.netHint - hintT) / 0.2 : 1;
         var pull = 6 * (1 - easeOut(hintT / 0.25));
         var fc = edgePt(e, 0.5, 6);
-        corners(ctx, fc[0], fc[1], 134 + pull, 18 + pull, e.m + Math.PI / 2, 18, '#ffffff', ba, 3);
+        corners(ctx, fc[0], fc[1], (TOUCH ? 128 : 134) + pull, 18 + pull, e.m + Math.PI / 2, 18, '#ffffff', ba, 3);
       }
     }
     // 一般觸發(碰網)回饋: 舊邊整條白閃 + 碰網點內側的白細環與勾; 畫在狀態分支外, 舊邊已熄滅也照畫
@@ -882,10 +1014,10 @@
         band(ctx, ce, -GATE_WIDEN, -GATE_WIDEN + 2 + 8 * fl, 0, 1);
       }
       var hx = num(cf.x, ce.mx - GATE_WIDEN * Math.cos(ce.m)), hy = num(cf.y, ce.my - GATE_WIDEN * Math.sin(ce.m));
-      var ix = hx - 34 * Math.cos(ce.m), iy = hy - 34 * Math.sin(ce.m);
-      ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,' + (1 - cp) + ')';
-      circle(ctx, ix, iy, 16 + 22 * easeOut(cp)); ctx.stroke();
-      drawCheck(ctx, ix, iy, 13, '#ffffff', 1 - cp * cp);
+      var ix = hx - 34 * BS * Math.cos(ce.m), iy = hy - 34 * BS * Math.sin(ce.m);
+      ctx.lineWidth = 2 * BS; ctx.strokeStyle = 'rgba(255,255,255,' + (1 - cp) + ')';
+      circle(ctx, ix, iy, (16 + 22 * easeOut(cp)) * BS); ctx.stroke();
+      drawCheck(ctx, ix, iy, 13 * BS, '#ffffff', 1 - cp * cp);
     }
     ctx.restore();
   }
@@ -952,7 +1084,7 @@
     } else {
       paintFloor(ctx, t, L, kind, color, shape, x, y, r);
       if (s.shrink) {
-        var sp = clamp01(num(s.shrink.t, 0)), toR = num(s.shrink.toR, 20);
+        var sp = clamp01(num(s.shrink.t, 0)), toR = num(s.shrink.toR, FLOOR_R_SMALL);
         ctx.beginPath(); ctx.arc(x, y, r + 2.5, 0, TAU); ctx.arc(x, y, toR, 0, TAU, true);
         ctx.fillStyle = rgba(t.ground, 0.75 * sp); ctx.fill();
         ctx.setLineDash([5, 4]); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,0.9)';
@@ -961,7 +1093,7 @@
       if (status === 'intro') {
         var tt = num(s.t, 0) * TIMING.floorIntro; // t 為 0~1 比例
         var a = tt > TIMING.floorIntro - 0.5 ? (TIMING.floorIntro - tt) / 0.5 : 1;
-        corners(ctx, x, y, r + 9, r + 9, 0, 8, '#ffffff', clamp01(a), 2.5);
+        corners(ctx, x, y, r + 9 * FS, r + 9 * FS, 0, 8 * FS, '#ffffff', clamp01(a), 2.5 * FS);
       }
     }
     ctx.restore();
@@ -971,11 +1103,11 @@
 
   // ---------------------------------------------------------------- 第 3 關輪轉預告
   // 每塊地板往順時針下一個位置畫一段弧: 虛線軌 = 要去的路, 實線由起點往前長、長滿 = 輪轉那一刻; 弧用該地板自己的色
-  // state: { level, p(0~1: 3 拍預告已過的比例), r?(地板半徑, 預設 24), floors: [{ angle(度, 目前位置), color?('A'~'D') | shape?('square'/'triangle') }] }
+  // state: { level, p(0~1: 3 拍預告已過的比例), r?(地板半徑, 預設 Art.geom.floorR), floors: [{ angle(度, 目前位置), color?('A'~'D') | shape?('square'/'triangle') }] }
   function drawRotateCue(ctx, state) {
     var s = state || {}, L = lv(s.level), t = THEMES[L];
     var p = clamp01(num(s.p, 0)), list = s.floors || [];
-    var fr = num(s.r, FLOOR_R), half = Math.asin(Math.min(0.9, (fr + 7) / FLOOR_RING));
+    var fr = num(s.r, FLOOR_R), half = Math.asin(Math.min(0.9, (fr + 7 * FS) / FLOOR_RING));
     ctx.save();
     ctx.lineCap = 'round';
     for (var i = 0; i < list.length; i++) {
@@ -983,15 +1115,15 @@
       var col = f.color ? condColor(L, f.color) : (f.shape ? t.shapeFloorGlyph : null);
       if (!col) continue;
       var a0 = num(f.angle, 0) * DEG + half, a1 = (num(f.angle, 0) + 60) * DEG - half;
-      ctx.lineWidth = 8; ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+      ctx.lineWidth = 8 * FS; ctx.strokeStyle = 'rgba(0,0,0,0.45)';
       ctx.beginPath(); ctx.arc(CX, CY, FLOOR_RING, a0, a1); ctx.stroke();
-      ctx.setLineDash([5, 6]); ctx.lineWidth = 3; ctx.strokeStyle = rgba(col, 0.6);
+      ctx.setLineDash([5, 6]); ctx.lineWidth = 3 * FS; ctx.strokeStyle = rgba(col, 0.6);
       ctx.beginPath(); ctx.arc(CX, CY, FLOOR_RING, a0, a1); ctx.stroke(); ctx.setLineDash([]);
       var tip = a0 + (a1 - a0) * Math.max(0.12, p);
-      ctx.lineWidth = 4.5; ctx.strokeStyle = col;
+      ctx.lineWidth = 4.5 * FS; ctx.strokeStyle = col;
       ctx.beginPath(); ctx.arc(CX, CY, FLOOR_RING, a0, tip); ctx.stroke();
       var hx = CX + FLOOR_RING * Math.cos(tip), hy = CY + FLOOR_RING * Math.sin(tip);
-      var dir = tip + Math.PI / 2, hs = 9;
+      var dir = tip + Math.PI / 2, hs = 9 * FS;
       ctx.beginPath(); ctx.moveTo(hx + Math.cos(dir) * hs, hy + Math.sin(dir) * hs);
       ctx.lineTo(hx + Math.cos(dir + 2.4) * hs, hy + Math.sin(dir + 2.4) * hs);
       ctx.lineTo(hx + Math.cos(dir - 2.4) * hs, hy + Math.sin(dir - 2.4) * hs); ctx.closePath();
@@ -1006,6 +1138,7 @@
     var s = state || {}, L = lv(s.level), t = THEMES[L];
     var x = num(s.x, CX), y = num(s.y, CY), p = clamp01(num(s.t, 0) / TIMING.batchCue);
     ctx.save();
+    bubbleSpace(ctx, x, y);
     ctx.lineWidth = 2;
     for (var k = 0; k < 2; k++) {
       var q = clamp01(p * 1.25 - k * 0.25);
@@ -1018,7 +1151,7 @@
   }
 
   // ---------------------------------------------------------------- 氣泡
-  // 外緣 = 壽命環 = 判定圓(半徑 20): 任何狀態都不放大、不位移。本體收在環內。
+  // 外緣 = 壽命環 = 判定圓(半徑 20; 觸控 28 = 整顆 ×1.4 畫): 任何狀態都不放大、不位移。本體收在環內。
   // beatPhase(0~1, 距上一拍已過的比例): 隨拍原地變化 = 本體內緣一圈用自己的邊色向內加粗 + 高光往上跳一下再落回,
   //   只在本體裡、不改色相與明度階、不碰壽命環。
   function bodyPath(ctx, shape, x, y, inset) { shapePath(ctx, shape, x, y, BODY[shape] - (inset || 0)); }
@@ -1037,6 +1170,7 @@
       k = q < 0.4 ? Math.pow(1 - q / 0.4, 2) : 0;
     }
     ctx.save();
+    bubbleSpace(ctx, x, y);   // v22: 觸控整顆(本體、壽命環、落影、冒出水紋)放大 1.4 倍; 以下數字都是電腦版基準
     if (st === 'returning') ctx.globalAlpha = 0.45;
     if (spawn < 1) {
       var rr = 18 + 22 * spawn;
@@ -1109,7 +1243,7 @@
       circle(ctx, x, y, RING_C); ctx.lineWidth = 1.5; ctx.strokeStyle = rgba(color ? lighten(color, 0.35) : t.glass, 0.7); ctx.stroke();
     }
     if (s.hover && st === 'idle') {
-      circle(ctx, x, y, BUBBLE_R + 3); ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.stroke();
+      circle(ctx, x, y, BASE_BUBBLE_R + 3); ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.stroke();
     }
     ctx.restore();
   }
@@ -1129,6 +1263,7 @@
     if (kind === 'unasked' && attr === 'shape') { drawUnasked(ctx, s, x, y, tt - stack * 0.08); return; }
     var fade = p > 0.72 ? 1 - (p - 0.72) / 0.28 : 1;
     ctx.save();
+    bubbleSpace(ctx, x, y);
     ctx.globalAlpha = clamp01(fade);
     if (kind === 'stick') {
       var e = easeOut(clamp01(p / 0.5));
@@ -1188,9 +1323,10 @@
     var a = tt < 0.06 ? tt / 0.06 : (tt < 0.3 ? 1 : 1 - (tt - 0.3) / (d - 0.3));
     var sh = s.value === 'triangle' ? 'triangle' : 'square';
     ctx.save();
+    bubbleSpace(ctx, x, y);
     // 墊: 剪掉氣泡外緣(半徑 21)以內, 只佔氣泡外圍
     ctx.save();
-    ctx.beginPath(); ctx.rect(x - 80, y - 80, 160, 160); ctx.arc(x, y, BUBBLE_R + 1, 0, TAU, true); ctx.clip('evenodd');
+    ctx.beginPath(); ctx.rect(x - 80, y - 80, 160, 160); ctx.arc(x, y, BASE_BUBBLE_R + 1, 0, TAU, true); ctx.clip('evenodd');
     unaskedPath(ctx, sh, x, y); ctx.fillStyle = 'rgba(0,0,0,' + (0.34 * a) + ')'; ctx.fill();
     ctx.restore();
     unaskedPath(ctx, sh, x, y);
@@ -1206,6 +1342,7 @@
     var col = s.color ? condColor(s.paletteLevel || L, s.color) : t.glass;
     var a = 1 - p * p;
     ctx.save();
+    bubbleSpace(ctx, x, y);
     for (var i = 0; i < SHARD.length; i++) {
       var ang = SHARD[i][0], sp = SHARD[i][1];
       var d = 14 + 30 * e * sp, sx = x + d * Math.cos(ang), sy = y + d * Math.sin(ang) + 26 * p * p;
@@ -1237,21 +1374,22 @@
     var onBubble = s.onBubble !== false, col = t.beat;
     var outer = CONTOUR[tier - 1] + 10;
     ctx.save();
+    bubbleSpace(ctx, x, y);
     if (onBubble) {
       // 只畫在氣泡外緣之外: 光暈不准染到氣泡本體(顏色是辨識通道)
-      ctx.beginPath(); ctx.arc(x, y, 200, 0, TAU); ctx.arc(x, y, BUBBLE_R + 1.5, 0, TAU, true); ctx.clip();
+      ctx.beginPath(); ctx.arc(x, y, 200, 0, TAU); ctx.arc(x, y, BASE_BUBBLE_R + 1.5, 0, TAU, true); ctx.clip();
     }
     // 光暈: 從氣泡外緣起往外, 內側透明(不蓋氣泡本體)
-    var gr = ctx.createRadialGradient(x, y, BUBBLE_R, x, y, outer + 6 * tier);
+    var gr = ctx.createRadialGradient(x, y, BASE_BUBBLE_R, x, y, outer + 6 * tier);
     gr.addColorStop(0, rgba(col, 0)); gr.addColorStop(0.18, rgba(col, (0.25 + 0.15 * tier) * a)); gr.addColorStop(1, rgba(col, 0));
-    ctx.beginPath(); ctx.arc(x, y, outer + 6 * tier, 0, TAU); ctx.arc(x, y, BUBBLE_R, 0, TAU, true);
+    ctx.beginPath(); ctx.arc(x, y, outer + 6 * tier, 0, TAU); ctx.arc(x, y, BASE_BUBBLE_R, 0, TAU, true);
     ctx.fillStyle = gr; ctx.fill();
     if (!onBubble) {
       // 被觸發消失那一下: 氣泡大小的一團拍子色光, 白芯
-      var cg = ctx.createRadialGradient(x, y, 0, x, y, BUBBLE_R + 6 * easeOut(p));
+      var cg = ctx.createRadialGradient(x, y, 0, x, y, BASE_BUBBLE_R + 6 * easeOut(p));
       cg.addColorStop(0, 'rgba(255,255,255,' + (0.95 * (1 - p)) + ')');
       cg.addColorStop(0.55, rgba(col, 0.8 * (1 - p))); cg.addColorStop(1, rgba(col, 0));
-      circle(ctx, x, y, BUBBLE_R + 6 * easeOut(p)); ctx.fillStyle = cg; ctx.fill();
+      circle(ctx, x, y, BASE_BUBBLE_R + 6 * easeOut(p)); ctx.fillStyle = cg; ctx.fill();
     }
     ctx.shadowColor = col; ctx.shadowBlur = 6 + 7 * tier;
     for (var i = 0; i < tier; i++) {
@@ -1277,6 +1415,7 @@
     var x = num(s.x, CX), y = num(s.y, CY), p = clamp01(num(s.t, 0) / TIMING.chainFx), e = easeOut(p);
     var col = t.beat;
     ctx.save();
+    bubbleSpace(ctx, x, y);
     var R = 30 + 90 * e;
     var g = ctx.createRadialGradient(x, y, 0, x, y, R);
     g.addColorStop(0, 'rgba(255,255,255,' + (0.85 * (1 - p)) + ')');
@@ -1373,12 +1512,10 @@
     line(ctx, x + 3.5, y + 3, x + 3.5, y - 7);
     line(ctx, x + 3.5, y - 7, x + 8, y - 4);
   }
-  function drawHud(ctx, state) {
-    var s = state || {};
-    var L = lv(s.level), t = THEMES[L];
-    ctx.save();
+  // 左 / 右 HUD 內容。r = 電腦版尺寸的框(240 × 80 / 220 × 80); 觸控模式由 drawHud 在外層整塊放大 1.35 倍
+  function hudLeftPanel(ctx, t, L, s, hl) {
     // v21: 內距 / 間距一律 8 的倍數: 左右內距 16、上下內距 16、標籤與內容間距 8、兩列之間 8
-    var hl = LAYOUT.hudLeft, hr = LAYOUT.hudRight, P = 16, LB = TOUCH ? 64 : 56;   // LB: 標籤放大後內容右移
+    var P = 16, LB = 56;
     roundRect(ctx, hl.x, hl.y, hl.w, hl.h, L === 1 ? 8 : 3); ctx.fillStyle = t.hudPlate; ctx.fill();
     // 第一列(y +16 ~ +32): 「血量」標籤(寬 32)+ 間距 8 + 血條
     text(ctx, '血量', hl.x + P, hl.y + 24, 16, s.danger ? t.danger : t.ink, 'left');
@@ -1388,13 +1525,16 @@
     text(ctx, num(s.survival, 0).toFixed(1) + ' 秒', hl.x + LB, hl.y + 56, 18, t.ink, 'left');
     if (s.songProgress != null) {
       // 歌曲進度: 細譜線 + 沿線滑動的音符(播放頭), 不是填滿長條, 不會讀成血量
-      var sp = clamp01(num(s.songProgress, 0)), x0 = hl.x + (TOUCH ? 168 : 152), x1 = hl.x + hl.w - P, ly = hl.y + 64;
+      var sp = clamp01(num(s.songProgress, 0)), x0 = hl.x + 152, x1 = hl.x + hl.w - P, ly = hl.y + 64;
       ctx.lineCap = 'round';
       ctx.lineWidth = 1.5; ctx.strokeStyle = rgba(t.inkDim, 0.45); line(ctx, x0, ly, x1, ly);
       ctx.lineWidth = 1; line(ctx, x1, ly - 5, x1, ly + 5);
       if (sp > 0) { ctx.lineWidth = 2.5; ctx.strokeStyle = rgba(t.rim, 0.9); line(ctx, x0, ly, x0 + (x1 - x0) * sp, ly); }
       drawNote(ctx, x0 + (x1 - x0) * sp - 2, ly - 8, t.ink);
     }
+  }
+  function hudRightPanel(ctx, t, L, s, hr) {
+    var P = 16;
     roundRect(ctx, hr.x, hr.y, hr.w, hr.h, L === 1 ? 8 : 3); ctx.fillStyle = t.hudPlate; ctx.fill();
     // 第一列(y +16 ~ +40): 分數; 第二列(y +48 ~ +64): 連續
     text(ctx, '分數', hr.x + P, hr.y + 28, 13, t.inkDim, 'left');
@@ -1403,6 +1543,27 @@
     if (combo > 0) {
       text(ctx, '連續', hr.x + P, hr.y + 56, 13, t.inkDim, 'left');
       text(ctx, '×' + combo, hr.x + hr.w - P, hr.y + 56, 22, t.ink, 'right');
+    }
+  }
+  function drawHud(ctx, state) {
+    var s = state || {};
+    var L = lv(s.level), t = THEMES[L];
+    ctx.save();
+    if (!TOUCH) {
+      hudLeftPanel(ctx, t, L, s, LAYOUT.hudLeft);
+      hudRightPanel(ctx, t, L, s, LAYOUT.hudRight);
+    } else {
+      // v22 觸控: 電腦版的版面整塊放大 1.35 倍畫在 Art.layout.hudLeft / hudRight; 字級下限照放大後的實際大小算(本地 16 = 實際 21.6)
+      var boxes = [[LAYOUT.hudLeft, HUD_BASE.left, hudLeftPanel], [LAYOUT.hudRight, HUD_BASE.right, hudRightPanel]];
+      for (var i = 0; i < 2; i++) {
+        var R = boxes[i][0], B = boxes[i][1];
+        ctx.save();
+        ctx.translate(R.x, R.y); ctx.scale(R.w / B.w, R.h / B.h);
+        TEXT_SCALE = HUD_S;
+        boxes[i][2](ctx, t, L, s, { x: 0, y: 0, w: B.w, h: B.h });
+        TEXT_SCALE = 1;
+        ctx.restore();
+      }
     }
     ctx.restore();
   }
@@ -1471,7 +1632,7 @@
   }
 
   // ---------------------------------------------------------------- 選單類畫面
-  function overlay(ctx, a) { ctx.fillStyle = 'rgba(0,0,0,' + a + ')'; ctx.fillRect(0, 0, W, H); }
+  function overlay(ctx, a) { ctx.fillStyle = 'rgba(0,0,0,' + a + ')'; ctx.fillRect(EX0, 0, EXW, H); }   // v22: 寬畫面觸控時壓暗整個畫布
   function panelBox(ctx, t, r) {
     roundRect(ctx, r.x, r.y, r.w, r.h, 16); ctx.fillStyle = t.panel; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = rgba(t.rim, 0.6); ctx.stroke();
@@ -1842,7 +2003,22 @@
     palette: palette,
     timing: TIMING,
     layout: LAYOUT,
-    geometry: { gateInnerApothem: WALL_APO - GATE_WIDEN, hpRingRadius: HP_R, bubbleOuterRadius: RING_C + RING_TRACK / 2 },
+    geometry: { gateInnerApothem: WALL_APO - GATE_WIDEN, hpRingRadius: HP_R, bubbleOuterRadius: (RING_C + RING_TRACK / 2) * BS },
+    // v22: 場地幾何(依模式)。RD 的物理與判定讀這裡, 不要寫死 210 / 20 / 24 / 140 / 300
+    geom: {
+      touch: TOUCH,
+      arenaR: ARENA_R,            // 內圈半徑
+      bubbleR: BUBBLE_R,          // 氣泡判定半徑(碰撞、地板相交、碰網)
+      floorR: FLOOR_R,            // 地板預設半徑
+      floorRSmall: FLOOR_R_SMALL, // 第 3 關後段縮小後的地板半徑
+      floorRing: FLOOR_RING,      // 6 塊地板所在環的半徑
+      wallMid: WALL_APO,          // 網牆每邊中點距圓心(八邊形邊心距)
+      wallVertex: WALL_R,         // 網牆頂點距圓心
+      gateInner: WALL_APO - GATE_WIDEN, // 光門判定帶內緣(邊中線往內 12)
+      hpR: HP_R,                  // 血量環中心半徑(軌 hpR ± 7)
+      grabR: GRAB_R,              // 抓取判定半徑(按在氣泡中心這距離內算按到)
+      scale: AS                   // 內圈內版位換算倍率(240 / 210; 電腦版 1)
+    },
     drawBackground: drawBackground,
     drawArena: drawArena,
     drawHpRing: drawHpRing,

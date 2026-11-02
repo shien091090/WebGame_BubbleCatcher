@@ -39,20 +39,23 @@
   }
 
   var CX = 640, CY = 360;
-  var INNER_R = 210;
-  var BUBBLE_R = 20;
-  var MOVE_R = INNER_R - BUBBLE_R;       // 190, 閒置氣泡可活動半徑
-  var WALL_APO = 300;                    // 網牆每邊中點距圓心
+  // v22: 場地幾何一律讀 Art.geom(電腦版值 = 原本常數; 觸控版放大)。讀不到時才用電腦版值
+  var G = Art.geom || { touch: false, arenaR: 210, bubbleR: 20, floorR: 24, floorRSmall: 20, floorRing: 140, wallMid: 300, gateInner: 288, grabR: 20, scale: 1 };
+  var SC = G.scale;                      // 內圈內以圓心為原點的版位換算倍率(電腦 1, 觸控 240 / 210)
+  var INNER_R = G.arenaR;
+  var BUBBLE_R = G.bubbleR;
+  var MOVE_R = INNER_R - BUBBLE_R;       // 閒置氣泡可活動半徑(電腦 190)
+  var WALL_APO = G.wallMid;              // 網牆每邊中點距圓心(電腦 300)
   var WALL_VERT_R = WALL_APO / Math.cos(22.5 * Math.PI / 180);   // 約 324.7
   var TAN225 = Math.tan(22.5 * Math.PI / 180);
-  var GATE_WIDEN = 12;                   // 光門判定加寬(亮邊線段往內圈方向)
-  var BAND_IN = WALL_APO - GATE_WIDEN;   // 判定帶內緣距圓心 288(= Art.geometry.gateInnerApothem)
-  var DRAG_B = { x0: 20, y0: 20, x1: 1260, y1: 700 };
-  var FLOOR_RING = 140;
+  var BAND_IN = G.gateInner;             // 判定帶內緣距圓心(電腦 288)
+  var GATE_WIDEN = WALL_APO - BAND_IN;   // 光門判定加寬(亮邊線段往內圈方向, 兩模式都 12)
+  var DRAG_B = { x0: BUBBLE_R, y0: BUBBLE_R, x1: W - BUBBLE_R, y1: H - BUBBLE_R };   // 電腦 20 / 20 / 1260 / 700
+  var FLOOR_RING = G.floorRing;
   var LIFE = 12;
 
   var PARAMS = {
-    bubbleR: BUBBLE_R, floorR: 24, floorRSmall: 20, floorRing: FLOOR_RING, innerR: INNER_R,
+    bubbleR: BUBBLE_R, floorR: G.floorR, floorRSmall: G.floorRSmall, floorRing: FLOOR_RING, innerR: INNER_R,
     lifeSec: LIFE, hpMax: 100, hpStart: 60,
     hpCatchGain: 6, hpBeatGain: 2, hpChainGain: 2, hpExpireLoss: 6, hpMissLoss: 3, overflowPerHp: 2,
     hpDangerEnter: 40, hpDangerExit: 50,
@@ -70,7 +73,7 @@
     autoSwapBeatPoint: 2,                 // 自動換位: 嚴格晚於卡住成立那一刻的第 2 個拍點
     rotateEveryBeats: 8, rotatePreviewBeats: 3,          // 第 3 關地板輪轉(循環不設上限)
     jumpEveryBeats: 8, jumpPreviewBeats: 1, jumpLastBeat: null,   // 第 2 關光門跳位(關末拍不跳, 關末前 1 拍不預告); 最後一次跳位拍 = 關末拍 − 8, 由曲子設定的關長推算(見 LEVELS 之後)
-    formationMaxR: 180, formationFloorMin: 48, formationGap: 44,
+    formationMaxR: 180 * SC, formationFloorMin: 48 * SC, formationGap: 44 * SC,
     spawnGap: 4, spawnTries: 10, spawnFxSec: 0.3,
     dragStartDist: 6, returnDurationSec: 0.2,
     scoreBase: 10, comboBonusPerStreak: 0.1, comboStreakCap: 20,
@@ -563,7 +566,7 @@
     var f = FORMATIONS[key];
     return f.pts(n).map(function (p) {
       var r = rotPt(p, d * f.dirStep);
-      return { x: CX + r.x, y: CY + r.y };
+      return { x: CX + r.x * SC, y: CY + r.y * SC };   // 內圈內版位 × 換算倍率
     });
   }
 
@@ -1685,7 +1688,7 @@
       var hit = segSegIntersect(p0, p1, { x: za.x, y: za.y }, { x: zb.x, y: zb.y });
       if (!hit) continue;
       var len = dist(za.x, za.y, zb.x, zb.y);
-      if (len > 200) continue;                                 // 只算相鄰兩個版位(間距 140)
+      if (len > 200 * FLOOR_RING / 140) continue;               // 只算相鄰兩個版位(間距 = 地板環半徑; 電腦 140 → 門檻 200)
       var lateral = (hit.s - 0.5) * len;
       var beforeSpeed = speedBefore(b, nowMs, PARAMS.relPassWindowMs);
       var touchedEither = !!(b.floorOverlap[za.id] || b.floorOverlap[zb.id]);
@@ -2118,7 +2121,7 @@
     if (sectorOf(px, py) !== net.slot) return;
     var s = slotByNo(net.slot);
     var a = (px - CX) * s.nx + (py - CY) * s.ny;
-    var sure = !(a < 268);
+    var sure = !(a < BAND_IN - BUBBLE_R);   // 電腦 268
     var gnow = gtAt(g, lt);
     var rec = emit(g, 'netMissSuspect', {
       bubbleId: b.id, kind: sure ? '確定' : '疑似', netSeq: net.seq, slotId: s.id, netCondition: { color: net.cond.color, shape: net.cond.shape },
@@ -2192,7 +2195,7 @@
       var b = g.bubbles[i];
       if (b.mode !== 'idle') continue;
       var d = dist(px, py, b.x, b.y);
-      if (d <= BUBBLE_R && d < bestD) { best = b; bestD = d; }
+      if (d <= G.grabR && d < bestD) { best = b; bestD = d; }   // 抓取半徑(電腦 20 = 氣泡半徑, 觸控 40); 多顆取最近
     }
     return best;
   }
@@ -4645,7 +4648,7 @@
   // ---- 標示(mark): 被標示物件的判定幾何。格式集中在這幾個函式, 之後照 style.md 對齊只改這裡 ----
   function tutMarkFloor(x, y, r) { return { kind: 'floor', x: x, y: y, r: r }; }
   function tutMarkGate(s) { return { kind: 'gate', slot: s.no }; }
-  function tutHpRingR() { return (Art.geometry && Art.geometry.hpRingRadius) || 221; }
+  function tutHpTop() { return (L.hpTop) || { x: CX, y: CY - ((Art.geometry && Art.geometry.hpRingRadius) || 221) }; }
   function tutMarkRing() { return { kind: 'hpRing' }; }
 
   function tutNewRun(g) {
@@ -4682,13 +4685,14 @@
     if (id === 'gate') {
       if (!g.net) return null;
       s = slotByNo(g.net.slot);
-      return { x: s.x, y: s.y, mark: tutMarkGate(s) };
+      var gin = (Art.geom && Art.geom.touch && L.slots && L.slots[s.no - 1] && L.slots[s.no - 1].inner) || s;   // 觸控: 判定帶內緣中點; 電腦版維持原錨點(網牆邊心)
+      return { x: gin.x, y: gin.y, mark: tutMarkGate(s) };
     }
     if (id === 'wrong') {
       if (!c.fixed) return null;
       return { x: c.fixed.x, y: c.fixed.y, mark: g.net ? tutMarkGate(slotByNo(g.net.slot)) : null };
     }
-    if (id === 'heal') return { x: CX, y: CY - tutHpRingR(), mark: tutMarkRing() };
+    if (id === 'heal') return { x: tutHpTop().x, y: tutHpTop().y, mark: tutMarkRing() };
     if (id === 'beat') {
       if (!c.fixed) return null;
       if (c.fixed.bubble && !c.fixed.bubble.dead) return { x: c.fixed.bubble.x, y: c.fixed.bubble.y, mark: null };
@@ -4854,7 +4858,7 @@
     var rect = canvas.getBoundingClientRect();
     return { x: (e.clientX - rect.left) * (CW / rect.width) - OX, y: (e.clientY - rect.top) * (H / rect.height) };
   }
-  function inCanvasPos(p) { return p.x >= 0 && p.x < W && p.y >= 0 && p.y < H; }
+  function inCanvasPos(p) { return p.x >= -OX && p.x < W + OX && p.y >= 0 && p.y < H; }   // 整個畫布(觸控寬畫面兩側有 HUD; 電腦 OX = 0 等於設計區)
 
   canvas.addEventListener('mousedown', function (e) {
     if (e.button !== 0) return;
@@ -5063,7 +5067,7 @@
   // 觸控模式不畫聲音開關圖示(聲音交給手機本身)
   function drawMute(st) { if (!(window.PVDX && PVDX.on)) Art.drawMuteButton(ctx, st); }
   function render() {
-    if (OX > 0) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, H); }
+    if (OX > 0 && !G.touch) { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, CW, H); }   // 觸控寬畫面兩側由美術的背景畫滿, 不塗黑
     ctx.save();
     ctx.translate(OX, 0);   // 設計區置中: 整個畫面最外層位移一次, 介面座標維持 1280 設計值
     try { renderScreens(); } finally { ctx.restore(); }

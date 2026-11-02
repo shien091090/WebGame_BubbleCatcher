@@ -307,8 +307,8 @@
   // 每幀畫在遊戲畫面上層
   PVDX.draw = function (ctx) {
     checkOrient();
-    // 兩側黑塊: 遊戲畫到設計區外的背景、壓暗、HUD 延伸一律蓋掉, 手機兩側只有黑底與按鈕
-    if (SW > 0) { ctx.save(); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, SW, CH); ctx.fillRect(CW - SW, 0, SW, CH); ctx.restore(); }
+    // 兩側黑塊(只有鍵盤遊戲): 遊戲畫到設計區外的背景、壓暗、HUD 延伸一律蓋掉; 滑鼠遊戲沒有按鈕, 兩側留給遊戲往外延伸的背景
+    if (SW > 0 && CONFIG.mode === 'keys') { ctx.save(); ctx.fillStyle = '#000'; ctx.fillRect(0, 0, SW, CH); ctx.fillRect(CW - SW, 0, SW, CH); ctx.restore(); }
     if (!KEYS) return;
     for (var id in touches) { recompute(); break; }   // 場景換了(按鈕顯示變了)而手指還按著: 重新判定
     Pad.draw(ctx, held, CONFIG.visible());
