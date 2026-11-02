@@ -9,9 +9,67 @@
 <div id="stage">
   <canvas id="game"></canvas>
 </div>
-<script src="art/art.js"></script>
-<script src="audio/sound.js"></script>
-<script src="game.js"></script>
-<script src="touch.js"></script>
+<!-- pvd-loader -->
+<div id="pvd-load" style="position:fixed;inset:0;z-index:9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#111;color:#e8e8ee;font:600 15px/1.4 system-ui,'Microsoft JhengHei',sans-serif">
+<div style="width:min(320px,60vw);height:10px;border-radius:5px;background:#2a2a33;overflow:hidden"><div id="pvd-load-bar" style="width:0;height:100%;border-radius:5px;background:#e8e8ee;transition:width .15s"></div></div>
+<div id="pvd-load-text">載入中 0%</div>
+</div>
+<script>
+// 載入進度條(由 game-studio-lab 發布流程產生, 改了遊戲檔要重新產生): FILES = [路徑, 未壓縮位元組]
+(function () {
+  var FILES = [["art/art.js", 104355], ["audio/sound.js", 5966056], ["game.js", 343493], ["touch.js", 19685]];
+  var total = 0, got = [], last = -1, i;
+  for (i = 0; i < FILES.length; i++) { total += FILES[i][1]; got.push(0); }
+  function post(msg) { try { if (window.parent && window.parent !== window) window.parent.postMessage(msg, location.origin); } catch (e) { /* file:// 開啟時略過 */ } }
+  function show() {
+    var n = 0; for (var k = 0; k < got.length; k++) n += got[k];
+    var p = total ? Math.min(1, n / total) : 1, pct = Math.floor(p * 100);
+    if (pct === last) return;
+    last = pct;
+    document.getElementById('pvd-load-bar').style.width = pct + '%';
+    document.getElementById('pvd-load-text').textContent = '載入中 ' + pct + '%';
+    post({ type: 'pvd:progress', progress: p });
+  }
+  function done() {
+    got = FILES.map(function (f) { return f[1]; }); show();
+    var el = document.getElementById('pvd-load'); if (el) el.parentNode.removeChild(el);
+    post({ type: 'pvd:loaded' });
+  }
+  // 退回做法: 逐個插入 <script src>, 一個載完才載下一個(保持執行順序)
+  function byTags(from) {
+    if (from >= FILES.length) return done();
+    var s = document.createElement('script');
+    s.src = FILES[from][0];
+    s.onload = s.onerror = function () { got[from] = FILES[from][1]; show(); byTags(from + 1); };
+    document.body.appendChild(s);
+  }
+  function fetchOne(f, k) {
+    return fetch(f[0]).then(function (r) {
+      if (!r.ok) throw new Error(f[0] + ' ' + r.status);
+      if (!r.body || !r.body.getReader) return r.text();
+      var rd = r.body.getReader(), parts = [], n = 0;
+      function pump() {
+        return rd.read().then(function (x) {
+          if (x.done) return new Blob(parts).text();
+          parts.push(x.value); n += x.value.length; got[k] = Math.min(n, f[1]); show();
+          return pump();
+        });
+      }
+      return pump();
+    });
+  }
+  show();
+  if (location.protocol === 'file:' || !window.fetch || !window.Blob || !Blob.prototype.text) return byTags(0);
+  Promise.all(FILES.map(fetchOne)).then(function (codes) {
+    for (var k = 0; k < codes.length; k++) {
+      var s = document.createElement('script');
+      s.text = codes[k] + '\n//# sourceURL=' + FILES[k][0];
+      document.body.appendChild(s);   // 插入即執行, 照 FILES 順序
+    }
+    done();
+  }, function () { got = FILES.map(function () { return 0; }); last = -1; byTags(0); });
+})();
+</script>
+<!-- /pvd-loader -->
 </body>
 </html>
