@@ -259,11 +259,14 @@
   //   畫布 > 1280 → 左塊貼左緣(x = VX + 16), 右塊貼右緣(右緣 = 1280 − VX − 16)且放在暫停 / 靜音按鈕下方(y = 靜音按鈕底 + 8 = 142)
   var HUD_BASE = { left: { w: 240, h: 80 }, right: { w: 220, h: 80 } };
   if (TOUCH) {
+    // v23 觸控: 暫停鈕放大 1.35 倍(48 → 64)並貼畫布實際右上角(右、上各留 16); 手機不畫靜音鈕, 右側 HUD 改接在暫停鈕下方
+    var pbs = Math.round(48 * HUD_S);
+    LAYOUT.pauseBtn = { x: EXR - 16 - pbs, y: 16, w: pbs, h: pbs };
     var hlw = Math.round(HUD_BASE.left.w * HUD_S), hlh = Math.round(HUD_BASE.left.h * HUD_S);
     var hrw = Math.round(HUD_BASE.right.w * HUD_S), hrh = Math.round(HUD_BASE.right.h * HUD_S);
     if (WIDE) {
       LAYOUT.hudLeft = { x: EX0 + 16, y: 20, w: hlw, h: hlh };
-      LAYOUT.hudRight = { x: EXR - 16 - hrw, y: LAYOUT.muteBtn.y + LAYOUT.muteBtn.h + 8, w: hrw, h: hrh };
+      LAYOUT.hudRight = { x: EXR - 16 - hrw, y: LAYOUT.pauseBtn.y + LAYOUT.pauseBtn.h + 8, w: hrw, h: hrh };
     } else {
       LAYOUT.hudLeft = { x: 20, y: 20, w: hlw, h: hlh };
       LAYOUT.hudRight = { x: LAYOUT.pauseBtn.x - 8 - hrw, y: 20, w: hrw, h: hrh };   // 右緣貼暫停按鈕左側 8(1198), 讓出右上光門的條件標示
@@ -1596,8 +1599,10 @@
   }
   // 48×48 小方鈕的版面(v21, 8 級距): 上內距 8、圖示 8~20、間距 8、字 28~40(12px)、下內距 8
   function drawPauseButton(ctx, state) {
-    var s = state || {}, t = theme(s.level), r = LAYOUT.pauseBtn;
+    var s = state || {}, t = theme(s.level), R = LAYOUT.pauseBtn, k = R.w / 48;
     ctx.save();
+    if (k !== 1) { ctx.translate(R.x, R.y); ctx.scale(k, k); ctx.translate(-R.x, -R.y); }   // v23 觸控放大: 以 48×48 版面整顆等比放大
+    var r = { x: R.x, y: R.y, w: 48, h: 48 };
     roundRect(ctx, r.x, r.y, r.w, r.h, 8); ctx.fillStyle = s.hover ? 'rgba(255,255,255,0.22)' : t.hudPlate; ctx.fill();
     ctx.lineWidth = 2; ctx.strokeStyle = s.hover ? '#ffffff' : rgba(t.ink, 0.45); ctx.stroke();
     ctx.fillStyle = t.ink;

@@ -17,7 +17,7 @@
 <script>
 // 載入進度條(由 game-studio-lab 發布流程產生, 改了遊戲檔要重新產生): FILES = [路徑, 未壓縮位元組]
 (function () {
-  var FILES = [["art/art.js", 116896], ["audio/sound.js", 5966056], ["game.js", 344598], ["touch.js", 19763]];
+  var FILES = [["art/art.js", 117375], ["audio/sound.js", 5966056], ["game.js", 344598], ["touch.js", 19763]];
   var total = 0, got = [], last = -1, i;
   for (i = 0; i < FILES.length; i++) { total += FILES[i][1]; got.push(0); }
   function post(msg) { try { if (window.parent && window.parent !== window) window.parent.postMessage(msg, location.origin); } catch (e) { /* file:// 開啟時略過 */ } }
