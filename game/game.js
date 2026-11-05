@@ -2794,6 +2794,7 @@
     }
     g.netHintT = 99; g.netFrom = null;
     g.maxLevel = newLvl;
+    if (window.PVDX) PVDX.levelClear(oldLvl);   // 單關通關: 過了舊的那關(換關每次只走一次)
     g.levelEnterSurv[newLvl] = g.surv;
     enterLevelStats(g, newLvl);
     var prevMax = parseInt(lsGetCompat(MAXLEVEL_KEY), 10) || 1;
@@ -4694,7 +4695,7 @@
     var ok = false;
     try { ok = finalizeAndDownload(g, reason); } catch (e) { ok = false; if (window.console) console.error(e); }
     endInfo = { time: g.surv, score: g.score, note: ok ? '紀錄已下載' : '紀錄下載失敗' };
-    if (window.PVDX) PVDX.finish();   // 一局結束(下載試玩紀錄的那一刻): 通知 PVD計畫網站
+    if (window.PVDX && reason === 'hpZero') PVDX.gameClear();   // 全局通關: 血量歸零出結算畫面才送, 重開與放棄不送
     lastGameEndWall = Date.now(); lsSet(LAST_END_KEY, String(lastGameEndWall));
     inputQueue = []; mouse.btn = false; mouse.press = null;
     if (reason === 'restart') { startNewGame(); }
