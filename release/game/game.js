@@ -101,8 +101,8 @@
 
   // 各關曲子設定一律從 Sound.getMusicInfo 讀入(實測 BPM、關長小節數 levelBars、循環 loop / loopBeats、曲檔、第一拍與關內第 0 拍在音檔中的位置、循環起訖); 程式不寫死拍速與關長。
   // 只有 Sound 載不進來(讀不到曲子設定)時才用緊急預設, 讓畫面不當掉並在 console 報錯; 正常載入一律走曲子設定。
-  var SONG_TITLES = { stage1: 'Voice Over Under', stage2: 'Cluster Block', stage3: 'Metallic Mistress' };
-  var EMERGENCY_MUSIC = [null, { bpm: 120, levelBars: 36, loop: false }, { bpm: 120, levelBars: 40, loop: false }, { bpm: 120, levelBars: 48, loop: true, loopBeats: 192 }];
+  var SONG_TITLES = { stage1: 'Voice Over Under', stage2: 'Litany to the Datastream Goddess', stage3: 'Thy Steel Consumed' };
+  var EMERGENCY_MUSIC = [null, { bpm: 120, levelBars: 36, loop: false }, { bpm: 120, levelBars: 40, loop: false }, { bpm: 120, levelBars: 48, loop: false }];
   function readMusicInfo(name, lvl) {
     var mi = null;
     try { mi = Sound.getMusicInfo(name); } catch (e) { logErr(e); }
@@ -274,8 +274,8 @@
   var CREDITS_LINES = [
     '音樂 / Music — Licensed under Creative Commons: By Attribution 4.0 / CC-BY 3.0',
     '第 1 關 "Voice Over Under" Kevin MacLeod (incompetech.com), CC BY 4.0, 已調速(135 → 105 BPM)並截取 / tempo changed and excerpted',
-    '第 2 關 "Cluster Block" by FoxSynergy (opengameart.org), CC-BY 3.0, 已調速(133 → 115 BPM)並截取 / tempo changed and excerpted',
-    '第 3 關 "Metallic Mistress" by FoxSynergy (opengameart.org), CC-BY 3.0, 已截取並循環 / excerpted and looped',
+    '第 2 關 "Litany to the Datastream Goddess" by FoxSynergy (opengameart.org), CC-BY 3.0, 已調速(128 → 115 BPM)並截取 / tempo changed and excerpted',
+    '第 3 關 "Thy Steel Consumed" by FoxSynergy (opengameart.org), CC-BY 3.0, 已調速(120 → 125 BPM)並截取 / tempo changed and excerpted',
     'creativecommons.org/licenses/by/4.0/  ·  creativecommons.org/licenses/by/3.0/'
   ];
 
