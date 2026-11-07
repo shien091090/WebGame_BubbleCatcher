@@ -250,7 +250,8 @@
     gameOver: {
       panel: { x: 400, y: 152, w: 480, h: 416 },
       again: { x: 448, y: 472, w: 184, h: 56 },
-      title: { x: 648, y: 472, w: 184, h: 56 }
+      title: { x: 648, y: 472, w: 184, h: 56 },
+      againClear: { x: 524, y: 456, w: 232, h: 64 }   // v24 過關畫面唯一的按鈕(標題下方)
     },
     credits: { x: 40, y: 604, w: 1200, h: 106 } // 署名可佔範圍(不可點), 與所有按鈕判定框不重疊
   };
@@ -1681,47 +1682,108 @@
     drawButton(ctx, t, b.start, '開始', s.hover === 'start', { primary: true, px: 26 });
     ctx.restore();
   }
-  // state: { survival, score, hover, cleared?(過完第 3 關), clearT?(過關後秒數), clearDur?(過場秒數, 預設 3) }
-  // 過關: 先播「恭喜過關」過場(不畫面板與按鈕), 過場結束才出結算面板, 標題改「恭喜過關」
+  // state: { survival, score, hover, cleared?(過完第 3 關), clearT?(過關後秒數), btnT?(「再玩一次」出現秒數, 預設 2.2) }
+  // 過關(v24 方案 C): 不出結算面板, 整個畫面就是過關過場, 收尾時在標題下方出「再玩一次」(LAYOUT.gameOver.againClear), 沒有回標題
   function drawGameOver(ctx, state) {
     var s = state || {}, t = THEMES[1], g = LAYOUT.gameOver;
-    if (s.cleared) {
-      var dur = num(s.clearDur, 3), ct = num(s.clearT, dur);
-      if (ct < dur) { drawClearTransition(ctx, ct, dur); return; }
-    }
+    if (s.cleared) { drawClearScene(ctx, num(s.clearT, 99), num(s.btnT, 2.2), s.hover === 'again'); return; }
     ctx.save();
     overlay(ctx, 0.62);
     panelBox(ctx, t, g.panel);
-    text(ctx, s.cleared ? '恭喜過關' : '結束', CX, g.panel.y + 64, 44, t.ink);
-    text(ctx, (s.cleared ? '過關時間 ' : '存活 ') + num(s.survival, 0).toFixed(1) + ' 秒', CX, g.panel.y + 152, 36, t.ink);
+    text(ctx, '結束', CX, g.panel.y + 64, 44, t.ink);
+    text(ctx, '存活 ' + num(s.survival, 0).toFixed(1) + ' 秒', CX, g.panel.y + 152, 36, t.ink);
     text(ctx, '分數 ' + Math.round(num(s.score, 0)), CX, g.panel.y + 208, 26, t.inkDim);
     drawButton(ctx, t, g.again, '再玩一次', s.hover === 'again', { primary: true });
     drawButton(ctx, t, g.title, '回標題', s.hover === 'title');
     ctx.restore();
   }
 
-  // 過關過場: 暗幕漸深 → 「恭喜過關」由大縮回定位並發光 → 四色光點由中央向外散開; 最後 0.4 秒淡出接結算面板
-  function drawClearTransition(ctx, ct, dur) {
-    var t = THEMES[3];
-    var cols = [t.colors.A, t.colors.B, t.colors.C, t.colors.D];
-    var fadeOut = ct > dur - 0.4 ? Math.max(0, (dur - ct) / 0.4) : 1;
-    ctx.save();
-    overlay(ctx, 0.62 * clamp01(ct / 0.5));
-    // 光點: 每色 6 顆, 沿固定角度向外飄, 越遠越淡
-    var sp = clamp01((ct - 0.3) / 1.8);
-    for (var i = 0; i < 24; i++) {
-      var ang = i / 24 * Math.PI * 2 + (i % 2) * 0.13, dist = 60 + sp * (220 + (i % 3) * 70);
-      ctx.globalAlpha = (1 - sp) * fadeOut * 0.9;
-      ctx.fillStyle = cols[i % 4];
-      ctx.beginPath(); ctx.arc(CX + Math.cos(ang) * dist, CY - 20 + Math.sin(ang) * dist * 0.62, 6 - sp * 3, 0, Math.PI * 2); ctx.fill();
+  // 過關過場(v24 方案 C「光門全開」): 8 道光門順時針逐一點亮(四色輪流) → 1.2 秒全亮閃白 + 兩道衝擊波, 光門轉白脈動、背後放射光芒慢轉、
+  //   餘燼往上飄 → 標題「恭喜過關」由下升起, 一道白光掃過 → btnT 秒在標題下方淡入「再玩一次」。之後停在這個畫面(光芒與餘燼持續動)
+  var CLEAR_FX = { allT: 1.2, gateStep: 0.13, titlePx: 120, embers: null, off: null };
+  function clearEase(v) { v = clamp01(v); return 1 - (1 - v) * (1 - v) * (1 - v); }
+  function clearTitle(c, str, x, y, px) {
+    c.save();
+    c.font = '900 ' + px + 'px ' + FONT; c.textAlign = 'center'; c.textBaseline = 'middle'; c.lineJoin = 'round';
+    c.shadowColor = '#ffffff'; c.shadowBlur = 26;
+    c.lineWidth = Math.round(px * 0.16); c.strokeStyle = '#120a20'; c.strokeText(str, x, y);
+    c.shadowBlur = 0;
+    var gr = c.createLinearGradient(0, y - px / 2, 0, y + px / 2);
+    gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.55, '#fff6dd'); gr.addColorStop(1, '#ffcf6a');
+    c.fillStyle = gr; c.fillText(str, x, y);
+    c.restore();
+  }
+  function drawClearScene(ctx, ct, btnT, hover) {
+    var T3 = THEMES[3], C4 = [T3.colors.A, T3.colors.B, T3.colors.C, '#c25ae0'], BEAT3 = T3.beat, EMB = T3.ember, F = CLEAR_FX, ALL = F.allT, i;
+    if (!F.embers) { F.embers = []; for (i = 0; i < 70; i++) F.embers.push({ x: CX + (((i * 97) % 130) / 130 - 0.5) * 1300, t0: ((i * 53) % 90) / 20, v: 40 + ((i * 31) % 70), s: 1 + ((i * 17) % 22) / 10, ph: i * 1.7 }); }
+    var V = [];
+    for (i = 0; i < 8; i++) { var va = Math.PI / 8 + i * OCT - Math.PI / 2; V.push([CX + WALL_R * Math.cos(va), CY + WALL_R * Math.sin(va)]); }
+    function edge(k, col, w, a, blur) {
+      var p0 = V[k], p1 = V[(k + 1) % 8];
+      ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = col; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.shadowColor = col; ctx.shadowBlur = blur;
+      ctx.beginPath(); ctx.moveTo(p0[0], p0[1]); ctx.lineTo(p1[0], p1[1]); ctx.stroke(); ctx.restore();
     }
-    // 標題: 0~0.45 秒由 1.6 倍縮回 1 倍並淡入
-    var ip = clamp01(ct / 0.45), e = 1 - (1 - ip) * (1 - ip), sc = 1.6 - 0.6 * e;
-    ctx.globalAlpha = e * fadeOut;
-    ctx.translate(CX, CY - 20); ctx.scale(sc, sc);
-    ctx.shadowColor = t.beat; ctx.shadowBlur = 24;
-    text(ctx, '恭喜過關', 0, 0, 72, '#ffffff');
-    ctx.shadowBlur = 0;
+    function ringAt(r, w, col, a) { if (a <= 0 || r <= 0) return; ctx.save(); ctx.globalAlpha = a; ctx.strokeStyle = col; ctx.lineWidth = w; ctx.beginPath(); ctx.arc(CX, CY, r, 0, TAU); ctx.stroke(); ctx.restore(); }
+    ctx.save();
+    overlay(ctx, 0.45 * clamp01(ct / 0.3) + 0.15 * clamp01((ct - ALL) / 0.4));
+    // 放射光芒
+    if (ct > ALL) {
+      var q = clamp01((ct - ALL) / 0.5);
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(CX, CY); ctx.rotate((ct - ALL) * 0.25);
+      for (i = 0; i < 18; i++) {
+        var a0 = i / 18 * TAU, rc = i % 2 ? EMB : BEAT3, rg = ctx.createRadialGradient(0, 0, 60, 0, 0, 900);
+        rg.addColorStop(0, rgba(rc, 0.22 * q)); rg.addColorStop(1, rgba(rc, 0));
+        ctx.fillStyle = rg; ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 900, a0, a0 + 0.09); ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
+    // 光門逐一點亮 → 全亮轉白脈動
+    for (var k = 0; k < 8; k++) {
+      var lt = ct - (0.1 + k * F.gateStep); if (lt < 0) continue;
+      if (ct < ALL) { edge(k, C4[k % 4], 9, 1, 26); if (lt < 0.2) edge(k, '#ffffff', 16, 1 - lt / 0.2, 40); }
+      else { var pul = 0.5 + 0.5 * Math.sin((ct - ALL) * 9); edge(k, C4[k % 4], 10, 1, 30); edge(k, '#ffffff', 4 + pul * 3, 0.85, 30); }
+    }
+    var hit = ct - ALL;
+    if (hit > 0 && hit < 0.45) { ctx.fillStyle = 'rgba(255,255,255,' + (0.6 * (1 - hit / 0.45)) + ')'; ctx.fillRect(EX0, 0, EXW, H); }
+    if (hit > 0) {
+      ringAt(WALL_R + clearEase(hit) * 600, 10 * (1 - clamp01(hit)) + 1, '#ffffff', 0.8 * (1 - clamp01(hit)));
+      ringAt(WALL_R + clearEase(hit - 0.15) * 600, 6 * (1 - clamp01(hit)) + 1, BEAT3, 0.7 * (1 - clamp01(hit - 0.15)));
+    }
+    // 餘燼
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.fillStyle = EMB;
+    for (i = 0; i < F.embers.length; i++) {
+      var e = F.embers[i], el = (ct - e.t0 + 4.5) % 4.5;
+      ctx.globalAlpha = 0.75 * clamp01(el / 0.4) * clamp01(ct / 0.5);
+      ctx.beginPath(); ctx.arc(e.x + Math.sin(el * 2 + e.ph) * 14, H + 10 - el * e.v * 2.2, e.s, 0, TAU); ctx.fill();
+    }
+    ctx.restore();
+    // 標題升起 + 白光掃過(先畫在離屏畫布上, 掃光只落在字上)
+    if (ct > ALL + 0.05) {
+      if (!F.off) { F.off = document.createElement('canvas'); F.off.width = 900; F.off.height = 220; }
+      var oc = F.off.getContext('2d'), p = clamp01((ct - ALL - 0.05) / 0.45);
+      oc.clearRect(0, 0, 900, 220);
+      clearTitle(oc, '恭喜過關', 450, 110, F.titlePx);
+      var sx = -300 + clamp01((ct - ALL - 0.4) / 0.7) * 1500;
+      oc.save(); oc.globalCompositeOperation = 'source-atop';
+      var sg = oc.createLinearGradient(sx - 120, 0, sx + 120, 0);
+      sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(0.5, 'rgba(255,255,255,0.95)'); sg.addColorStop(1, 'rgba(255,255,255,0)');
+      oc.fillStyle = sg; oc.transform(1, 0, -0.35, 1, 0, 0); oc.fillRect(sx - 120, 0, 320, 220); oc.restore();
+      ctx.save(); ctx.globalAlpha = clearEase(p); ctx.drawImage(F.off, CX - 450, CY - 130 + (1 - clearEase(p)) * 70); ctx.restore();
+    }
+    // 「再玩一次」: 判定框固定在 LAYOUT.gameOver.againClear, 淡入時往上滑 24
+    var bp = clamp01((ct - btnT) / 0.35);
+    if (bp > 0) {
+      var R = LAYOUT.gameOver.againClear, by = R.y + (1 - clearEase(bp)) * 24;
+      ctx.save(); ctx.globalAlpha = clearEase(bp);
+      ctx.shadowColor = BEAT3; ctx.shadowBlur = hover ? 30 : 18;
+      roundRect(ctx, R.x, by, R.w, R.h, 10);
+      var bg = ctx.createLinearGradient(0, by, 0, by + R.h);
+      bg.addColorStop(0, hover ? '#ffffff' : '#fff6dd'); bg.addColorStop(1, hover ? '#ffe39a' : '#ffcf6a');
+      ctx.fillStyle = bg; ctx.fill(); ctx.shadowBlur = 0;
+      ctx.lineWidth = hover ? 3 : 2; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+      text(ctx, '再玩一次', CX, by + R.h / 2 + 1, 26, '#1a1020');
+      ctx.restore();
+    }
     ctx.restore();
   }
 

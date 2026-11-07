@@ -4821,12 +4821,12 @@
     if (inRect(p.x, p.y, m.quit)) return 'quit';
     return null;
   }
-  // 過關過場(恭喜過關)的秒數; 過場中結算面板還沒出來, 按鈕不能按
-  var CLEAR_TRANSITION_SEC = 3;
+  // 過關畫面(v24 方案 C): 「再玩一次」在過關後第幾秒出現; 出現前按不到, 過關畫面沒有回標題
+  var CLEAR_BTN_SEC = 2.2;
   function endClearT() { return endInfo && endInfo.cleared ? (Date.now() - endInfo.wall0) / 1000 : null; }
   function endLocate(p) {
     var ct = endClearT();
-    if (ct != null && ct < CLEAR_TRANSITION_SEC) return null;
+    if (ct != null) return (ct >= CLEAR_BTN_SEC && inRect(p.x, p.y, L.gameOver.againClear)) ? 'again' : null;
     if (inRect(p.x, p.y, L.gameOver.again)) return 'again';
     if (inRect(p.x, p.y, L.gameOver.title)) return 'title';
     return null;
@@ -5100,7 +5100,7 @@
     } else if (screen === SCREEN.END) {
       if (game) renderGame(game, true, true);
       var ctD = endClearT();
-      Art.drawGameOver(ctx, { survival: endInfo ? endInfo.time : 0, score: endInfo ? endInfo.score : 0, hover: hov.end, cleared: ctD != null, clearT: ctD, clearDur: CLEAR_TRANSITION_SEC });
+      Art.drawGameOver(ctx, { survival: endInfo ? endInfo.time : 0, score: endInfo ? endInfo.score : 0, hover: hov.end, cleared: ctD != null, clearT: ctD, btnT: CLEAR_BTN_SEC });
       Art.drawCredits(ctx, { lines: CREDITS_LINES });
       drawMute({ level: 1, corner: true, hover: hov.muteBtn, muted: muted });
     }
