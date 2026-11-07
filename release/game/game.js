@@ -124,7 +124,7 @@
     lv.beatSec = 60 / lv.bpm;                         // 每拍秒數
     lv.bars = u.levelBars;                            // 關長小節數(第 3 首為一輪)
     lv.loopBeats = u.loop ? (u.loopBeats || u.levelBars * 4) : u.levelBars * 4;
-    lv.endBeat = u.loop ? null : u.levelBars * 4;     // 第 1、2 關關末拍(第 3 關循環沒有關末)
+    lv.endBeat = u.levelBars * 4;                     // 關末拍(第 3 關曲檔可循環, 但播完一輪就過關結束)
     lv.levelSec = u.levelBars * 240 / lv.bpm;         // 關長秒數(第 3 關為一輪)
     lv.title = SONG_TITLES[lv.music];
   });
@@ -2625,10 +2625,10 @@
     if (eb != null && k >= eb && g.net && g.net.misread && g.net.misread.pending) cancelMisread(g, '關末', g.net);
     if (!g.curBack && k >= pb) segmentSwitch(g);
     if (g.lvl === 3) {
-      // 輪轉: 第 8、16、24、… 拍, 循環不設上限; 預告 = 輪轉前 3 拍
+      // 輪轉: 第 8、16、24、… 拍, 關末拍(過關)本身不轉也不預告; 預告 = 輪轉前 3 拍
       var kr = k + PARAMS.rotatePreviewBeats;
-      if (kr % PARAMS.rotateEveryBeats === 0 && kr >= PARAMS.rotateEveryBeats) startRotatePreview(g, kr);
-      if (k >= PARAMS.rotateEveryBeats && k % PARAMS.rotateEveryBeats === 0) doRotate(g, k);
+      if (kr % PARAMS.rotateEveryBeats === 0 && kr >= PARAMS.rotateEveryBeats && kr < eb) startRotatePreview(g, kr);
+      if (k >= PARAMS.rotateEveryBeats && k % PARAMS.rotateEveryBeats === 0 && k < eb) doRotate(g, k);
     } else if (g.lvl === 2) {
       // 跳位: 第 8、16、…、152 拍(第 160 拍關末不跳, 第 159 拍不預告); 預告 = 跳位前 1 拍
       var kj = k + PARAMS.jumpPreviewBeats;
@@ -3016,8 +3016,11 @@
     var guard = 0;
     while (g.sampleAcc >= PARAMS.sampleIntervalSec && guard < 10) { g.sampleAcc -= PARAMS.sampleIntervalSec; emitSample(g); guard++; }
 
-    // 7. 換關(含血量回滿, 在關末那一幀血量結算之後)
-    if (g.endFrame) changeLevel(g);
+    // 7. 換關(含血量回滿, 在關末那一幀血量結算之後); 第 3 關關末 = 過關, 這局結束
+    if (g.endFrame) {
+      if (g.lvl < 3) changeLevel(g);
+      else { endGame('cleared'); return; }
+    }
     // 8. 危險狀態: 以本幀第 1~7 步(含換關回滿)全部完成後的血量判進入 / 解除, 每幀只判一次
     updateDanger(g);
   }
@@ -4605,11 +4608,13 @@
       g.deathReasons = uq;
     } else if (reason === 'restart') g.deathReasons = ['重開'];
     else if (reason === 'quit') g.deathReasons = ['放棄'];
+    else if (reason === 'cleared') g.deathReasons = ['過關'];
     else g.deathReasons = [reason];
     try { Sound.stopMusic(); } catch (e) { logErr(e); }
+    if (reason === 'cleared') snd('stageChange');
     try { finalizeRun(g, reason); } catch (e) { if (window.console) console.error(e); }
-    endInfo = { time: g.surv, score: g.score };
-    if (window.PVDX && reason === 'hpZero') PVDX.gameClear();   // 全局通關: 血量歸零出結算畫面才送, 重開與放棄不送
+    endInfo = { time: g.surv, score: g.score, cleared: reason === 'cleared', wall0: Date.now() };
+    if (window.PVDX && reason === 'cleared') { PVDX.levelClear(3); PVDX.gameClear(); }   // 過完第 3 關: 單關通關 3 + 全局通關; 死掉、重開、放棄都不送
     lastGameEndWall = Date.now(); lsSet(LAST_END_KEY, String(lastGameEndWall));
     inputQueue = []; mouse.btn = false; mouse.press = null;
     if (reason === 'restart') { startNewGame(); }
@@ -4816,7 +4821,12 @@
     if (inRect(p.x, p.y, m.quit)) return 'quit';
     return null;
   }
+  // 過關過場(恭喜過關)的秒數; 過場中結算面板還沒出來, 按鈕不能按
+  var CLEAR_TRANSITION_SEC = 3;
+  function endClearT() { return endInfo && endInfo.cleared ? (Date.now() - endInfo.wall0) / 1000 : null; }
   function endLocate(p) {
+    var ct = endClearT();
+    if (ct != null && ct < CLEAR_TRANSITION_SEC) return null;
     if (inRect(p.x, p.y, L.gameOver.again)) return 'again';
     if (inRect(p.x, p.y, L.gameOver.title)) return 'title';
     return null;
@@ -5089,7 +5099,8 @@
       drawMute({ level: game.lvl, hover: hov.muteBtn, muted: muted });
     } else if (screen === SCREEN.END) {
       if (game) renderGame(game, true, true);
-      Art.drawGameOver(ctx, { survival: endInfo ? endInfo.time : 0, score: endInfo ? endInfo.score : 0, hover: hov.end });
+      var ctD = endClearT();
+      Art.drawGameOver(ctx, { survival: endInfo ? endInfo.time : 0, score: endInfo ? endInfo.score : 0, hover: hov.end, cleared: ctD != null, clearT: ctD, clearDur: CLEAR_TRANSITION_SEC });
       Art.drawCredits(ctx, { lines: CREDITS_LINES });
       drawMute({ level: 1, corner: true, hover: hov.muteBtn, muted: muted });
     }

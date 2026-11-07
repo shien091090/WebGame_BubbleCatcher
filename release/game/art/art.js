@@ -1681,16 +1681,47 @@
     drawButton(ctx, t, b.start, '開始', s.hover === 'start', { primary: true, px: 26 });
     ctx.restore();
   }
+  // state: { survival, score, hover, cleared?(過完第 3 關), clearT?(過關後秒數), clearDur?(過場秒數, 預設 3) }
+  // 過關: 先播「恭喜過關」過場(不畫面板與按鈕), 過場結束才出結算面板, 標題改「恭喜過關」
   function drawGameOver(ctx, state) {
     var s = state || {}, t = THEMES[1], g = LAYOUT.gameOver;
+    if (s.cleared) {
+      var dur = num(s.clearDur, 3), ct = num(s.clearT, dur);
+      if (ct < dur) { drawClearTransition(ctx, ct, dur); return; }
+    }
     ctx.save();
     overlay(ctx, 0.62);
     panelBox(ctx, t, g.panel);
-    text(ctx, '結束', CX, g.panel.y + 64, 44, t.ink);
-    text(ctx, '存活 ' + num(s.survival, 0).toFixed(1) + ' 秒', CX, g.panel.y + 152, 36, t.ink);
+    text(ctx, s.cleared ? '恭喜過關' : '結束', CX, g.panel.y + 64, 44, t.ink);
+    text(ctx, (s.cleared ? '過關時間 ' : '存活 ') + num(s.survival, 0).toFixed(1) + ' 秒', CX, g.panel.y + 152, 36, t.ink);
     text(ctx, '分數 ' + Math.round(num(s.score, 0)), CX, g.panel.y + 208, 26, t.inkDim);
     drawButton(ctx, t, g.again, '再玩一次', s.hover === 'again', { primary: true });
     drawButton(ctx, t, g.title, '回標題', s.hover === 'title');
+    ctx.restore();
+  }
+
+  // 過關過場: 暗幕漸深 → 「恭喜過關」由大縮回定位並發光 → 四色光點由中央向外散開; 最後 0.4 秒淡出接結算面板
+  function drawClearTransition(ctx, ct, dur) {
+    var t = THEMES[3];
+    var cols = [t.colors.A, t.colors.B, t.colors.C, t.colors.D];
+    var fadeOut = ct > dur - 0.4 ? Math.max(0, (dur - ct) / 0.4) : 1;
+    ctx.save();
+    overlay(ctx, 0.62 * clamp01(ct / 0.5));
+    // 光點: 每色 6 顆, 沿固定角度向外飄, 越遠越淡
+    var sp = clamp01((ct - 0.3) / 1.8);
+    for (var i = 0; i < 24; i++) {
+      var ang = i / 24 * Math.PI * 2 + (i % 2) * 0.13, dist = 60 + sp * (220 + (i % 3) * 70);
+      ctx.globalAlpha = (1 - sp) * fadeOut * 0.9;
+      ctx.fillStyle = cols[i % 4];
+      ctx.beginPath(); ctx.arc(CX + Math.cos(ang) * dist, CY - 20 + Math.sin(ang) * dist * 0.62, 6 - sp * 3, 0, Math.PI * 2); ctx.fill();
+    }
+    // 標題: 0~0.45 秒由 1.6 倍縮回 1 倍並淡入
+    var ip = clamp01(ct / 0.45), e = 1 - (1 - ip) * (1 - ip), sc = 1.6 - 0.6 * e;
+    ctx.globalAlpha = e * fadeOut;
+    ctx.translate(CX, CY - 20); ctx.scale(sc, sc);
+    ctx.shadowColor = t.beat; ctx.shadowBlur = 24;
+    text(ctx, '恭喜過關', 0, 0, 72, '#ffffff');
+    ctx.shadowBlur = 0;
     ctx.restore();
   }
 
