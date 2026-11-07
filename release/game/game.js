@@ -72,6 +72,7 @@
     gapBeatPoint: 2,                      // 批間等待: 嚴格晚於本批清完那一刻的第 2 個拍點
     autoSwapBeatPoint: 2,                 // 自動換位: 嚴格晚於卡住成立那一刻的第 2 個拍點
     rotateEveryBeats: 8, rotatePreviewBeats: 3,          // 第 3 關地板輪轉(循環不設上限)
+    l2Jump: false,                                         // v25 使用者決定移除第 2 關光門跳位; 關掉後第 2 關改用第 1、3 關的卡住自動換位與看錯保底
     jumpEveryBeats: 8, jumpPreviewBeats: 1, jumpLastBeat: null,   // 第 2 關光門跳位(關末拍不跳, 關末前 1 拍不預告); 最後一次跳位拍 = 關末拍 − 8, 由曲子設定的關長推算(見 LEVELS 之後)
     formationMaxR: 180 * SC, formationFloorMin: 48 * SC, formationGap: 44 * SC,
     spawnGap: 4, spawnTries: 10, spawnFxSec: 0.3,
@@ -79,7 +80,7 @@
     scoreBase: 10, comboBonusPerStreak: 0.1, comboStreakCap: 20,
     sampleIntervalSec: 1.0,
     relPassWindowMs: 150,
-    drain: { l1f: 3.2, l1b: 3.8, l2f: 4.6, l2b: 5.2, l3base: 5.2, l3perSec: 0.032 },
+    drain: { l1f: 3.2, l1b: 3.8, l2f: 4.6, l2b: 5.2, l3base: 4.8, l3perSec: 0.008 },   // v25 第 3 關太難: 原 5.2 + 0.032 × 秒(關末約 8.1)
     shapeProb: { l2f: 0.25, l2b: 0.4, l3: 0.4 },
     levelIntroSec: 2.4,
     structCost: { rotate: 0.20, jump: 0.19 },             // 第 3 關撞上輪轉 0.20 秒 / 第 2 關撞上跳位 0.19 秒
@@ -113,7 +114,7 @@
   }
   var LEVELS = [null,
     { n: 1, music: 'stage1', N: [4, 5], drain: [3.2, 3.8], feature: '無' },
-    { n: 2, music: 'stage2', N: [5, 6], drain: [4.6, 5.2], feature: '光門跳位' },
+    { n: 2, music: 'stage2', N: [5, 6], drain: [4.6, 5.2], feature: '無(v25 移除光門跳位)' },
     { n: 3, music: 'stage3', N: [6, 6], drain: null, feature: '地板輪轉' }
   ];
   LEVELS.forEach(function (lv, i) {
@@ -808,7 +809,8 @@
   //   取消: 這張網被捕捉、本關到達關末、換關; 與卡住同時成立只執行卡住(讓給卡住)。換上來的是新的一張網: 不是保底張、不用掉保底、不扣血不加分不改連續數
   //   秒數用局時間(g.gt)差, 暫停、預備拍、形狀說明對話框開著時 g.gt 都不走
   // ==================================================================
-  function misreadN(lvl) { return lvl === 2 ? PARAMS.misread.l2Sec : PARAMS.misread.l13Sec; }
+  function isJumpLvl(lvl) { return lvl === 2 && PARAMS.l2Jump; }   // 這關有沒有光門跳位(v25 起都沒有)
+  function misreadN(lvl) { return isJumpLvl(lvl) ? PARAMS.misread.l2Sec : PARAMS.misread.l13Sec; }
   function noteMisread(g, kind, atLT) {
     var net = g.net;
     if (!net || net.closed || g.phase !== 'playing') return;
@@ -824,12 +826,12 @@
     if (g.gt - net.appearGT < N - 1e-9) return;
     var estGT = Math.min(g.gt, Math.max(net.misSecondGT == null ? g.gt : net.misSecondGT, net.appearGT + N));
     var estLT = g.lt - (g.gt - estGT);
-    var sched = g.lvl !== 2 ? Math.floor(estLT / g.bs + 1e-9) + PARAMS.misread.l13BeatPoint : null;
-    var nextJump = g.lvl === 2 ? (Math.floor(estLT / g.bs / PARAMS.jumpEveryBeats + 1e-9) + 1) * PARAMS.jumpEveryBeats : null;
+    var sched = !isJumpLvl(g.lvl) ? Math.floor(estLT / g.bs + 1e-9) + PARAMS.misread.l13BeatPoint : null;
+    var nextJump = isJumpLvl(g.lvl) ? (Math.floor(estLT / g.bs / PARAMS.jumpEveryBeats + 1e-9) + 1) * PARAMS.jumpEveryBeats : null;
     var rec = emit(g, 'misread', {
       netSeq: net.seq, netLevelSeq: net.levelSeq, slotId: slotByNo(net.slot).id, oldCondition: { color: net.cond.color, shape: net.cond.shape },
       establishedMs: Math.round(estGT * 1000), litSecAtEstablish: r3(estGT - net.appearGT), thresholdSec: N, missDuring: net.misMiss, bounceDuring: net.misBounce,
-      scheduledBeat: sched, nextJumpBeatIfNoLaterChange: nextJump, executeRule: g.lvl === 2 ? '成立後的下一次跳位' : '嚴格晚於成立的第 2 個拍點',
+      scheduledBeat: sched, nextJumpBeatIfNoLaterChange: nextJump, executeRule: isJumpLvl(g.lvl) ? '成立後的下一次跳位' : '嚴格晚於成立的第 2 個拍點',
       deferrals: 0, outcome: null, execMs: null, execBeat: null, cancelReason: null, newCondition: null, forcedOldColor: null, newNetSeq: null, afterExecToCaptureSec: null
     }, estLT);
     net.misread = { pending: true, rec: rec, scheduledBeat: sched, deferrals: 0 };
@@ -1528,7 +1530,7 @@
   }
   // 第 2 關跳位預告中: 跳位前 1 拍(第 k − 1 拍), k = 8 的倍數、>= 8、<= 152(第 159 拍不預告)
   function inJumpCue(g) {
-    if (g.lvl !== 2 || g.phase !== 'playing') return false;
+    if (!isJumpLvl(g.lvl) || g.phase !== 'playing') return false;
     var beat = g.lt / g.bs, k = Math.ceil(beat / PARAMS.jumpEveryBeats - 1e-9) * PARAMS.jumpEveryBeats;
     if (k < PARAMS.jumpEveryBeats) k = PARAMS.jumpEveryBeats;
     return k <= PARAMS.jumpLastBeat && beat >= k - PARAMS.jumpPreviewBeats && beat < k;
@@ -2629,15 +2631,15 @@
       var kr = k + PARAMS.rotatePreviewBeats;
       if (kr % PARAMS.rotateEveryBeats === 0 && kr >= PARAMS.rotateEveryBeats && kr < eb) startRotatePreview(g, kr);
       if (k >= PARAMS.rotateEveryBeats && k % PARAMS.rotateEveryBeats === 0 && k < eb) doRotate(g, k);
-    } else if (g.lvl === 2) {
+    } else if (isJumpLvl(g.lvl)) {
       // 跳位: 第 8、16、…、152 拍(第 160 拍關末不跳, 第 159 拍不預告); 預告 = 跳位前 1 拍
       var kj = k + PARAMS.jumpPreviewBeats;
       if (kj % PARAMS.jumpEveryBeats === 0 && kj >= PARAMS.jumpEveryBeats && kj <= PARAMS.jumpLastBeat) startJumpPreview(g, kj);
       if (k >= PARAMS.jumpEveryBeats && k % PARAMS.jumpEveryBeats === 0 && k <= PARAMS.jumpLastBeat) doJump(g, k);
     }
-    if (g.lvl !== 2 && !g.endFrame && g.stuck && g.stuck.scheduledBeat != null && k >= g.stuck.scheduledBeat) autoSwapNow(g, k);
+    if (!isJumpLvl(g.lvl) && !g.endFrame && g.stuck && g.stuck.scheduledBeat != null && k >= g.stuck.scheduledBeat) autoSwapNow(g, k);
     // 到時的看錯保底(第 1、3 關; 第 2 關併入跳位): 排在自動換位之後, 與卡住同時成立時讓給卡住
-    if (g.lvl !== 2 && !g.endFrame && g.net && g.net.misread && g.net.misread.pending && k >= g.net.misread.scheduledBeat) misreadSwapNow(g, k);
+    if (!isJumpLvl(g.lvl) && !g.endFrame && g.net && g.net.misread && g.net.misread.pending && k >= g.net.misread.scheduledBeat) misreadSwapNow(g, k);
   }
 
   // ==================================================================
@@ -2654,11 +2656,11 @@
       var bs = g.bs, beat = g.lt / bs;
       g.stuckSeq++;
       // 第 1、3 關: 嚴格晚於卡住成立那一刻的第 2 個拍點自動換位; 第 2 關沒有獨立的自動換位, 等下一次跳位(第 152 拍之後不再跳, 只能等換關)
-      var sched = g.lvl !== 2 ? Math.floor(beat + 1e-9) + PARAMS.autoSwapBeatPoint : (Math.floor(beat / PARAMS.jumpEveryBeats + 1e-9) + 1) * PARAMS.jumpEveryBeats;
+      var sched = !isJumpLvl(g.lvl) ? Math.floor(beat + 1e-9) + PARAMS.autoSwapBeatPoint : (Math.floor(beat / PARAMS.jumpEveryBeats + 1e-9) + 1) * PARAMS.jumpEveryBeats;
       g.stuck = {
         seq: g.stuckSeq, batchSeq: g.batchSeq, startGT: g.gt, startLT: g.lt, cause: g.stuckHint, countAtStart: cnt, bubbles: stuckBubbleList(g),
-        netSeq: g.net.seq, condition: { color: g.net.cond.color, shape: g.net.cond.shape }, scheduledBeat: g.lvl !== 2 ? sched : null, nextJumpBeat: g.lvl === 2 ? sched : null,
-        startedAfterLastJump: g.lvl === 2 ? beat >= PARAMS.jumpLastBeat : null,
+        netSeq: g.net.seq, condition: { color: g.net.cond.color, shape: g.net.cond.shape }, scheduledBeat: !isJumpLvl(g.lvl) ? sched : null, nextJumpBeat: isJumpLvl(g.lvl) ? sched : null,
+        startedAfterLastJump: isJumpLvl(g.lvl) ? beat >= PARAMS.jumpLastBeat : null,
         waveStates: [], expiredDuring: false
       };
       g.levelStats[g.lvl].stuckSegs++;
