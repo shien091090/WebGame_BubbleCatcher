@@ -231,7 +231,7 @@
 | 靜音按鈕 | `drawMuteButton(ctx, state)` | `level`, `hover`, `muted`, **`corner`(v21, bool)** | 有聲 = 該關 HUD 深底板 + ink 喇叭與兩道聲波 + 「靜音」; **靜音中(v21)= 更深的底 + inkDim 框與喇叭 + ink 叉 + 「靜音中」, 不用危險紅**; hover = 白框 + 亮底。`corner: true` 畫在 `Art.layout.muteBtnCorner`(中心 (1230,50), 開始與結束畫面), 否則畫在 `Art.layout.muteBtn`(中心 (1230,110)) |
 | 暫停選單 | `drawPauseMenu(ctx, state)` | `level`, `hover`('resume' / 'restart' / 'quit') | 壓暗 + 面板 + 「繼續」(rim 色實心主按鈕)、「重開」、「放棄」三顆。v21 版位改 8 級距 |
 | **確認面板(v21 新增)** | **`drawConfirm(ctx, state)`** | `kind`('restart' / 'quit'), `hover`('yes' / 'no' / null), `level` | 再壓暗一層 + 面板 + 問句「確定重開?」/「確定放棄?」(30px)+ 一行後果說明(16px, inkDim)+ 「確定」(深底 + 4 粗 rim 框 + rim 斜紋 + rim 色字, hover 時框與字變白、斜紋變亮)+ 「取消」(rim 色實心主按鈕, 跟「繼續」同一種: 安全選項)。不用危險紅; 面板在畫面中央, 不碰右上暫停 / 靜音按鈕 |
-| 開始畫面 | `drawTitle(ctx, state)` | `hover`('start' / null) | 林間背景 + 4 顆裝飾氣泡(用第 1 關新色 A / C / B)+ 標題字 + 副標 + 只有「開始」一顆(rim 色實心主按鈕)。靜音按鈕由 RD 另外呼叫 `drawMuteButton({level:1, corner:true, ...})` 疊在上面 |
+| 開始畫面 | `drawTitle(ctx, state)` | `t`(秒, 進入開始畫面起算, 網站暫停凍結) | v26(第二版): 不放標題文字、沒有按鈕、不演玩法。林間背景 + 主視覺動畫(構圖照發佈橫幅): 深色橢圓舞台(中心 (640,330), 半徑 560 × 196)上橫排五顆放大的 drawBubble, x = 260 / 450 / 640 / 830 / 1020、y = 318, 左起 色 D 綠圓(外緣半徑 50)/ 色 B 黃方(56)/ 色 A 紫圓(80, 正中)/ 色 C 藍三角(56)/ 空心玻璃圓(50); 正中那顆外圍拍子色(#3ff0d8)光暈 + 4 圈同心光環。進場 1.2 秒由中間往兩側彈出; 之後 105 BPM、8 拍一圈無縫循環: 每拍正中鼓一下 + 往外推青色漣漪(小節第 1 拍加亮)、第 2/4 拍內側一對跳、第 3 拍外側一對跳、五顆慢漂、舞台內小玻璃泡上飄 + 底部小字「按任意按鍵開始遊戲」/ 觸控「點擊畫面開始遊戲」(y = 596)。靜音按鈕由 RD 另外呼叫 `drawMuteButton({level:1, corner:true, ...})` 疊在上面 |
 | 結束畫面 | `drawGameOver(ctx, state)` | `survival`, `score`, `hover`('again' / 'title') | 同 v19, v21 版位改 8 級距; 靜音按鈕同開始畫面(`corner: true`, `level: 1`) |
 | 背景音樂署名 | `drawCredits(ctx, state)` | `lines`(字串陣列), `y?` | 同 v19 |
 | 拍子時鐘、背景音樂、教學進度 | 不畫 | — | 非視覺物件(教學進度由 RD 管, 美術只畫目前那一個) |

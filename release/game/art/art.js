@@ -8,6 +8,7 @@
  *      新增確認面板 drawConfirm 與靜音按鈕角落位置(layout.muteBtnCorner)。
  * v22: 手機版放大(只在觸控模式; 電腦版畫面與數值完全不變): 內圈 240、網牆邊中點 285、地板環 170、地板 32 / 27、氣泡 28(含回饋整組 ×1.4)、
  *      光門條件標示 ×1.5、HUD ×1.35(寬畫面移到兩側)、寬畫面時背景與壓暗畫滿整個畫布。新增匯出 Art.geom、Art.layout.slots / arena / hpTop。
+ * v26: 開始畫面重新設計(drawTitle): 不放標題文字, 主體改為主視覺動畫(橫幅構圖的五顆大氣泡 + 青色拍子光環, 8 拍無縫循環)+ 底部一行「按任意按鍵開始遊戲」小字; 拿掉「開始」按鈕。
  * 只負責「給狀態就畫」, 不算規則、不管輸入。每個函式自己 save / restore。
  */
 (function () {
@@ -232,9 +233,7 @@
     // v21: 開始與結束畫面的靜音按鈕放在右上角最角落(= 暫停按鈕的位置, 中心 (1230,50))
     muteBtnCorner: { x: 1206, y: 26, w: 48, h: 48 },
     // v21: 按鈕與面板的內距 / 間距改 8 的倍數級距(8 / 16 / 24 / 32 / 40 / 48 / 56)
-    title: {
-      start: { x: 536, y: 392, w: 208, h: 56 }
-    },
+    title: {},   // v26: 開始畫面不再有「開始」按鈕(任意鍵 / 點擊畫面任一處開始), 只剩右上角靜音按鈕(muteBtnCorner)
     pauseMenu: {
       panel: { x: 464, y: 208, w: 352, h: 304 },
       resume: { x: 520, y: 288, w: 240, h: 56 },
@@ -1670,16 +1669,109 @@
     drawButton(ctx, t, c.no, '取消', s.hover === 'no', { primary: true });
     ctx.restore();
   }
+  // v26 開始畫面(第二版): 不放任何標題文字、不演玩法。主體 = 一段主視覺動畫, 構圖照發佈橫幅(release/assets/banner.png):
+  //   林間背景 + 中央一塊深色橢圓舞台 + 橫排五顆大氣泡(左起 色 D 綠圓 / 色 B 黃方 / 色 A 紫圓(最大, 正中) / 色 C 藍三角 / 空心玻璃圓),
+  //   正中那顆外圍一圈拍子色(青)光暈與光環。氣泡直接用遊戲裡的 drawBubble 放大畫(同一套立體漸層、高光、壽命環、落影)。
+  //   進場 0 ~ 1.2 秒: 舞台與光暈淡入, 氣泡由中間往兩側依序彈出(正中 0.15 秒、內側一對 0.35 秒、外側一對 0.55 秒)。
+  //   之後進入待機循環(105 BPM = 第 1 關速度, 8 拍一圈約 4.57 秒, 無縫): 每拍正中氣泡鼓一下並往外推一圈青色漣漪(每小節第 1 拍加亮);
+  //   兩側氣泡跟著小節輪流跳: 第 2、4 拍內側一對、第 3 拍外側一對; 五顆都慢速上下漂(8 拍一個來回, 相位錯開);
+  //   舞台裡一群小玻璃泡慢慢往上飄。氣泡本體的隨拍內緣變化照 drawBubble(beatPhase)。
+  //   底部一行小字: 電腦「按任意按鍵開始遊戲」/ 觸控「點擊畫面開始遊戲」, 深色膠囊襯底, 慢速明暗呼吸(1.6 秒一次)。
+  // state: { t(秒, 進入開始畫面起算, 網站暫停時凍結; 不傳 = 0) }
+  var TITLE_KV = {
+    bpm: 105, introSec: 1.2, loopBeats: 8, cy: 318, promptY: 584, promptPx: 22,   // 提示小字與下方署名(開始畫面 10px)隔約 40px
+    // dx = 離畫面中線的橫向距離; r = 畫出來的氣泡外緣半徑(像素); grp 0 = 正中 / 1 = 內側一對 / 2 = 外側一對
+    bubbles: [
+      { dx: -380, color: 'D', shape: 'circle', r: 50, grp: 2, ph: 0.0 },
+      { dx: -190, color: 'B', shape: 'square', r: 56, grp: 1, ph: 0.6 },
+      { dx: 0, color: 'A', shape: 'circle', r: 80, grp: 0, ph: 1.3 },
+      { dx: 190, color: 'C', shape: 'triangle', r: 56, grp: 1, ph: 2.0 },
+      { dx: 380, color: null, shape: 'circle', r: 50, grp: 2, ph: 2.7 }
+    ],
+    popAt: [0.15, 0.35, 0.55], popDur: 0.45
+  };
   function drawTitle(ctx, state) {
-    var s = state || {}, t = THEMES[1], b = LAYOUT.title;
+    var s = state || {}, t = THEMES[1], F = TITLE_KV, time = Math.max(0, num(s.t, 0)), i;
+    var bs = 60 / F.bpm, B = (time - F.introSec) / bs, started = B >= 0;
+    var ph = B - Math.floor(B), bar = ((Math.floor(B) % 4) + 4) % 4;
+    var kick = started ? Math.pow(1 - ph, 3) : 0;
+    var loopU = B / F.loopBeats;                     // 循環進度(整數 = 一圈), 漂浮與小泡都以它為週期, 所以 8 拍後無縫接回
+    var fade = easeOut(clamp01(time / 0.6)), cy = F.cy;
     ctx.save();
-    drawBackground(ctx, { level: 1 });
-    overlay(ctx, 0.2);
-    var deco = [[420, 232, 'A', 'circle'], [860, 208, 'C', 'circle'], [328, 472, null, 'circle'], [952, 480, 'B', 'circle']];
-    for (var i = 0; i < deco.length; i++) drawBubble(ctx, { level: 1, x: deco[i][0], y: deco[i][1], color: deco[i][2], shape: deco[i][3], life: 1 });
-    text(ctx, 'Bubble Tempo', CX, 140, 68, t.ink, 'center', { stroke: 'rgba(6,36,22,0.8)', strokeWidth: 9 });
-    text(ctx, '把氣泡染色、送進光門、對上拍子', CX, 304, 20, t.ink, 'center', { stroke: 'rgba(6,36,22,0.7)', strokeWidth: 5 });
-    drawButton(ctx, t, b.start, '開始', s.hover === 'start', { primary: true, px: 26 });
+    drawBackground(ctx, { level: 1, time: time, beat: started ? B : undefined });
+    // 舞台: 畫面上方往中間收的暗暈 + 深色橢圓
+    ctx.save();
+    ctx.globalAlpha = fade;
+    var vg = ctx.createRadialGradient(CX, cy - 40, 80, CX, cy - 40, 640);
+    vg.addColorStop(0, 'rgba(6,34,22,0.55)'); vg.addColorStop(0.6, 'rgba(6,34,22,0.3)'); vg.addColorStop(1, 'rgba(6,34,22,0)');
+    ctx.fillStyle = vg; ctx.fillRect(EX0, 0, EXW, H);
+    ctx.beginPath(); ctx.ellipse(CX, cy + 12, 560, 196, 0, 0, TAU);
+    var eg = ctx.createRadialGradient(CX, cy + 12, 60, CX, cy + 12, 560);
+    eg.addColorStop(0, 'rgba(10,52,34,0.78)'); eg.addColorStop(0.75, 'rgba(14,62,40,0.6)'); eg.addColorStop(1, 'rgba(20,74,48,0.42)');
+    ctx.fillStyle = eg; ctx.fill();
+    // 往上飄的小玻璃泡(在舞台橢圓內)
+    ctx.save();
+    ctx.beginPath(); ctx.ellipse(CX, cy + 12, 560, 196, 0, 0, TAU); ctx.clip();
+    for (i = 0; i < 18; i++) {
+      var n = 1 + (i % 2), q = loopU * n + hash01(i * 7.3);
+      q = q - Math.floor(q);
+      var px0 = CX + (hash01(i * 3.1) * 2 - 1) * 520, py0 = cy + 200 - 400 * q;
+      var pr = 3 + 5 * hash01(i * 5.7), pa = Math.sin(Math.PI * q) * 0.55;
+      var pxx = px0 + 10 * Math.sin(TAU * (loopU * 2 + hash01(i)));
+      circle(ctx, pxx, py0, pr); ctx.fillStyle = rgba(t.glass, pa * 0.18); ctx.fill();
+      ctx.lineWidth = 1.5; ctx.strokeStyle = rgba(t.glass, pa); ctx.stroke();
+      circle(ctx, pxx - pr * 0.35, py0 - pr * 0.35, Math.max(0.8, pr * 0.25)); ctx.fillStyle = rgba('#ffffff', pa); ctx.fill();
+    }
+    ctx.restore();
+    ctx.restore();
+    // 正中氣泡的青色光暈 + 光環 + 每拍往外推的漣漪
+    var mainR = F.bubbles[2].r, mp = clamp01((time - F.popAt[0]) / F.popDur), mainBob = 6 * Math.sin(TAU * loopU + F.bubbles[2].ph);
+    var my = cy + mainBob, hk = easeOut(mp);
+    if (hk > 0) {
+      ctx.save();
+      ctx.globalAlpha = hk;
+      var gr = mainR + 110 + 16 * kick;
+      var hg = ctx.createRadialGradient(CX, my, mainR * 0.6, CX, my, gr);
+      hg.addColorStop(0, rgba(t.beat, 0.75)); hg.addColorStop(0.45, rgba(t.beat, 0.32 + 0.2 * kick)); hg.addColorStop(1, rgba(t.beat, 0));
+      ctx.fillStyle = hg; circle(ctx, CX, my, gr); ctx.fill();
+      // 光環帶: 三圈同心, 內圈最亮(近白)
+      var rings = [[mainR + 8, 7, lighten(t.beat, 0.7)], [mainR + 20, 6, t.beat], [mainR + 31, 4, rgba(t.beat, 0.8)], [mainR + 40, 3, rgba(t.beat, 0.55)]];
+      for (i = 0; i < rings.length; i++) {
+        circle(ctx, CX, my, rings[i][0] * (1 + 0.03 * kick)); ctx.lineWidth = rings[i][1]; ctx.strokeStyle = rings[i][2]; ctx.stroke();
+      }
+      if (started) {
+        var down = bar === 0, wv = easeOut(ph), wr = mainR + 44 + (down ? 210 : 150) * wv;
+        ctx.shadowColor = t.beat; ctx.shadowBlur = 14;
+        circle(ctx, CX, my, wr); ctx.lineWidth = (down ? 8 : 5) * (1 - ph) + 1;
+        ctx.strokeStyle = rgba(down ? lighten(t.beat, 0.4) : t.beat, (down ? 0.9 : 0.6) * (1 - ph)); ctx.stroke();
+      }
+      ctx.restore();
+    }
+    // 五顆大氣泡(由外往內畫, 正中那顆最後蓋在最上面)
+    var order = [0, 4, 1, 3, 2];
+    for (var oi = 0; oi < order.length; oi++) {
+      var bb = F.bubbles[order[oi]];
+      var pp = clamp01((time - F.popAt[bb.grp]) / F.popDur);
+      if (pp <= 0) continue;
+      var hop = 0;
+      if (started && ph < 0.5 && ((bb.grp === 1 && (bar === 1 || bar === 3)) || (bb.grp === 2 && bar === 2))) hop = 16 * Math.sin(Math.PI * ph / 0.5);
+      var bx = CX + bb.dx, by = cy + 6 * Math.sin(TAU * loopU + bb.ph) - hop;
+      var sc = (bb.r / (RING_C + RING_TRACK / 2)) / BS * easeOutBack(pp);
+      if (bb.grp === 0) sc *= 1 + 0.05 * kick;
+      ctx.save();
+      ctx.globalAlpha = clamp01(pp * 2.5);
+      ctx.translate(bx, by); ctx.scale(sc, sc);
+      drawBubble(ctx, { level: 1, x: 0, y: 0, color: bb.color, shape: bb.shape, status: 'idle', life: 1, beatPhase: started ? ph : undefined });
+      ctx.restore();
+    }
+    // 底部提示小字(深色膠囊襯底, 慢速明暗呼吸)
+    var hint = TOUCH ? '點擊畫面開始遊戲' : '按任意按鍵開始遊戲', px = F.promptPx;
+    ctx.font = font(px);
+    var tw = ctx.measureText(hint).width, pa2 = 0.68 + 0.32 * (0.5 + 0.5 * Math.cos(time * TAU / 1.6));
+    ctx.globalAlpha = clamp01((time - 0.3) / 0.5);
+    roundRect(ctx, CX - tw / 2 - 18, F.promptY - px / 2 - 7, tw + 36, px + 14, (px + 14) / 2); ctx.fillStyle = 'rgba(6,30,20,0.55)'; ctx.fill();
+    ctx.globalAlpha *= pa2;
+    text(ctx, hint, CX, F.promptY + 1, px, t.ink, 'center', { stroke: 'rgba(6,36,22,0.8)', strokeWidth: 4 });
     ctx.restore();
   }
   // state: { survival, score, hover, cleared?(過完第 3 關), clearT?(過關後秒數), btnT?(「再玩一次」出現秒數, 預設 2.2) }
@@ -1792,7 +1884,7 @@
     var s = state || {}, t = THEMES[1];
     var lines = s.lines == null ? [] : (Array.isArray(s.lines) ? s.lines : [String(s.lines)]);
     if (!lines.length) return;
-    var px = 13, lh = 18, yLast = num(s.y, 698), maxW = 1200;
+    var px = num(s.px, 13), lh = num(s.lh, 18), yLast = num(s.y, 698), maxW = 1200;   // 開始畫面傳較小的 px / lh
     if (yLast - (lines.length - 1) * lh - lh / 2 < 604) lh = Math.max(14, (yLast - 604 - 7) / Math.max(1, lines.length - 1));
     ctx.save();
     ctx.font = font(px, 'normal');

@@ -4898,9 +4898,9 @@
   // ==================================================================
   // UI 命中與動作
   // ==================================================================
+  // v26: 開始畫面沒有按鈕, 點畫面任一處(靜音按鈕除外, 由呼叫端先判斷)就開始
   function titleLocate(p) {
-    if (inRect(p.x, p.y, L.title.start)) return 'start';
-    return null;
+    return inCanvasPos(p) ? 'start' : null;
   }
   function pauseMenuLocate(p) {
     var m = L.pauseMenu;
@@ -4951,7 +4951,7 @@
   }
 
   // ==================================================================
-  // 滑鼠事件(遊戲動作唯一輸入); 鍵盤只掛 Esc(暫停 / 繼續 / 取消確認), 不掛其他鍵與觸控事件
+  // 滑鼠事件(遊戲動作唯一輸入); 鍵盤只掛 Esc(暫停 / 繼續 / 取消確認)與開始畫面的「任意鍵開始」(v26), 不掛觸控事件(觸控由 touch.js 轉成滑鼠事件)
   // ==================================================================
   function logicalPos(e) {
     var rect = canvas.getBoundingClientRect();
@@ -5048,6 +5048,16 @@
   window.addEventListener('blur', function () {
     if (screen !== SCREEN.PLAYING || !game || game.paused || game.done) return;
     interruptToPause('blur');
+  });
+
+  // v26: 開始畫面按任意鍵開始(Esc 維持無作用; 單按修飾鍵、帶 Ctrl / Alt / Meta 的組合鍵、F1~F12 不算, 留給瀏覽器)
+  var TITLE_SKIP_KEYS = { Escape: 1, Esc: 1, Shift: 1, Control: 1, Alt: 1, Meta: 1, AltGraph: 1, CapsLock: 1, NumLock: 1, ScrollLock: 1, Fn: 1, OS: 1, ContextMenu: 1, Dead: 1, Unidentified: 1 };
+  window.addEventListener('keydown', function (e) {
+    if (screen !== SCREEN.TITLE || e.repeat || e.ctrlKey || e.altKey || e.metaKey) return;
+    if (TITLE_SKIP_KEYS[e.key] || e.keyCode === 27 || /^F[0-9]{1,2}$/.test(e.key || '')) return;
+    e.preventDefault();
+    ensureSoundInit();
+    doTitleAction('start');
   });
 
   // 通用鍵 Esc(只處理 Esc, 其他鍵一律不理也不 preventDefault): 遊戲中 → 暫停; 暫停選單 → 繼續; 確認面板 → 取消; 開始 / 結束畫面無作用
@@ -5174,8 +5184,8 @@
   }
   function renderScreens() {
     if (screen === SCREEN.TITLE) {
-      Art.drawTitle(ctx, { hover: hov.title });
-      Art.drawCredits(ctx, { lines: CREDITS_LINES });
+      Art.drawTitle(ctx, { t: titleT });
+      Art.drawCredits(ctx, { lines: CREDITS_LINES, px: 10, lh: 13 });
       drawMute({ level: 1, corner: true, hover: hov.muteBtn, muted: muted });
     } else if (screen === SCREEN.PLAYING) {
       renderGame(game, false);
@@ -5198,6 +5208,7 @@
   // 主迴圈
   // ==================================================================
   var lastTs = null, pvdxWas = false;
+  var titleT = 0, titleWas = false;   // v26: 開始畫面演出的時鐘(每次進開始畫面從 0 起; 網站暫停時凍結)
   function frame(ts) {
     if (lastTs == null) lastTs = ts;
     var rawDt = ts - lastTs;
@@ -5209,6 +5220,8 @@
       try { interruptToPause('blur'); } catch (e) { logErr(e); }
     }
     pvdxWas = pvdxP;
+    if (screen === SCREEN.TITLE) { if (!titleWas) titleT = 0; else if (!pvdxP) titleT += dt; }
+    titleWas = screen === SCREEN.TITLE;
     if (!pvdxP && screen === SCREEN.PLAYING && game && !game.paused && !game.done) {
       if (game.frameIntervalCount < 600) { game.frameIntervalSum += rawDt; game.frameIntervalCount++; }
       animT += dt; game.clipSec += Math.max(0, rawDt / 1000 - dt);       // 逐局時間核對用: dt 上限裁掉的秒數(切分頁、卡頓)
